@@ -17,11 +17,48 @@ export default defineConfig({
         '/javascript': [
           {
             text: '指南',
+            collapsible: true,
             items: [
-              { text: '/', link: '/javascript/introduction' }
+              { text: '指南', link: '/javascript/index' },
             ],
          }
         ],
+        '/vue': [
+          {
+            text: 'vue',
+            collapsible: true,
+            items: [
+              { text: 'Knowledge Points', link: '/vue/knowledge' },
+              { text: 'Source Code', link: '/vue/code' }
+            ]
+          }
+        ],
+        '/bundle': [
+          {
+            text: 'bundle',
+            items: [
+              { text: 'Webpack', link: '/bundle/webpack' },
+              { text: 'Rollup', link: '/bundle/rollup' },
+              { text: 'Vite', link: 'bundle/vite' }
+            ]
+          }
+        ],
+        '/algorithm': [
+          {
+            text: 'Data Structure',
+            collapsible: true,
+            items: [
+              { text: 'Array', link: '/algorithm/array' }
+            ]
+          },
+          {
+            text: 'Algorithm',
+            collapsed: true,
+            items: [
+              { text: 'Recursion', link: '/algorithm/recursion' }
+            ]
+          }
+        ]
       },
       nav: [
         { text: 'Javascript', link: '/javascript/index', activeMatch: '/javascript/' },
