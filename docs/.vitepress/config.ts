@@ -55,7 +55,8 @@ export default defineConfig({
             text: 'Algorithm',
             collapsed: true,
             items: [
-              { text: 'Recursion', link: '/algorithm/recursion' }
+              { text: 'Recursion', link: '/algorithm/recursion' },
+              { text: 'KMP', link: '/algorithm/KMP' },
             ]
           }
         ]
