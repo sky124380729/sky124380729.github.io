@@ -1,0 +1,17 @@
+{
+  // ============ EDITOR =============
+  "editor.detectIndentation": false,
+  "editor.tabSize": 2,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true,
+    "source.fixAll.stylelint": true
+  },
+  "editor.rulers": [80, 120],
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "files.eol": "\n",
+  "cSpell.words": [
+    "flexbox",
+    "tailwindcss",
+    "vitepress"
+  ]
+}

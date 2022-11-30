@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "vitepress dev docs",
+    "dev": "vitepress dev docs --port 4033",
     "build": "vitepress build docs",
     "serve": "vitepress serve docs"
   },
@@ -12,6 +12,16 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "autoprefixer": "^10.4.13",
+    "eslint": "^8.28.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-vue": "^9.8.0",
+    "postcss": "^8.4.19",
+    "prettier": "^2.8.0",
+    "tailwindcss": "^3.2.4",
+    "typescript": "^4.9.3",
     "vitepress": "1.0.0-alpha.29",
     "vue": "^3.2.45"
   },
@@ -21,5 +31,8 @@
         "@algolia/client-search"
       ]
     }
+  },
+  "engines": {
+    "node": ">=16.0.0"
   }
 }

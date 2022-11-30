@@ -1,6 +1,40 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
-    title: 'Levi Notebook',
-    base: '/notebook'
+    head: [
+      ['link', { rel: 'shortcut icon', href: '/favicon.ico'} ],
+    ],
+    lastUpdated: true,
+    title: 'LEVI NOTEBOOK',
+    base: '/notebook',
+    themeConfig: {
+      logo: '/logo.svg',
+      editLink: {
+        pattern: 'https://github.com/sky124380729/notebook/tree/master/docs/:path',
+        text: 'Edit this page on github'
+      },
+      sidebar: {
+        '/javascript': [
+          {
+            text: '指南',
+            items: [
+              { text: '/', link: '/javascript/introduction' }
+            ],
+         }
+        ],
+      },
+      nav: [
+        { text: 'Javascript', link: '/javascript/index', activeMatch: '/javascript/' },
+        { text: 'Typescript', link: '/typescript/index', activeMatch: '/typescript/' },
+        { text: 'Vue', link: '/vue/index', activeMatch: '/vue/' },
+        { text: 'React', link: '/react/index', activeMatch: '/react/' },
+        { text: 'Bundle', link: '/bundle/index', activeMatch: '/bundle/' },
+        { text: 'Algorithm', link: '/algorithm/index', activeMatch: '/algorithm/' },
+        { text: 'Links', link: '/links/index', activeMatch: '/links/' },
+      ],
+      footer: {
+        message: 'Released under the MIT License.',
+        copyright: 'Copyright © 2022-present Levi'
+      }
+    }
 })

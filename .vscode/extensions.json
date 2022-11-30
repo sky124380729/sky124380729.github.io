@@ -1,0 +1,14 @@
+{
+  "recommendations": [
+    // Eslint
+    "dbaeumer.vscode-eslint",
+    // Prettier
+    "esbenp.prettier-vscode",
+    // Editor Config
+    "editorconfig.editorconfig",
+    // volar
+    "Vue.volar",
+    // Code Spell Checker
+    "streetsidesoftware.code-spell-checker"
+  ]
+}
