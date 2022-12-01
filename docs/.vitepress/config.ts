@@ -55,8 +55,8 @@ export default defineConfig({
             text: 'Algorithm',
             collapsed: true,
             items: [
-              { text: 'Recursion', link: '/algorithm/recursion' },
-              { text: 'KMP', link: '/algorithm/KMP' },
+              { text: 'RECURSION', link: '/algorithm/recursion' },
+              { text: 'KMP', link: '/algorithm/kmp' },
             ]
           }
         ]
@@ -68,6 +68,7 @@ export default defineConfig({
         { text: 'React', link: '/react/index', activeMatch: '/react/' },
         { text: 'Bundle', link: '/bundle/index', activeMatch: '/bundle/' },
         { text: 'Algorithm', link: '/algorithm/index', activeMatch: '/algorithm/' },
+        { text: 'Mini Code', link: '/mini-code/index', activeMatch: '/mini-code/' },
         { text: 'Links', link: '/links/index', activeMatch: '/links/' },
       ],
       footer: {

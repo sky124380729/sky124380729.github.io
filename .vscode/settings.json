@@ -11,7 +11,10 @@
   "files.eol": "\n",
   "cSpell.words": [
     "flexbox",
+    "substr",
     "tailwindcss",
-    "vitepress"
+    "typeof",
+    "vitepress",
+    "vnode"
   ]
 }
