@@ -107,7 +107,7 @@ export default {
 
 > 这个`issue`由来已久，目前可以使用`redirect`的方案
 
-<div class="text-sm font-bold">redirect.vue</div>
+<div class="filename">redirect.vue</div>
 
 ```vue
 <script lang="ts" setup name="redirect">
@@ -129,7 +129,7 @@ onBeforeMount(() => {
 </script>
 ```
 
-<div class="text-sm font-bold">xxx.vue</div>
+<div class="filename">xxx.vue</div>
 
 ```vue
 <script lang="ts" setup>
@@ -318,7 +318,7 @@ export default defineComponent({
 
 ## 如何以方法的形式弹出`message`组件
 
-<div class="text-sm font-bold">createMessage.ts</div>
+<div class="filename">createMessage.ts</div>
 
 ```ts
 import { creteApp } from 'vue'
@@ -374,13 +374,13 @@ export default defineComponent({
 
 - 为了防止provide,inject的key重复，官方建议key使用Symbol
 
-<div class="text-sm font-bold">context.ts</div>
+<div class="filename">context.ts</div>
 
 ```ts
 export const MyKey = Symbol()
 ```
 
-<div class="text-sm font-bold">a.tsx</div>
+<div class="filename">a.tsx</div>
 
 ```tsx
 import { MyKey } from './context.ts'
@@ -392,7 +392,7 @@ export default defineComponent({
 })
 ```
 
-<div class="text-sm font-bold">b.tsx</div>
+<div class="filename">b.tsx</div>
 
 ```tsx
 import { MyKey } from './context.ts'
