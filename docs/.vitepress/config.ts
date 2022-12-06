@@ -6,7 +6,7 @@ export default defineConfig({
     ],
     lastUpdated: true,
     title: 'LEVI NOTEBOOK',
-    base: '/notebook',
+    // base: '/notebook',
     themeConfig: {
       logo: '/logo.svg',
       editLink: {
