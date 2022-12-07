@@ -73,6 +73,8 @@ export default defineConfig({
         { text: 'Algorithm', link: '/algorithm/index', activeMatch: '/algorithm/' },
         { text: 'Mini Code', link: '/mini-code/index', activeMatch: '/mini-code/' },
         { text: 'Links', link: '/links/index', activeMatch: '/links/' },
+        { text: 'RegExp', link: '/reg-exp/index', activeMatch: '/reg-exp/' },
+        { text: 'Interview ', link: '/interview/index', activeMatch: '/interview/' },
       ],
       footer: {
         message: 'Released under the MIT License.',
