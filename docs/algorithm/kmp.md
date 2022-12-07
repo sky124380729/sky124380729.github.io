@@ -10,11 +10,17 @@ Knuth-Morris-Pratt 字符串查找算法，简称为 KMP算法，这个算法由
 
 常用于在一个文本串 S 内查找一个模式串 P 的出现位置
 
+KMP的主要思想是**当出现字符串不匹配时，可以知道一部分之前已经匹配的文本内容，可以利用这些信息避免从头再去做匹配了**
+
+所以如何记录已经匹配的文本内容，是KMP的重点，也是next数组肩负的重任
+
 ## 时间复杂度
 
 在一个文本串 S 内查找一个模式串 P 的出现位置的暴力解法时间复杂度为O(m * n)，KMP算法时间复杂度为O(m + n)
 
-## 前缀表
+## 前缀表（prefix table）
+
+前缀表是用来回退的，它记录了模式串与主串(文本串)不匹配的时候，模式串应该从哪里开始重新匹配
 
 前缀：包含首字母，不包含尾字母的连续子串
 
@@ -29,6 +35,8 @@ const s = 'aabaabaaf'
 const p = 'aabaaf'
 ```
 
+![kmp](/assets/kmp.gif)
+
 模式串的前缀表
 
 | 子串   | 前缀表               | 后缀表                | 最长公共前后缀 |
@@ -42,6 +50,10 @@ const p = 'aabaaf'
 
 这个之上而下的0 -> 1 -> 0 -> 1 -> 2 -> 0就是 `aabaaf` 的 `前缀表`
 
+![kmp](/assets/kmp3.png)
+
+可以看出模式串与前缀表对应位置的数字表示的就是：**下标i之前（包括i）的字符串中，有多大长度的相同前缀后缀**
+
 ## next数组
 
 - next数组有很多种表示方法:
@@ -54,7 +66,7 @@ const p = 'aabaaf'
 
   设`j`为前缀末尾位置，设`i`为后缀末尾位置
 
-  这里的`j`其实也代表包含`i`之前包括`i`子串的最长公共前后缀的长度
+  这里的`j`其实也代表下标`i`之前包括`i`子串的最长公共前后缀的长度
 
   :::details
   关于指针回溯求next的理解：
@@ -70,11 +82,11 @@ const p = 'aabaaf'
   因为之前的结果不为0时，前后缀有相等的部分，所以j所指的实际是与当前值相等的前缀，可视为将前缀从前面拖了过来，就不必将指针从前缀开始匹配了，所以之前的结果是可以传递的。
   :::
 
-  <<< @/coding/algorithm/kmp.js#getNext
+  <<< @/snippets/algorithm/kmp.js#getNext
 
   <script setup>
   import { ref, watch } from 'vue'
-  import { getNext } from '../coding/algorithm/kmp.js'
+  import { getNext } from '../snippets/algorithm/kmp.js'
   const input = ref(null)
   const output = ref(null)
   watch(input, (val) => {
@@ -101,3 +113,5 @@ const p = 'aabaaf'
       {{ item }}
     </li>
   </TransitionGroup>
+
+![kmp](/assets/kmp2.gif)

@@ -13,6 +13,9 @@ export default defineConfig({
         pattern: 'https://github.com/sky124380729/notebook/tree/master/docs/:path',
         text: 'Edit this page on github'
       },
+      socialLinks: [
+        { icon: 'github', link: 'https://github.com/sky124380729/notebook' }
+      ],
       sidebar: {
         '/javascript': [
           {
