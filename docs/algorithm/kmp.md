@@ -1,5 +1,7 @@
 # KMP
 
+[[toc]]
+
 ## KMP是什么
 
 Knuth-Morris-Pratt 字符串查找算法，简称为 KMP算法，这个算法由 Donald Knuth、Vaughan Pratt、James H. Morris 三人于 1977 年联合发表，故取这 3 人的姓氏命名此算法。
@@ -68,25 +70,34 @@ const p = 'aabaaf'
   因为之前的结果不为0时，前后缀有相等的部分，所以j所指的实际是与当前值相等的前缀，可视为将前缀从前面拖了过来，就不必将指针从前缀开始匹配了，所以之前的结果是可以传递的。
   :::
 
-  ```js
-  function getNext(str) {
-    // 初始化
-    const next = [0]
-    let j = 0
-    for(let i = 1; i < str.length; i++) {
-      // 处理字符串不相同的情况
-      while(j > 0 && str[i] !== str[j]) {
-        j = next[j - 1]
-      }
-      // 处理字符串相同的情况
-      if(str[i] === str[j]) {
-        // 因为j代表了i之前包含i子串的最长公共前缀的长度
-        // 所以当字符串相同的时候，需要对j + 1
-        j++
-      }
-      // 更新next数组
-      next[i] = j
-    }
-    return next
+  <<< @/coding/algorithm/kmp.js#getNext
+
+  <script setup>
+  import { ref, watch } from 'vue'
+  import { getNext } from '../coding/algorithm/kmp.js'
+  const input = ref(null)
+  const output = ref(null)
+  watch(input, (val) => {
+    output.value = getNext(val)
+  })
+  </script>
+  <style>
+  .list-enter-active,
+  .list-leave-active {
+    transition: all 0.5s ease;
   }
-  ```
+  .list-enter-from,
+  .list-leave-to {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  </style>
+  Let's have a try!
+  <div class="mb-2"><span class="inline-flex w-12">输入:</span><input class="px-3 border-2 border-solid rounded border-blue" v-model="input"/></div>
+  <!-- <div class="mb-2">输出: <input class="px-3 border-2 border-solid rounded border-blue" readonly v-model="output"/></div> -->
+  <TransitionGroup name="list" tag="ul" class="!pl-0">
+    <li key="output" class="inline-flex w-12 ml-0 list-none">输出：</li>
+    <li class="inline-flex px-2 mr-2 list-none border-2 border-solid rounded border-purple" v-for="item in output" :key="item">
+      {{ item }}
+    </li>
+  </TransitionGroup>

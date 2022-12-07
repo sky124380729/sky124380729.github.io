@@ -10,6 +10,7 @@
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
   "files.eol": "\n",
   "cSpell.words": [
+    "endregion",
     "flexbox",
     "substr",
     "tailwindcss",
