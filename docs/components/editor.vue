@@ -41,7 +41,7 @@ onMounted(async () => {
       fontSize: 12,
       tabSize: 2,
       insertSpaces: true,
-      readOnly: true,
+      readOnly: false,
       fontFamily: 'Cascadia Code',
       theme: 'BlackTheme'
     })
