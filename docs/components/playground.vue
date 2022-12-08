@@ -5,21 +5,21 @@
       <slot></slot>
       <n-divider>console</n-divider>
       <!-- TODO: 这里后面根据实际输出结果，\n 分割加上transition-group，还可以搞渐变色哈哈 -->
-      <pre class="text-pink text-xs">> i'm output</pre>
-      <pre class="text-purple text-xs">> i'm output</pre>
-      <pre class="text-pink text-xs">> i'm output</pre>
-      <pre class="text-purple text-xs">> {{ output }}</pre>
+      <pre class="text-xs text-pink">> i'm output</pre>
+      <pre class="text-xs text-purple">> i'm output</pre>
+      <pre class="text-xs text-pink">> i'm output</pre>
+      <pre class="text-xs text-purple">> {{ output }}</pre>
       <template #footer>
-        <n-button @click="run">Run</n-button>
+        <button @click="run">Run</button>
       </template>
     </n-drawer-content>
   </n-drawer>
-  <n-button @click="showMe">Let's run it!</n-button>
+  <button @click="showMe">Let's run it!</button>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import { NButton, NDivider, NDrawer, NDrawerContent } from 'naive-ui'
+import { NDivider, NDrawer, NDrawerContent } from 'naive-ui'
 
 const visible = ref(false)
 

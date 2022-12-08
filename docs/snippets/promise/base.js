@@ -40,6 +40,6 @@ class MyPromise {
     }
   }
 }
-// #regionend promise
+// #endregion promise
 
 export default MyPromise

@@ -1,5 +1,6 @@
 import DefaultTheme from 'vitepress/theme'
 import { Playground } from '../../components'
+import './useWork'
 import './custom.css'
 
 export default {

@@ -2,6 +2,12 @@
 
 [[toc]]
 
+<script>
+import Editor from '../components/editor.vue'
+import code from '../snippets/promise/base.js?raw'
+</script>
+<Editor :code="code" />
+
 ## 基本概念
 
 - Promise 就是一个类 在执行这个类的时候 需要传递一个执行器进去 执行器会立即执行
@@ -44,7 +50,7 @@ promise.then(
 </script>
 
 <playground>
-  <pre class="text-xs text-purple" style="font-family:PingFang SC">{{ MyPromise }}</pre>
+  <pre class="text-xs text-purple" style="font-family:Casadia Code">{{ MyPromise }}</pre>
   <p>这里后面集成monaco-editor</p>
 </playground>
 
