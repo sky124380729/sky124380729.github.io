@@ -1,4 +1,11 @@
 import DefaultTheme from 'vitepress/theme'
+import { Playground } from '../../components'
 import './custom.css'
 
-export default DefaultTheme
+export default {
+  ...DefaultTheme,
+  enhanceApp(ctx) {
+    DefaultTheme.enhanceApp(ctx)
+    ctx.app.component('Playground', Playground)
+  }
+}

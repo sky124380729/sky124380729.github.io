@@ -35,5 +35,8 @@
   },
   "engines": {
     "node": ">=16.0.0"
+  },
+  "dependencies": {
+    "naive-ui": "^2.34.2"
   }
 }

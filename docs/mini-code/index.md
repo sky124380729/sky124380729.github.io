@@ -6,5 +6,6 @@
 
 对于源码，我将尽可能注释每一行代码，并以文章讲述原理与实现过程。目前已实现列表为:
 
-- [mini-vue2](./mini-vue2.md)
-- [mini-vue3](./mini-vue3.md)
+- [Vue2](./mini-vue2.md)
+- [Vue3](./mini-vue3.md)
+- [Promise](./promise.md)
