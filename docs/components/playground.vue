@@ -23,9 +23,8 @@
 import { ref, computed } from 'vue'
 import Editor from './editor.vue'
 
-const modules = import.meta.glob('../public/snippets/**/*.js')
+const modules = import.meta.glob('../snippets/**/*.js', { import: 'default' })
 
-// TODO: import.glob.eager动态加载所有js，外部只需要传模块就可以，提供执行环境
 const props = defineProps({
   code: {
     type: Function,
@@ -72,9 +71,9 @@ const showMe = () => {
 }
 
 const run = async () => {
-  modules['../public/snippets/base.js']().then((mod: any) => {
+  modules['../snippets/promise/base.js']().then((mod: any) => {
     const runner = new Function(code.value!)()
-    runner(mod.default)
+    runner(mod)
   })
 }
 
