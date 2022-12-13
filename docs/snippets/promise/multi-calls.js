@@ -15,10 +15,12 @@ class MyPromise {
   value = undefined
   // 失败后的原因
   reason = undefined
-  // 成功回调 // [!code ++]
-  successCallback = undefined // [!code ++]
-  // 失败回调 // [!code ++]
-  failCallback = undefined // [!code ++]
+  // 成功回调
+  // successCallback = undefined // [!code --]
+  successCallback = [] // [!code ++]
+  // 失败回调
+  // failCallback = undefined // [!code --]
+  failCallback = [] // [!code ++]
   resolve = (value) => {
     // 如果状态不是等待，阻止程序向下执行
     if (this.status !== PENDING) return
@@ -26,8 +28,9 @@ class MyPromise {
     this.status = FULFILLED
     // 保存成功之后的值
     this.value = value
-    // 判断成功回调是否存在 如果存在 调用 // [!code ++]
-    this.successCallback && this.successCallback(this.value) // [!code ++]
+    // 判断成功回调是否存在 如果存在 调用
+    // this.successCallback && this.successCallback(this.value) // [!code --]
+    while (this.successCallback.length) this.successCallback.shift()(this.value) // [!code ++]
   }
   reject = (reason) => {
     // 如果状态不是等待，阻止程序向下执行
@@ -36,8 +39,9 @@ class MyPromise {
     this.status = REJECTED
     // 保存失败后的原因
     this.reason = reason
-    // 判断失败回调是否存在 如果存在 调用 // [!code ++]
-    this.failCallback && this.failCallback(this.reason) // [!code ++]
+    // 判断失败回调是否存在 如果存在 调用
+    // this.failCallback && this.failCallback(this.reason) // [!code --]
+    while (this.failCallback.length) this.failCallback.shift()(this.value) // [!code ++]
   }
   then(successCallback, failCallback) {
     // 判断状态
@@ -47,9 +51,11 @@ class MyPromise {
       failCallback(this.reason)
     } else {
       // 等待
-      // 将成功回调和失败回调存储起来 // [!code ++]
-      this.successCallback = successCallback // [!code ++]
-      this.failCallback = failCallback // [!code ++]
+      // 将成功回调和失败回调存储起来
+      // this.successCallback = successCallback // [!code --]
+      this.successCallback.push(successCallback) // [!code ++]
+      // this.failCallback = failCallback // [!code --]
+      this.failCallback.push(failCallback) // [!code ++]
     }
   }
 }
@@ -62,7 +68,13 @@ export function testCase(MyPromise) {
     }, 2000)
   })
   promise.then((value) => {
-    console.log(value)
+    console.log(value, 1)
+  })
+  promise.then((value) => {
+    console.log(value, 2)
+  })
+  promise.then((value) => {
+    console.log(value, 3)
   })
 }
 

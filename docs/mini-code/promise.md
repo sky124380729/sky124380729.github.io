@@ -2,8 +2,6 @@
 
 [[toc]]
 
-
-
 ## 基本概念
 
 - Promise 就是一个类 在执行这个类的时候 需要传递一个执行器进去 执行器会立即执行
@@ -26,6 +24,8 @@
 <script setup>
 import { testCase as baseTest } from '../snippets/promise/base.js'
 import { testCase as asyncTest } from '../snippets/promise/async.js'
+import { testCase as multiCallsTest } from '../snippets/promise/multi-calls.js'
+import { testCase as chainTest } from '../snippets/promise/chain.js'
 </script>
 
 ## 最基本的实现
@@ -41,6 +41,22 @@ import { testCase as asyncTest } from '../snippets/promise/async.js'
 <<< @/snippets/promise/async.js#promise
 
 <playground module="promise/async" :code="asyncTest"></playground>
+
+## 多次调用
+
+一个promise示例，可能多次调用then方法，如果不对代码进行改造，只会执行最后一个then的内容
+
+<<< @/snippets/promise/multi-calls.js#promise
+
+<playground module="promise/multi-calls" :code="multiCallsTest"></playground>
+
+## 支持链式调用
+
+promise示例不仅可以多次调用，还支持链式调用
+
+<<< @/snippets/promise/chain.js#promise
+
+<playground module="promise/chain" :code="chainTest"></playground>
 
 ## 完整的代码
 
