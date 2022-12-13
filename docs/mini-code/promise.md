@@ -38,7 +38,7 @@ import { testCase as asyncTest } from '../snippets/promise/async.js'
 
 以上代码，对于executor中的函数是异步的时候，就不生效了，这个时候我们要增加对于异步的处理
 
-<<< @/snippets/promise/async.js
+<<< @/snippets/promise/async.js#promise
 
 <playground module="promise/async" :code="asyncTest"></playground>
 
