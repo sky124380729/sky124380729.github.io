@@ -16,6 +16,7 @@
     "substr",
     "tailwindcss",
     "typeof",
+    "unref",
     "vitepress",
     "vnode"
   ]

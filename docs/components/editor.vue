@@ -1,57 +1,64 @@
 <template>
   <div ref="editorRef" class="editor"></div>
-  <button @click="run">run</button>
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, onMounted, nextTick, PropType } from 'vue'
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
+import { ref, unref, onMounted } from 'vue'
+import { basicSetup, EditorView } from 'codemirror'
+import { ViewUpdate } from '@codemirror/view'
+import { javascript } from '@codemirror/lang-javascript'
 
 const props = defineProps({
   code: {
-    type: String as PropType<string>
+    type: [String, Function]
   }
 })
+
+const emit = defineEmits(['update:code'])
+
 const editorRef = ref(null)
-const run = () => {
-  // eval(props.code!)
-  console.log('假装我run了')
+
+const code = ref(props.code)
+
+// 初始化编译器
+const initEditor = () => {
+  // TODO: 这里的doc是不会发生变化的，后续用state进行更新
+  new EditorView({
+    doc: unref(code)?.toString(),
+    extensions: [basicSetup, javascript(), getEditorTheme(), EditorView.updateListener.of(onEditorUpdate)],
+    parent: editorRef.value!
+  })
 }
-onMounted(async () => {
-  await nextTick()
-  if (editorRef.value) {
-    monaco.editor.defineTheme('BlackTheme', {
-      base: 'vs-dark',
-      inherit: true,
-      rules: [],
-      colors: {
-        // 相关颜色属性配置
-        'editor.foreground': '#00c4ff'
-        // 'editor.background': '#3e414a', //背景色
-        // 'editorCursor.foreground': '#8B0000',
-        // 'editor.lineHighlightBackground': '#0000FF20',
-        // 'editorLineNumber.foreground': '#008800',
-        // 'editor.selectionBackground': '#88000030',
-        // 'editor.inactiveSelectionBackground': '#88000015'
-      }
-    })
-    monaco.editor.create(editorRef.value, {
-      value: props.code,
-      language: 'javascript',
-      fontSize: 12,
-      tabSize: 2,
-      insertSpaces: true,
-      readOnly: false,
-      fontFamily: 'Cascadia Code',
-      theme: 'BlackTheme'
-    })
-  }
+
+// 编译器代码变更的回调
+const onEditorUpdate = (v: ViewUpdate) => {
+  emit('update:code', v.state.doc.toString())
+}
+
+// 初始化编译器编译器主题
+const getEditorTheme = () => {
+  return EditorView.theme({
+    '.cm-scroller': {
+      'font-family': 'Cascadia Code, PingFang SC, Microsoft YaHei'
+    },
+    '.cm-gutterElement': {
+      'font-size': '12px'
+    },
+    '.cm-line': {
+      'font-size': '12px'
+    }
+  })
+}
+
+onMounted(() => {
+  initEditor()
 })
 </script>
 
 <style lang="scss">
 .editor {
-  width: 100%;
-  height: 500px;
+  min-height: 200px;
+  max-height: 300px;
+  overflow-y: scroll;
 }
 </style>

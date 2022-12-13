@@ -2,11 +2,18 @@
 
 [[toc]]
 
-<script>
+<!-- <script>
 import Editor from '../components/editor.vue'
-import code from '../snippets/promise/base.js?raw'
+import { testCase } from '../snippets/promise/base.js'
+
 </script>
-<Editor :code="code" />
+<Editor module="../snippets/promise/base.js" :code="testCase" /> -->
+
+<script>
+import { testCase } from '../snippets/promise/base.js'
+</script>
+
+<playground :code="testCase"></playground>
 
 ## 基本概念
 
@@ -32,27 +39,10 @@ import code from '../snippets/promise/base.js?raw'
 <<< @/snippets/promise/base.js#promise
 
 <script setup>
-import MyPromise from '../snippets/promise/base.js'
-
-let promise = new MyPromise((resolve, reject) => {
-  resolve('成功')
-  reject('失败')
-})
-promise.then(
-  (value) => {
-    console.log(value)
-  },
-  (reason) => {
-    console.log(reason)
-  }
-)
-
+// import MyPromise from '../snippets/promise/base.js'
 </script>
 
-<playground>
-  <pre class="text-xs text-purple" style="font-family:Casadia Code">{{ MyPromise }}</pre>
-  <p>这里后面集成monaco-editor</p>
-</playground>
+<playground :code="testCase"></playground>
 
 ## 加入异步
 
