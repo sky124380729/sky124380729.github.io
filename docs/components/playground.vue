@@ -16,16 +16,18 @@
       </template>
     </n-drawer-content>
   </n-drawer>
-  <button @click="showMe">Let's run it!</button>
+  <n-button @click="showMe">> Let's run it!</n-button>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { dynamicImport } from '../utils'
 import Editor from './editor.vue'
 
-const modules = import.meta.glob('../snippets/**/*.js', { import: 'default' })
-
 const props = defineProps({
+  module: {
+    type: String
+  },
   code: {
     type: Function,
     default: () =>
@@ -67,11 +69,16 @@ console.log = function (...args) {
 const visible = ref(false)
 
 const showMe = () => {
+  log.value = ''
   visible.value = true
 }
 
 const run = async () => {
-  modules['../snippets/promise/base.js']().then((mod: any) => {
+  if (!props.module) {
+    return console.warn('没有module')
+  }
+  const module = dynamicImport(props.module)
+  module().then((mod) => {
     const runner = new Function(code.value!)()
     runner(mod)
   })

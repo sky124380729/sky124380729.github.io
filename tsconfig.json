@@ -13,6 +13,9 @@
     "esModuleInterop": true,
     "lib": ["ESNext", "DOM"],
     "types": ["naive-ui/volar"],
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "#/*": ["snippets/*"]
+    }
   }
 }
