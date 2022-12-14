@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --vp-code-line-diff-add-color: rgba(125, 191, 123, 0.15);
+  --vp-code-line-diff-remove-color: rgba(255, 87, 87, 0.15);
+}
+
 .text-gradient-error {
   color: #0000;
   -webkit-background-clip: text;

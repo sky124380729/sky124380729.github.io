@@ -11,14 +11,10 @@ export const dynamicImport = (module?: string) => {
       const matchKey = matchKeys[0]
       return modules[matchKey]
     }
-    // specify a directory to extract index.vue or index.tsx
+    // specify a directory to extract index.js or index.ts
     // extract the first directory matched
     if (matchKeys?.length > 1) {
-      const matchKey = matchKeys
-        .filter((key) => {
-          return /\/index\.js|ts$/.test(key)
-        })
-        .sort((a, b) => a.length - b.length)[0]
+      const matchKey = matchKeys.sort((a, b) => a.length - b.length)[0]
       return modules[matchKey]
     }
   }

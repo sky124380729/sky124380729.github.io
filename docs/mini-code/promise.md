@@ -26,6 +26,8 @@ import { testCase as baseTest } from '../snippets/promise/base.js'
 import { testCase as asyncTest } from '../snippets/promise/async.js'
 import { testCase as multiCallsTest } from '../snippets/promise/multi-calls.js'
 import { testCase as chainTest } from '../snippets/promise/chain.js'
+import { testCase as chainAsyncTest } from '../snippets/promise/chain-async.js'
+import { testCase as chainCycleTest } from '../snippets/promise/chain-cycle.js'
 </script>
 
 ## 最基本的实现
@@ -57,6 +59,20 @@ promise示例不仅可以多次调用，还支持链式调用
 <<< @/snippets/promise/chain.js#promise
 
 <playground module="promise/chain" :code="chainTest"></playground>
+
+## then回调中返回promise的情况
+
+<<< @/snippets/promise/chain-async.js#promise
+
+<playground module="promise/chain-async" :code="chainAsyncTest"></playground>
+
+## 处理promise循环调用自身的边界逻辑判断
+
+<<< @/snippets/promise/chain-cycle.js#promise
+
+<playground module="promise/chain-cycle" :code="chainCycleTest"></playground>
+
+## 未完待续~
 
 ## 完整的代码
 
