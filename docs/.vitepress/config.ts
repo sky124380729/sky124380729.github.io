@@ -17,32 +17,68 @@ export default defineConfig({
         { icon: 'github', link: 'https://github.com/sky124380729/notebook' }
       ],
       sidebar: {
-        '/javascript': [
+        '/language': [
           {
-            text: '指南',
+            text: 'Javascript',
             collapsible: true,
             items: [
-              { text: '指南', link: '/javascript/index' },
+              { text: 'knowledge', link: '/language/javascript/index' },
             ],
-         }
-        ],
-        '/vue': [
+          },
           {
-            text: 'vue',
+            text: 'Typescript',
             collapsible: true,
             items: [
-              { text: 'Knowledge Points', link: '/vue/knowledge' },
-              { text: 'Source Code', link: '/vue/code' }
+              { text: 'knowledge', link: '/language/typescript/index' },
+            ],
+          }
+        ],
+        '/framework': [
+          {
+            text: 'Vue',
+            collapsible: true,
+            items: [
+              { text: 'Knowledge Points', link: '/framework/vue/knowledge' },
+              { text: 'Source Code', link: '/framework/vue/code' }
+            ]
+          },
+          {
+            text: 'React',
+            collapsible: true,
+            items: [
+              { text: 'Knowledge Points', link: '/framework/react/knowledge' },
+              { text: 'Source Code', link: '/framework/react/code' }
+            ]
+          },
+          {
+            text: 'Micro Frontend',
+            collapsible: true,
+            items: [
+              { text: 'Single SPA', link: '/framework/micro-frontend/single-spa' },
+              { text: 'Module Federation', link: '/framework/micro-frontend/module-federation' },
             ]
           }
         ],
         '/bundle': [
           {
-            text: 'bundle',
+            text: 'Webpack',
             items: [
-              { text: 'Webpack', link: '/bundle/webpack' },
-              { text: 'Rollup', link: '/bundle/rollup' },
-              { text: 'Vite', link: 'bundle/vite' }
+              { text: 'information', link: '/bundle/webpack/information' },
+              { text: 'config reference', link: '/bundle/webpack/config' },
+            ]
+          },
+          {
+            text: 'Rollup',
+            items: [
+              { text: 'information', link: '/bundle/rollup/information' },
+              { text: 'config reference', link: '/bundle/rollup/config' },
+            ]
+          },
+          {
+            text: 'Vite',
+            items: [
+              { text: 'information', link: '/bundle/vite/information' },
+              { text: 'config reference', link: '/bundle/vite/config' },
             ]
           }
         ],
@@ -65,10 +101,8 @@ export default defineConfig({
         ]
       },
       nav: [
-        { text: 'Javascript', link: '/javascript/index', activeMatch: '/javascript/' },
-        { text: 'Typescript', link: '/typescript/index', activeMatch: '/typescript/' },
-        { text: 'Vue', link: '/vue/index', activeMatch: '/vue/' },
-        { text: 'React', link: '/react/index', activeMatch: '/react/' },
+        { text: 'Language', link: '/language/index', activeMatch: '/language/' },
+        { text: 'Framework', link: '/framework/index', activeMatch: '/framework/'  },
         { text: 'Bundle', link: '/bundle/index', activeMatch: '/bundle/' },
         { text: 'Algorithm', link: '/algorithm/index', activeMatch: '/algorithm/' },
         { text: 'Mini Code', link: '/mini-code/index', activeMatch: '/mini-code/' },
