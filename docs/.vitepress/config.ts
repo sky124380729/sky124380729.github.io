@@ -87,14 +87,15 @@ export default defineConfig({
             text: 'Data Structure',
             collapsible: true,
             items: [
-              { text: 'Array', link: '/algorithm/array' }
+              { text: 'Stack', link: '/algorithm/stack' },
+              { text: 'Queue', link: '/algorithm/queue' },
             ]
           },
           {
             text: 'Algorithm',
             collapsed: true,
             items: [
-              { text: 'RECURSION', link: '/algorithm/recursion' },
+              { text: 'Recursion', link: '/algorithm/recursion' },
               { text: 'KMP', link: '/algorithm/kmp' },
             ]
           }
