@@ -51,6 +51,13 @@ export default defineConfig({
             ]
           },
           {
+            text: 'Miniprogram',
+            collapsed: true,
+            items: [
+              { text: 'Knowledge Points', link: '/framework/miniprogram/knowledge' },
+            ]
+          },
+          {
             text: 'Micro Frontend',
             collapsible: true,
             items: [
