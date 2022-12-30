@@ -97,12 +97,14 @@ export default defineConfig({
               { text: 'Stack', link: '/algorithm/stack' },
               { text: 'Queue', link: '/algorithm/queue' },
               { text: 'Heap', link: '/algorithm/heap' },
+              { text: 'Binary Tree', link: '/algorithm/binary-tree' },
             ]
           },
           {
             text: 'Algorithm',
             collapsed: true,
             items: [
+              { text: 'Sort', link: '/algorithm/sort' },
               { text: 'Recursion', link: '/algorithm/recursion' },
               { text: 'KMP', link: '/algorithm/kmp' },
             ]

@@ -77,10 +77,11 @@ const run = async () => {
   if (!props.module) {
     return console.warn('没有module')
   }
-  const module = dynamicImport(props.module)
-  module().then((mod) => {
+  const [path, mod = 'default'] = props.module.split('#')
+  const module = dynamicImport(path)
+  module().then((m:any) => {
     const runner = new Function(code.value!)()
-    runner(mod)
+    runner(m[mod])
   })
 }
 

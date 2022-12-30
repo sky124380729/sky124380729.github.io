@@ -1,6 +1,6 @@
 export const dynamicImport = (module?: string) => {
   if (module) {
-    const modules = import.meta.glob('../snippets/**/*.{ts,js}', { import: 'default' })
+    const modules = import.meta.glob('../snippets/**/*.{ts,js}')
     const keys = Object.keys(modules)
     const matchKeys = keys.filter((key) => {
       const k = key.replace('../snippets', '')
