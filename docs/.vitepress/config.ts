@@ -96,6 +96,7 @@ export default defineConfig({
             items: [
               { text: 'Stack', link: '/algorithm/stack' },
               { text: 'Queue', link: '/algorithm/queue' },
+              { text: 'Heap', link: '/algorithm/heap' },
             ]
           },
           {
