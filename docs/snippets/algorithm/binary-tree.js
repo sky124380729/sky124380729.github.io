@@ -44,8 +44,8 @@ export const TreeNode = (val, left, right) => {
 export const preorder1 = (root) => {
   if (!root) return
   console.log(root.val)
-  if (root.left) preorder1(root.left)
-  if (root.right) preorder1(root.rights)
+  preorder1(root.left)
+  preorder1(root.rights)
 }
 // #endregion preorder-recursive
 
@@ -68,9 +68,9 @@ export const preorder2 = (root) => {
 // #region inorder-recursive
 export const inorder1 = (root) => {
   if (!root) return
-  if (root.left) inorder1(root.left)
+  inorder1(root.left)
   console.log(root.val)
-  if (root.right) inorder1(root.rights)
+  inorder1(root.rights)
 }
 // #endregion inorder-recursive
 
@@ -89,6 +89,25 @@ export const inorder2 = (root) => {
     p = n.right
   }
 }
+
+export const inorder3 = (root) => {
+  if (!root) return
+  const stack = []
+  let p = root
+  while (stack.length || p) {
+    if (p) {
+      stack.push(p)
+      // 左
+      p = p.left
+    } else {
+      // 弹出右
+      p = stack.pop()
+      console.log(p.val)
+      // 右
+      p = p.right
+    }
+  }
+}
 // #endregion inorder-non-recursive
 
 /* ============== 后序遍历 ============== */
@@ -96,8 +115,8 @@ export const inorder2 = (root) => {
 // #region postorder-recursive
 export const postorder1 = (root) => {
   if (!root) return
-  if (root.left) postorder1(root.left)
-  if (root.right) postorder1(root.rights)
+  postorder1(root.left)
+  postorder1(root.rights)
   console.log(root.val)
 }
 // #endregion postorder-recursive
