@@ -1,19 +1,32 @@
 # Source Code
 
+Vue是一套`运行时` + `编译时`框架
+
+## render函数
+
+<<< @/public/demos/render.html
+
+<iframe width="100%" src="/demos/render.html"></iframe>
+
+## compile函数
+
+把template中的html编译成render函数
+
+<<< @/public/demos/compiler.html
+
+<iframe width="100%" src="/demos/compiler.html"></iframe>
+
+## reactivity
+
+<<< @/public/demos/reactivity/reactive.html
+
+<iframe width="100%" src="/demos/reactivity/reactive.html"></iframe>
+
 ## vue2
 
 我们终于看到了 Vue 的庐山真面目，它实际上就是一个用 Function 实现的类，我们只能通过 new Vue 去实例化它
 
-```js
-function Vue (options) {
-  if (process.env.NODE_ENV !== 'production' &&
-    !(this instanceof Vue)
-  ) {
-    warn('Vue is a constructor and should be called with the `new` keyword')
-  }
-  this._init(options)
-}
-```
+<<< @/snippets/framework/vue2.js
 
 Virtual DOM 除了它的数据结构的定义，映射到真实的 DOM 实际上要经历 VNode 的 create、diff、patch 等过程。那么在 Vue.js 中，VNode 的 create 是通过之前提到的 createElement 方法创建的，我们接下来分析这部分的实现。
 
