@@ -22,6 +22,10 @@ Vue是一套`运行时` + `编译时`框架
 
 <iframe width="100%" src="/demos/reactivity/reactive.html"></iframe>
 
+## test
+
+<<< @/../../vue-next-mini/test.js
+
 ## vue2
 
 我们终于看到了 Vue 的庐山真面目，它实际上就是一个用 Function 实现的类，我们只能通过 new Vue 去实例化它

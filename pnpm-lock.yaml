@@ -1,52 +1,60 @@
 lockfileVersion: 5.4
 
-specifiers:
-  '@codemirror/basic-setup': ^0.20.0
-  '@codemirror/commands': ^6.1.3
-  '@codemirror/lang-javascript': ^6.1.2
-  '@codemirror/state': ^6.2.0
-  '@codemirror/view': ^6.7.1
-  '@typescript-eslint/eslint-plugin': ^5.48.0
-  '@typescript-eslint/parser': ^5.48.0
-  autoprefixer: ^10.4.13
-  codemirror: ^6.0.1
-  eslint: ^8.31.0
-  eslint-config-prettier: ^8.6.0
-  eslint-plugin-prettier: ^4.2.1
-  eslint-plugin-vue: ^9.8.0
-  naive-ui: ^2.34.3
-  postcss: ^8.4.20
-  prettier: ^2.8.1
-  sass: ^1.57.1
-  tailwindcss: ^3.2.4
-  typescript: ^4.9.4
-  vitepress: ^1.0.0-alpha.35
-  vue: ^3.2.45
+importers:
 
-dependencies:
-  '@codemirror/basic-setup': 0.20.0
-  '@codemirror/commands': 6.1.3
-  '@codemirror/lang-javascript': 6.1.2
-  '@codemirror/state': 6.2.0
-  '@codemirror/view': 6.7.1
-  codemirror: 6.0.1
-  naive-ui: 2.34.3_vue@3.2.45
+  .:
+    specifiers:
+      '@typescript-eslint/eslint-plugin': ^5.48.0
+      '@typescript-eslint/parser': ^5.48.0
+      autoprefixer: ^10.4.13
+      eslint: ^8.31.0
+      eslint-config-prettier: ^8.6.0
+      eslint-plugin-prettier: ^4.2.1
+      eslint-plugin-vue: ^9.8.0
+      naive-ui: ^2.34.3
+      postcss: ^8.4.20
+      prettier: ^2.8.1
+      sass: ^1.57.1
+      tailwindcss: ^3.2.4
+      typescript: ^4.9.4
+      vitepress: ^1.0.0-alpha.35
+      vue: ^3.2.45
+    dependencies:
+      naive-ui: 2.34.3_vue@3.2.45
+    devDependencies:
+      '@typescript-eslint/eslint-plugin': 5.48.0_k73wpmdolxikpyqun3p36akaaq
+      '@typescript-eslint/parser': 5.48.0_iukboom6ndih5an6iafl45j2fe
+      autoprefixer: 10.4.13_postcss@8.4.20
+      eslint: 8.31.0
+      eslint-config-prettier: 8.6.0_eslint@8.31.0
+      eslint-plugin-prettier: 4.2.1_32m5uc2milwdw3tnkcq5del26y
+      eslint-plugin-vue: 9.8.0_eslint@8.31.0
+      postcss: 8.4.20
+      prettier: 2.8.1
+      sass: 1.57.1
+      tailwindcss: 3.2.4
+      typescript: 4.9.4
+      vitepress: 1.0.0-alpha.35_sass@1.57.1
+      vue: 3.2.45
 
-devDependencies:
-  '@typescript-eslint/eslint-plugin': 5.48.0_k73wpmdolxikpyqun3p36akaaq
-  '@typescript-eslint/parser': 5.48.0_iukboom6ndih5an6iafl45j2fe
-  autoprefixer: 10.4.13_postcss@8.4.20
-  eslint: 8.31.0
-  eslint-config-prettier: 8.6.0_eslint@8.31.0
-  eslint-plugin-prettier: 4.2.1_32m5uc2milwdw3tnkcq5del26y
-  eslint-plugin-vue: 9.8.0_eslint@8.31.0
-  postcss: 8.4.20
-  prettier: 2.8.1
-  sass: 1.57.1
-  tailwindcss: 3.2.4
-  typescript: 4.9.4
-  vitepress: 1.0.0-alpha.35_sass@1.57.1
-  vue: 3.2.45
+  packages/levi-docs:
+    specifiers:
+      '@codemirror/basic-setup': ^0.20.0
+      '@codemirror/commands': ^6.1.3
+      '@codemirror/lang-javascript': ^6.1.2
+      '@codemirror/state': ^6.2.0
+      '@codemirror/view': ^6.7.1
+      codemirror: ^6.0.1
+    dependencies:
+      '@codemirror/basic-setup': 0.20.0
+      '@codemirror/commands': 6.1.3
+      '@codemirror/lang-javascript': 6.1.2
+      '@codemirror/state': 6.2.0
+      '@codemirror/view': 6.7.1
+      codemirror: 6.0.1
+
+  packages/vue-next-mini:
+    specifiers: {}
 
 packages:
 
