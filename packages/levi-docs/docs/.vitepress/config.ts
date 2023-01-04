@@ -10,7 +10,7 @@ export default defineConfig({
     themeConfig: {
       logo: '/logo.svg',
       editLink: {
-        pattern: 'https://github.com/sky124380729/notebook/tree/master/docs/:path',
+        pattern: 'https://github.com/sky124380729/notebook/tree/master/packages/levi-docs/docs/:path',
         text: 'Edit this page on github'
       },
       socialLinks: [
