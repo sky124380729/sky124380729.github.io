@@ -41,7 +41,7 @@ jobs:
         run: pnpm install
 
       - name: Build
-        run: pnpm -F @levi/docs
+        run: pnpm -F @levi/docs build
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
