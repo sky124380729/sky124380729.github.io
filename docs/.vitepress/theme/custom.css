@@ -7,6 +7,21 @@
   --vp-code-line-diff-remove-color: rgba(255, 87, 87, 0.15);
 }
 
+@font-face {
+  font-family: CascadiaCode;
+  src: url(/assets/fonts/CascadiaCode.ttf) format("truetype");
+  unicode-range: U+00-FF, U+980-9FF;
+}
+
+@font-face {
+  font-family: ZCOOLKuaiLe;
+  src: url(/assets/fonts/ZCOOLKuaiLe-Regular.ttf) format("truetype");
+}
+
+*, code {
+  font-family: CascadiaCode, ZCOOLKuaiLe;
+}
+
 .text-gradient-error {
   color: #0000;
   -webkit-background-clip: text;

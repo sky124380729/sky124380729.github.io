@@ -35,7 +35,7 @@ const s = 'aabaabaaf'
 const p = 'aabaaf'
 ```
 
-![kmp](/assets/kmp.gif)
+![kmp](/assets/imgs/kmp.gif)
 
 模式串的前缀表
 
@@ -50,7 +50,7 @@ const p = 'aabaaf'
 
 这个之上而下的0 -> 1 -> 0 -> 1 -> 2 -> 0就是 `aabaaf` 的 `前缀表`
 
-![kmp](/assets/kmp3.png)
+![kmp](/assets/imgs/kmp3.png)
 
 可以看出模式串与前缀表对应位置的数字表示的就是：**下标i之前（包括i）的字符串中，有多大长度的相同前缀后缀**
 
@@ -114,4 +114,4 @@ const p = 'aabaaf'
     </li>
   </TransitionGroup>
 
-![kmp](/assets/kmp2.gif)
+![kmp](/assets/imgs/kmp2.gif)
