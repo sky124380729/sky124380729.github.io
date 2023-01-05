@@ -120,6 +120,7 @@ export default defineConfig({
         { text: 'Links', link: '/links/index', activeMatch: '/links/' },
         { text: 'RegExp', link: '/reg-exp/index', activeMatch: '/reg-exp/' },
         { text: 'Interview ', link: '/interview/index', activeMatch: '/interview/' },
+        { text: 'Q&A', link: '/qa/index', activeMatch: '/qa/' },
       ],
       footer: {
         message: 'Released under the MIT License.',
