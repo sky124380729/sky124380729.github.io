@@ -61,6 +61,7 @@ export default defineConfig({
             text: 'Micro Frontend',
             collapsible: true,
             items: [
+              { text: 'Knowledge', link: '/framework/micro-frontend/index' },
               { text: 'Single SPA', link: '/framework/micro-frontend/single-spa' },
               { text: 'Module Federation', link: '/framework/micro-frontend/module-federation' },
             ]
