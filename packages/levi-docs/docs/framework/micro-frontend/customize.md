@@ -32,6 +32,181 @@ function runChild() {
 
 ## 简易实现
 
+### vue-cli + vue3创建的主应用
+
+::: code-group
+
+```js [store/sub.js]
+
+export const subNavList = [
+  {
+    name: 'react15',
+    activeRule: '/react15',
+    container: '#micro-container',
+    entry: '//localhost:9002/'
+  },
+  {
+    name: 'react16',
+    activeRule: '/react16',
+    container: '#micro-container',
+    entry: '//localhost:9003/'
+  },
+  {
+    name: 'vue2',
+    activeRule: '/vue2',
+    container: '#micro-container',
+    entry: '//localhost:9004/'
+  },
+  {
+    name: 'vue3',
+    activeRule: '/vue3',
+    container: '#micro-container',
+    entry: '//localhost:9005/'
+  },
+]
+
+```
+
+```js [micro/const/subApps.js]
+
+let list = []
+
+export const getList = () => list
+
+export const setList = (appList) => list = appList
+
+```
+
+```js [micro/utils/index.js]
+
+import { getList } from '../const/subApps'
+
+// 给当前的路由跳转打补丁
+export const patchRouter = (globalEvent, eventName) => {
+  return function () {
+    const e = new Event(eventName)
+    globalEvent.apply(this, arguments)
+    window.dispatchEvent(e)
+  }
+}
+
+// 获取当前子应用
+export const currentApp = () => {
+  const currentUrl = window.location.pathname
+  return filterApp('activeRule', currentUrl)
+}
+
+const filterApp = (key, value) => {
+  const currentApp = getList().filter(item => item[key] === value)
+  return currentApp && currentApp.length ? currentApp[0] : {}
+}
+
+// 子应用是否做了切换
+const const isTurnChild = () => {
+  if(window.__CURRENT_SUB_APP__ === window.location.pathname) {
+    return false
+  }
+  return true
+}
+
+```
+
+```js [micro/router/routerHandle.js]
+
+import { isTurnChild } from '../utils'
+
+export const turnApp = () => {
+  if(isTurnChild()) {
+    console.log('路由切换了')
+  }
+}
+
+```
+
+```js [micro/router/rewriteRouter.js]
+import { patchRouter } from '../utils'
+import { turnApp } from './routerHandle'
+
+// 重写window的路由跳转
+export const rewriteRouter = () => {
+  window.history.pushState = patchRouter(window.history.pushState, 'micro_push')
+  window.history.replaceState = patchRouter(window.history.replaceState, 'micro_replace')
+  window.addEventListener('micro_push', turnApp)
+  window.addEventListener('micro_replace', turnApp)
+  // 监听浏览器的前进后退按钮
+  window.onpopstate = function() {
+    turnApp()
+  }
+}
+
+```
+
+```js [micro/start.js]
+import { getList, setList } from './const/subApps'
+import { currentApp } from './utils'
+import { rewriteRouter } from './router/rewriteRouter'
+
+rewriteRouter()
+
+export const registerMicroApps = (appList) => {
+  setList(appList)
+}
+
+// 启动微前端框架
+export const start = () => {
+  // 首先验证当前子应用列表是否为空
+  const apps = getList()
+  if(!apps.length) {
+    throw Error('子应用列表为空，请正确注册')
+  }
+  // 有子应用的内容，查找到符合当前路由的子应用
+  const app = currentApp()
+
+  if(app) {
+    const { pathname, hash } = window.location
+    const url = pathname + hash
+    window.history.pushState('', '', url)
+    // 这里是为了防止多次触发turnApp，打个标记
+    window.__CURRENT_SUB_APP__ = app.activeRule
+  }
+
+}
+
+```
+
+```js [micro/index.js]
+
+export { registerMicroApps, start } from './start'
+
+```
+
+```js [util/index.js]
+import { registerMicroApps, start } from '../../micro'
+
+export const registerApp = (list) => {
+  // 注册到微前端框架里
+  registerMicroApps(list)
+  // 开启微前端框架
+  start()
+}
+
+```
+
+```js [main.js]
+import { createApp } from 'vue'
+import App from './App.vue'
+import router from './router'
+import { subNavList } from './store/sub'
+import { registerApp } from './util'
+
+registerApp(subNavList)
+
+createApp(App).use(router()).mount('#micro_web_main_app')
+
+```
+
+:::
+
 ### vue-cli + vue2创建的子应用
 
 ::: code-group
