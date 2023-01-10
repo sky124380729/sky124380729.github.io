@@ -7,4 +7,4 @@
 
 ## 多个git账号切换使用的问题
 
-- 详情可参考https://blog.csdn.net/qq_30997503/article/details/121124907
+- 详情可参考：<https://blog.csdn.net/qq_30997503/article/details/121124907>
