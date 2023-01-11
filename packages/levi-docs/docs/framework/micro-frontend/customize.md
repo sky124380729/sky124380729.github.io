@@ -34,10 +34,197 @@ function runChild() {
 
 ### vue-cli + vue3创建的主应用
 
+> 微前端框架内容(文件夹名才能为micro，与src平级)
+
+::: code-group
+
+```js [const/subApps.js]
+let list = []
+
+export const getList = () => list
+
+export const setList = (appList) => list = appList
+```
+
+```js [const/mainLifecycle.js]
+// 主应用生命周期
+let lifecycle = {}
+
+export const getMainLifecycle = () => lifecycle
+
+export const setMainLifecycle = (data) => lifecycle = data
+```
+
+```js [lifecycle/index.js]
+// 子应用生命周期
+import { findAppByRoute } from '../utils'
+import { getMainLifecycle } from '../const/mainLifecycle'
+
+export const lifecycle = async () => {
+  // 获取到上一个子应用
+  const prevApp = findAppByRoute(window.__ORIGIN_APP__)
+  // 获取要跳转到的子应用
+  const nextApp = findAppByRoute(window.__CURRENT_SUB_APP__)
+  // 如果没有下一个子应用，不需要继续执行，因为没有下一个子应用，不需要加载任何东西
+  if(!nextApp){
+    return
+  }
+  // 如果有上一个子应用，需要调用上一个子应用的销毁方法
+  if(prevApp && prevApp.destroyed) {
+    await destroyed(prevApp)
+  }
+  // 执行下一个子应用的beforeLoad方法
+  const app = await beforeLoad(nextApp)
+  // 执行mounted方法
+  await mounted(app)
+}
+
+export const beforeLoad = async (app) => {
+  // 先让主应用的生命周期执行
+  await runMainLifecycle('beforeLoad')
+  app && app.beforeLoad && app.beforeLoad()
+  const appContext = null
+  return appContext
+}
+
+export const mounted = async (app) => {
+  app && app.mounted()
+
+  await runMainLifecycle('mounted')
+}
+
+export const destroyed = async (app) => {
+  app && app.destroyed && app.destroyed()
+  // 对应执行一下主应用的生命周期
+  await runMainLifecycle('destroyed')
+}
+
+export const runMainLifecycle = async (type) => {
+  const mainLife = getMainLifecycle()
+  // 等待所有的生命周期执行完成
+  await Promise.all(mainLife[type].map(async => await item()))
+}
+```
+
+```js [utils/index.js]
+import { getList } from '../const/subApps'
+
+// 给当前的路由跳转打补丁
+export const patchRouter = (globalEvent, eventName) => {
+  return function () {
+    const e = new Event(eventName)
+    globalEvent.apply(this, arguments)
+    window.dispatchEvent(e)
+  }
+}
+
+// 获取当前子应用
+export const currentApp = () => {
+  const currentUrl = window.location.pathname
+  return filterApp('activeRule', currentUrl)
+}
+
+// 根据router获取子应用
+export const findAppByRoute = (router) => {
+  return filterApp('activeRule', router)
+}
+
+const filterApp = (key, value) => {
+  const currentApp = getList().filter(item => item[key] === value)
+  return currentApp && currentApp.length ? currentApp[0] : {}
+}
+
+// 子应用是否做了切换
+const const isTurnChild = () => {
+  window.__ORIGIN_APP__ = window.__CURRENT_SUB_APP__
+  // 为了防止在同一个子应用中路由发生变化重复执行事件，此处加一个判断
+  if(window.__CURRENT_SUB_APP__ === window.location.pathname) {
+    return false
+  }
+  // 处理一下pathname /react15/ -> /react15
+  const currentApp = window.location.pathname.match(/\/\w+/)
+  if(!currentApp) {
+    return
+  }
+  window.__CURRENT_SUB_APP__ === currentApp[0]
+  return true
+}
+```
+
+```js [router/routerHandle.js]
+import { isTurnChild } from '../utils'
+import { lifecycle } from '.../lifecycle'
+
+export const turnApp = async () => {
+  if(isTurnChild()) {
+    // 微前端的生命周期执行
+    await lifecycle()
+  }
+}
+```
+
+```js [router/rewriteRouter.js]
+import { patchRouter } from '../utils'
+import { turnApp } from './routerHandle'
+
+// 重写window的路由跳转
+export const rewriteRouter = () => {
+  window.history.pushState = patchRouter(window.history.pushState, 'micro_push')
+  window.history.replaceState = patchRouter(window.history.replaceState, 'micro_replace')
+  window.addEventListener('micro_push', turnApp)
+  window.addEventListener('micro_replace', turnApp)
+  // 监听浏览器的前进后退按钮
+  window.onpopstate = function() {
+    turnApp()
+  }
+}
+```
+
+```js [start.js]
+// 微前端框架入口文件
+import { getList, setList } from './const/subApps'
+import { setMainLifecycle } from './const/lifecycle'
+import { currentApp } from './utils'
+import { rewriteRouter } from './router/rewriteRouter'
+
+rewriteRouter()
+
+export const registerMicroApps = (appList, lifecycle) => {
+  setList(appList)
+  setMainLifecycle(lifecycle)
+}
+
+// 启动微前端框架
+export const start = () => {
+  // 首先验证当前子应用列表是否为空
+  const apps = getList()
+  if(!apps.length) {
+    throw Error('子应用列表为空，请正确注册')
+  }
+  // 有子应用的内容，查找到符合当前路由的子应用
+  const app = currentApp()
+
+  if(app) {
+    const { pathname, hash } = window.location
+    const url = pathname + hash
+    window.history.pushState('', '', url)
+    // 这里是为了防止多次触发turnApp，打个标记
+    window.__CURRENT_SUB_APP__ = app.activeRule
+  }
+}
+```
+
+```js [index.js]
+export { registerMicroApps, start } from './start'
+```
+
+:::
+
+> 主应用内容(src目录下)
+
 ::: code-group
 
 ```js [store/sub.js]
-
 export const subNavList = [
   {
     name: 'react15',
@@ -64,120 +251,6 @@ export const subNavList = [
     entry: '//localhost:9005/'
   },
 ]
-
-```
-
-```js [micro/const/subApps.js]
-
-let list = []
-
-export const getList = () => list
-
-export const setList = (appList) => list = appList
-
-```
-
-```js [micro/utils/index.js]
-
-import { getList } from '../const/subApps'
-
-// 给当前的路由跳转打补丁
-export const patchRouter = (globalEvent, eventName) => {
-  return function () {
-    const e = new Event(eventName)
-    globalEvent.apply(this, arguments)
-    window.dispatchEvent(e)
-  }
-}
-
-// 获取当前子应用
-export const currentApp = () => {
-  const currentUrl = window.location.pathname
-  return filterApp('activeRule', currentUrl)
-}
-
-const filterApp = (key, value) => {
-  const currentApp = getList().filter(item => item[key] === value)
-  return currentApp && currentApp.length ? currentApp[0] : {}
-}
-
-// 子应用是否做了切换
-const const isTurnChild = () => {
-  if(window.__CURRENT_SUB_APP__ === window.location.pathname) {
-    return false
-  }
-  return true
-}
-
-```
-
-```js [micro/router/routerHandle.js]
-
-import { isTurnChild } from '../utils'
-
-export const turnApp = () => {
-  if(isTurnChild()) {
-    console.log('路由切换了')
-  }
-}
-
-```
-
-```js [micro/router/rewriteRouter.js]
-import { patchRouter } from '../utils'
-import { turnApp } from './routerHandle'
-
-// 重写window的路由跳转
-export const rewriteRouter = () => {
-  window.history.pushState = patchRouter(window.history.pushState, 'micro_push')
-  window.history.replaceState = patchRouter(window.history.replaceState, 'micro_replace')
-  window.addEventListener('micro_push', turnApp)
-  window.addEventListener('micro_replace', turnApp)
-  // 监听浏览器的前进后退按钮
-  window.onpopstate = function() {
-    turnApp()
-  }
-}
-
-```
-
-```js [micro/start.js]
-import { getList, setList } from './const/subApps'
-import { currentApp } from './utils'
-import { rewriteRouter } from './router/rewriteRouter'
-
-rewriteRouter()
-
-export const registerMicroApps = (appList) => {
-  setList(appList)
-}
-
-// 启动微前端框架
-export const start = () => {
-  // 首先验证当前子应用列表是否为空
-  const apps = getList()
-  if(!apps.length) {
-    throw Error('子应用列表为空，请正确注册')
-  }
-  // 有子应用的内容，查找到符合当前路由的子应用
-  const app = currentApp()
-
-  if(app) {
-    const { pathname, hash } = window.location
-    const url = pathname + hash
-    window.history.pushState('', '', url)
-    // 这里是为了防止多次触发turnApp，打个标记
-    window.__CURRENT_SUB_APP__ = app.activeRule
-  }
-
-}
-
-```
-
-```js [micro/index.js]
-
-export { registerMicroApps, start } from './start'
-
 ```
 
 ```js [util/index.js]
@@ -185,11 +258,26 @@ import { registerMicroApps, start } from '../../micro'
 
 export const registerApp = (list) => {
   // 注册到微前端框架里
-  registerMicroApps(list)
+  registerMicroApps(list, {
+    beforeLoad: [
+      () => {
+        console.log('开始加载')
+      }
+    ],
+    mounted: [
+      () => {
+        console.log('加载完成')
+      }
+    ],
+    destroyed: [
+      () => {
+        console.log('下载完成')
+      }
+    ]
+  })
   // 开启微前端框架
   start()
 }
-
 ```
 
 ```js [main.js]
@@ -200,9 +288,7 @@ import { subNavList } from './store/sub'
 import { registerApp } from './util'
 
 registerApp(subNavList)
-
 createApp(App).use(router()).mount('#micro_web_main_app')
-
 ```
 
 :::
