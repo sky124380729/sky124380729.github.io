@@ -1,12 +1,10 @@
-# Links
+# Plugins
 
-## 优秀的开源项目
+> 收集一些优秀的插件/npm包
 
-- 快速创建基于Ts的库：[typescript-library-starter](https://github.com/alexjoverm/typescript-library-starter)
+[[toc]]
 
-## 优秀的npm包
-
-- 解析参数选项：[minimist](https://www.npmjs.com/package/minimist)
+## 解析参数选项：[minimist](https://www.npmjs.com/package/minimist)
 
 ```js
 var argv = require('minimist')(process.argv.slice(2));
@@ -30,7 +28,7 @@ $ node example/parse.js -x 3 -y 4 -n5 -abc --beep=boop foo bar baz
   beep: 'boop' }
 ```
 
-- 微型生成器框架: [plop](https://www.npmjs.com/package/plop)
+## 微型生成器框架: [plop](https://www.npmjs.com/package/plop)
 
 ![plop](/assets/imgs/plop.gif)
 
@@ -53,19 +51,19 @@ export default function (plop) {
 };
 ```
 
-- 多浏览器同步：[browser-sync](https://www.npmjs.com/package/browser-sync)
+## 多浏览器同步：[browser-sync](https://www.npmjs.com/package/browser-sync)
 
 ![browser-sync](/assets/imgs/browser-sync.gif)
 
-- 新手引导插件：[driver.js](https://www.npmjs.com/package/driver.js)
+## 新手引导插件：[driver.js](https://www.npmjs.com/package/driver.js)
 
 ![driver.js](/assets/imgs/driver-js.png)
 
-- 故事书：[storybook](https://github.com/storybookjs/storybook)
+## 故事书：[storybook](https://github.com/storybookjs/storybook)
 
 ![storybook](/assets/imgs/storybook.gif)
 
-- 创建类名的函数：[classnames](https://www.npmjs.com/package/classnames)
+## 创建类名的函数：[classnames](https://www.npmjs.com/package/classnames)
 
 ```js
 classNames('foo', 'bar'); // => 'foo bar'
@@ -82,7 +80,7 @@ classNames('foo', { bar: true, duck: false }, 'baz', { quux: true }); // => 'foo
 classNames(null, false, 'bar', undefined, 0, 1, { baz: null }, ''); // => 'bar 1'
 ```
 
-- 视频播放插件 [西瓜播放器](https://www.npmjs.com/package/xgplayer)
+## 视频播放插件 [西瓜播放器](https://www.npmjs.com/package/xgplayer)
 
 ```html
 <div id="vs"></div>
@@ -96,10 +94,3 @@ const player = new Player({
   url: 'https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/byted-player-videos/1.0.0/xgplayer-demo.mp4'
 })
 ```
-
-## 优秀的网站
-
-- 算法可视化：[visualgo](https://visualgo.net/zh)
-- 阴影样式示例：[box-shadow-demos](https://getcssscan.com/css-box-shadow-examples)
-
-## 优秀的博客

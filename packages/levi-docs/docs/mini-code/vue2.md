@@ -1,8 +1,10 @@
 # Mini Vue2
 
-## <div class="filename">index.html</div>
+> 简易vue2的实现
 
-```html
+::: code-group
+
+```html [index.html]
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -44,9 +46,7 @@
 </html>
 ```
 
-## <div class="filename">vue.js</div>
-
-```js
+```js [vue.js]
 class Vue {
   constructor(options) {
     // 1.通过属性保存选项的数据
@@ -82,9 +82,7 @@ class Vue {
 }
 ```
 
-## <div class="filename">observe.js</div>
-
-```js
+```js [observer.js]
 class Observer {
   constructor(data) {
     this.walk(data)
@@ -126,9 +124,7 @@ class Observer {
 }
 ```
 
-## <div class="filename">dep.js</div>
-
-```js
+```js [dep.js]
 class Dep {
   constructor() {
     // 存储所有的观察者
@@ -149,9 +145,7 @@ class Dep {
 }
 ```
 
-## <div class="filename">watcher.js</div>
-
-```js
+```js [watcher.js]
 class Watcher {
   constructor(vm, key, cb) {
     this.vm = vm
@@ -175,9 +169,7 @@ class Watcher {
 }
 ```
 
-## <div class="filename">compiler.js</div>
-
-```js
+```js [compiler.js]
 class Compiler {
   constructor(vm) {
     this.el = vm.el

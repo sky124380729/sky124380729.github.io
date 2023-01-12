@@ -125,8 +125,6 @@ factorial(5) // 120
 
 - ES6 的函数默认值
 
-
-
 ```js
 function fibonacci(n) {
   let a = 1, b = 1, c = 1

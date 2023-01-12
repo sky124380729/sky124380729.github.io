@@ -9,13 +9,13 @@
 
 @font-face {
   font-family: CascadiaCode;
-  src: url(/assets/fonts/CascadiaCode.ttf) format("truetype");
+  src: url(/fonts/CascadiaCode.ttf) format("truetype");
   unicode-range: U+00-FF, U+980-9FF;
 }
 
 @font-face {
   font-family: ZCOOLKuaiLe;
-  src: url(/assets/fonts/ZCOOLKuaiLe-Regular.ttf) format("truetype");
+  src: url(/fonts/ZCOOLKuaiLe-Regular.ttf) format("truetype");
 }
 
 *, code {

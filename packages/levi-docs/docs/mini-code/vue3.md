@@ -1,8 +1,10 @@
 # Mini Vue3
 
-## <div class="filename">index.html</div>
+> 简易vue3的实现
 
-```html
+::: code-group
+
+```html [index.html]
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41,9 +43,7 @@
 </html>
 ```
 
-## <div class="filename">index.js</div>
-
-```js
+```js [index.js]
 function createApp(rootComponent) {
   return {
     mount(selector) {
@@ -65,9 +65,7 @@ function createApp(rootComponent) {
 }
 ```
 
-## <div class="filename">reactive.js</div>
-
-```js
+```js [reactive.js]
 class Dep {
   constructor() {
     this.subscribers = new Set()
@@ -128,9 +126,7 @@ function reactive(raw) {
 }
 ```
 
-## <div class="filename">renderer.js</div>
-
-```js
+```js [renderer.js]
 const h = (tag, props, children) => {
   return { tag, props, children }
 }

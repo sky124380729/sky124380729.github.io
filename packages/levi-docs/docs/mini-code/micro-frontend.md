@@ -1,4 +1,6 @@
-# Customize(自研微前端框架)
+# Micro-Frontend
+
+[[toc]]
 
 ## 整体架构设计
 
@@ -32,9 +34,7 @@ function runChild() {
 }
 ```
 
-## 简易实现
-
-### vue-cli + vue3创建的主应用
+## vue-cli + vue3创建的主应用
 
 > 微前端框架内容(文件夹名才能为micro，与src平级)
 
@@ -56,6 +56,10 @@ export const getMainLifecycle = () => lifecycle
 
 export const setMainLifecycle = (data) => lifecycle = data
 ```
+
+:::
+
+::: code-group
 
 ```js [lifecycle/index.js]
 // 子应用生命周期
@@ -111,6 +115,10 @@ export const runMainLifecycle = async (type) => {
 }
 ```
 
+:::
+
+::: code-group
+
 ```js [utils/index.js]
 import { getList } from '../const/subApps'
 
@@ -159,6 +167,10 @@ const const isTurnChild = () => {
 ```js [utils/fetchResource.js]
 export const fetchResource = (url) => fetch(url).then(async res => await res.text())
 ```
+
+:::
+
+::: code-group
 
 ```js [loader/index.js]
 import { fetchResource } from '../utils/fetchResource'
@@ -216,7 +228,7 @@ export const getResources = async (root, entry) => {
         parent.replaceChild(document.createComment('此js文件已经被微前端替换'), element)
       }
     }
-    // 第二步，对link进行解析，link也会有js的内容
+  // 第二步，对link进行解析，link也会有js的内容
     if(element.nodeName.toLowerCase() === 'link') {
       const href = element.getAttribute('href')
       if(href.endsWith('.js')) {
@@ -236,6 +248,10 @@ export const getResources = async (root, entry) => {
   return [dom, scriptUrl, script]
 }
 ```
+
+:::
+
+::: code-group
 
 ```js [router/routerHandle.js]
 import { isTurnChild } from '../utils'
@@ -265,6 +281,154 @@ export const rewriteRouter = () => {
   }
 }
 ```
+
+:::
+
+::: code-group
+
+```js [sandbox/performScript.js]
+// 执行应用的 js 内容 new Function 篇
+export const performScript = (script, appName, global) => {
+  const scriptText =
+    `try {
+       ${script}
+       return window['${appName}']
+      } catch (err) {
+          console.error('runScript error:' + err);
+      }`;
+
+  const performer = new Function(scriptText);
+  return performer.call(global, global);
+}
+
+// 执行应用中的 js 内容 eval篇
+export const performScriptForEval = (script, appName, global) => {
+  const scriptText = `
+    (() => () => {
+      try {
+        ${script}
+        return window['${appName}']
+      } catch (err) {
+        console.error('runScript error:' + err);
+      }
+    })()
+  `
+  return (() => eval(scriptText))().call(global, global)
+}
+```
+
+```js [sandbox/proxySandBox.js]
+export const isFunction = (value) => typeof value === 'function';
+
+// 代理沙箱
+export class ProxySandBox {
+  constructor() {
+    this.proxy = window;
+    this.active();
+  }
+  active() {
+    const proxy = window;
+
+    const draftValue = Object.create(Object.getPrototypeOf(proxy))
+
+    this.proxy = new Proxy(proxy, {
+      get(target, propKey) {
+        // 函数做特殊处理
+        if (isFunction(draftValue[propKey])) {
+          return draftValue[propKey].bind(proxy)
+        }
+        if (isFunction(target[propKey])) {
+          return target[propKey].bind(proxy)
+        }
+
+        return draftValue[propKey] || target[propKey]
+      },
+      set(target, propKey, value) {
+        draftValue[propKey] = value
+        return true
+      }
+    })
+  }
+  inactive() {
+    console.log('关闭沙箱');
+  }
+}
+```
+
+```js [sandbox/sandbox.js]
+import {ProxySandBox} from './proxySandBox';
+import {findAppByName} from '../util';
+import {performScriptForEval} from './performScript';
+
+// 检测是否漏掉了生命周期方法
+export const lackOfLifecycle = (lifecycles) => !lifecycles ||
+  !lifecycles.bootstrap ||
+  !lifecycles.mount ||
+  !lifecycles.unmount;
+
+// 创建沙箱环境
+export const sandbox = (script, appName) => {
+  // 获取当前子应用
+  const app = findAppByName(appName);
+
+  // 创建沙箱环境
+  const global = new ProxySandBox();
+
+  // 设置微前端环境
+  window.__MICRO_WEB__ = true;
+
+  // 获取子应用生命周期
+  const lifeCycles = performScriptForEval(script, appName, global.proxy);
+
+  app.sandBox = global;
+
+  // 检查子应用是否包含必须的方法
+  const isLack = lackOfLifecycle(lifeCycles)
+  if (isLack) {
+    return;
+  }
+
+  app.bootstrap = lifeCycles.bootstrap;
+  app.mount = lifeCycles.mount;
+  app.unmount = lifeCycles.unmount;
+}
+```
+
+```js [sandbox/snapshotSandBox.js]
+// 快照沙箱
+export class SnapShotSandBox {
+  constructor() {
+    this.proxy = window;
+    this.active();
+  }
+  active() {
+    this.snapshot = new Map(); // 创建 window 对象的快照
+    for (const key in window) {
+      // eslint-disable-next-line no-prototype-builtins
+      if (window.hasOwnProperty(key)) {
+        // 将window上的属性进行拍照
+        this.snapshot[key] = window[key];
+      }
+    }
+  }
+  inactive() {
+    for (const key in window) {
+      // eslint-disable-next-line no-prototype-builtins
+      if (window.hasOwnProperty(key)) {
+        // 将上次快照的结果和本次window属性做对比
+        if (window[key] !== this.snapshot[key]) {
+          // 还原window
+          window[key] = this.snapshot[key];
+        }
+      }
+    }
+  }
+}
+```
+
+:::
+
+::: code-group
 
 ```js [start.js]
 // 微前端框架入口文件
@@ -300,13 +464,17 @@ export const start = () => {
 }
 ```
 
+:::
+
+::: code-group
+
 ```js [index.js]
 export { registerMicroApps, start } from './start'
 ```
 
 :::
 
-> 主应用内容(src目录下)
+> 主应用相关内容(src目录下)
 
 ::: code-group
 
@@ -379,7 +547,7 @@ createApp(App).use(router()).mount('#micro_web_main_app')
 
 :::
 
-### vue-cli + vue2创建的子应用
+## vue-cli + vue2创建的子应用
 
 ::: code-group
 
@@ -446,7 +614,7 @@ module.exports = {
 
 :::
 
-### vue-cli + vue3创建的子应用
+## vue-cli + vue3创建的子应用
 
 ::: code-group
 
@@ -511,7 +679,7 @@ module.exports = {
 
 :::
 
-### webpack + react15创建的子应用
+## webpack + react15创建的子应用
 
 ::: code-group
 
@@ -574,7 +742,7 @@ module.exports = {
 
 :::
 
-### webpack + react16创建的子应用
+## webpack + react16创建的子应用
 
 ::: code-group
 

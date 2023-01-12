@@ -6,7 +6,6 @@ export default defineConfig({
     ],
     lastUpdated: true,
     title: 'LEVI NOTEBOOK',
-    // base: '/notebook',
     themeConfig: {
       logo: '/logo.svg',
       editLink: {
@@ -17,22 +16,6 @@ export default defineConfig({
         { icon: 'github', link: 'https://github.com/sky124380729/notebook' }
       ],
       sidebar: {
-        '/language': [
-          {
-            text: 'Javascript',
-            collapsible: true,
-            items: [
-              { text: 'knowledge', link: '/language/javascript/index' },
-            ],
-          },
-          {
-            text: 'Typescript',
-            collapsible: true,
-            items: [
-              { text: 'knowledge', link: '/language/typescript/index' },
-            ],
-          }
-        ],
         '/framework': [
           {
             text: 'Vue',
@@ -61,33 +44,9 @@ export default defineConfig({
             text: 'Micro Frontend',
             collapsible: true,
             items: [
-              { text: 'Knowledge', link: '/framework/micro-frontend/knowledge' },
-              { text: 'Customize', link: '/framework/micro-frontend/customize' },
+              { text: 'Knowledge Points', link: '/framework/micro-frontend/knowledge' },
               { text: 'Single SPA', link: '/framework/micro-frontend/single-spa' },
               { text: 'Module Federation', link: '/framework/micro-frontend/module-federation' },
-            ]
-          }
-        ],
-        '/bundle': [
-          {
-            text: 'Webpack',
-            items: [
-              { text: 'information', link: '/bundle/webpack/information' },
-              { text: 'config reference', link: '/bundle/webpack/config' },
-            ]
-          },
-          {
-            text: 'Rollup',
-            items: [
-              { text: 'information', link: '/bundle/rollup/information' },
-              { text: 'config reference', link: '/bundle/rollup/config' },
-            ]
-          },
-          {
-            text: 'Vite',
-            items: [
-              { text: 'information', link: '/bundle/vite/information' },
-              { text: 'config reference', link: '/bundle/vite/config' },
             ]
           }
         ],
@@ -104,7 +63,7 @@ export default defineConfig({
           },
           {
             text: 'Algorithm',
-            collapsed: true,
+            collapsible: true,
             items: [
               { text: 'Sort', link: '/algorithm/sort' },
               { text: 'Recursion', link: '/algorithm/recursion' },
@@ -114,13 +73,41 @@ export default defineConfig({
         ]
       },
       nav: [
-        { text: 'Language', link: '/language/index', activeMatch: '/language/' },
-        { text: 'Framework', link: '/framework/index', activeMatch: '/framework/'  },
-        { text: 'Bundle', link: '/bundle/index', activeMatch: '/bundle/' },
+        { text: 'Language', items: [
+          { text: 'Javascript', link: '/language/javascript' },
+          { text: 'Typescript', link: '/language/typescript' }
+        ] },
+        { text: 'Framework', items: [
+          { text: 'Vue', link: '/framework/vue/knowledge' },
+          { text: 'React', link: '/framework/react/knowledge' },
+          { text: 'Miniprogram', link: '/framework/miniprogram/knowledge' },
+          { text: 'Micro-Frontend', link: '/framework/micro-frontend/knowledge' },
+        ] },
+        { text: 'Bundle', items: [
+          { text: 'Webpack', link: '/bundle/webpack' },
+          { text: 'Vite', link: '/bundle/vite' },
+          { text: 'Rollup', link: '/bundle/rollup' },
+          { text: 'Esbuild', link: '/bundle/esbuild' }
+        ] },
         { text: 'Algorithm', link: '/algorithm/index', activeMatch: '/algorithm/' },
-        { text: 'Mini Code', link: '/mini-code/index', activeMatch: '/mini-code/' },
-        { text: 'Links', link: '/links/index', activeMatch: '/links/' },
-        { text: 'RegExp', link: '/reg-exp/index', activeMatch: '/reg-exp/' },
+        { text: 'Mini Code', items: [
+          { text: 'Vue2', link: '/mini-code/vue2' },
+          { text: 'Vue3', link: '/mini-code/vue3' },
+          { text: 'Vue-Router', link: '/mini-code/vue-router' },
+          { text: 'Promise', link: '/mini-code/promise' },
+          { text: 'Micro-Frontend', link: '/mini-code/micro-frontend' },
+        ] },
+        { text: 'Advanced', items: [
+          { text: 'Framework', link: '/advanced/framework' },
+          { text: 'Design Patterns', link: '/advanced/design-patterns' },
+          { text: 'Reg-Exp', link: '/advanced/reg-exp' }
+        ] },
+        { text: 'Links', items: [
+          { text: 'Projects', link: '/links/projects' },
+          { text: 'Plugins', link: '/links/plugins' },
+          { text: 'Websites', link: '/links/websites' },
+          { text: 'Blogs', link: '/links/blogs' },
+        ] },
         { text: 'Interview ', link: '/interview/index', activeMatch: '/interview/' },
         { text: 'Q&A', link: '/qa/index', activeMatch: '/qa/' },
       ],
