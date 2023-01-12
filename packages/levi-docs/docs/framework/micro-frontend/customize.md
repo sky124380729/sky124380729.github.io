@@ -17,6 +17,8 @@ const filePath = {
   vue3: path.join(__dirname, '../vue3'),
   react15: path.join(__dirname, '../react15'),
   react16: path.join(__dirname, '../react15'),
+  service: path.join(__dirname, '../service'),
+  main: path.join(__dirname, '../main')
 }
 
 // cd 子应用的目录 npm start 启动项目
@@ -59,6 +61,7 @@ export const setMainLifecycle = (data) => lifecycle = data
 // 子应用生命周期
 import { findAppByRoute } from '../utils'
 import { getMainLifecycle } from '../const/mainLifecycle'
+import { loadHtml } from '../loader'
 
 export const lifecycle = async () => {
   // 获取到上一个子应用
@@ -83,13 +86,15 @@ export const beforeLoad = async (app) => {
   // 先让主应用的生命周期执行
   await runMainLifecycle('beforeLoad')
   app && app.beforeLoad && app.beforeLoad()
-  const appContext = null
-  return appContext
+  // 获取子应用的内容
+  const subApp = await loadHtml(app)
+  subApp && subApp.beforeLoad && subApp.beforeLoad()
+  return subApp
 }
 
 export const mounted = async (app) => {
-  app && app.mounted()
-
+  app && app.mounted && app.mounted()
+  // 对应执行一下主应用的生命周期
   await runMainLifecycle('mounted')
 }
 
@@ -148,6 +153,87 @@ const const isTurnChild = () => {
   }
   window.__CURRENT_SUB_APP__ === currentApp[0]
   return true
+}
+```
+
+```js [utils/fetchResource.js]
+export const fetchResource = (url) => fetch(url).then(async res => await res.text())
+```
+
+```js [loader/index.js]
+import { fetchResource } from '../utils/fetchResource'
+
+// 加载html的方法
+export const loadHtml = async (app) => {
+  // 子应用需要显示的位置
+  let container = app.container // #id内容
+  // 入口
+  let entry = app.entry
+  const [dom, scripts] = await parseHtml(entry)
+  const ct = document.querySelector(container)
+  if(!ct) {
+    throw Error('容器不存在，请检查')
+  }
+  ct.innerHTML = html
+  return app
+}
+
+export const parseHtml = async (entry) => {
+  const html = await fetchResource(entry)
+  let allScript = []
+  const div = document.createElement('div')
+  div.innerHTML = html
+  // 处理标签、link、script(src,js)
+  const [dom, scriptUrl, script] = await getResources(div, entry)
+  // 获取所有外链的js资源
+  const fetchedScripts = await Promise.all(scriptUrl.map(async item => fetchResource(item)))
+  allScript = script.concat[fetchedScripts]
+  return [dom, allScript]
+}
+
+export const getResources = async (root, entry) => {
+  const scriptUrl = []
+  const script = []
+  const dom = root.outerHTML
+  // 递归处理节点信息
+  function deepParse(element) {
+    const children = element.children
+    const parent = element.parent
+    // 第一步，处理script中的内容
+    if(element.nodeName.toLowerCase() === 'script') {
+      const src = element.getAttribute('src')
+      if(!src) {
+        script.push(element.outerHTML)
+      }else {
+        if(src.startsWith('http')) {
+          scriptUrl.push(src)
+        }else {
+          // 这里是为了兼容子应用脚手架假如没有设置publicPath,加载的资源会是/static/这种形式
+          scriptUrl.push(`http:${entry}/${src}`)
+        }
+      }
+      if(parent) {
+        parent.replaceChild(document.createComment('此js文件已经被微前端替换'), element)
+      }
+    }
+    // 第二步，对link进行解析，link也会有js的内容
+    if(element.nodeName.toLowerCase() === 'link') {
+      const href = element.getAttribute('href')
+      if(href.endsWith('.js')) {
+        if(href.startsWith('http')) {
+          scriptUrl.push(href)
+        }else {
+          scriptUrl.push(`http:${entry}/${href}`)
+        }
+      }
+    }
+    // 第三步，递归处理子节点
+    for(let i = 0; i < children.length; i++) {
+      deepParse(children[i])
+    }
+  }
+  deepParse(root)
+  return [dom, scriptUrl, script]
 }
 ```
 
@@ -340,7 +426,7 @@ module.exports = {
   outputDir: 'dist', // 打包输出目录
   assetsDir: 'static', // 打包的静态资源目录
   filenameHashing: true, // 打包出来的文件，会带有hash信息
-  publicPath: 'http://localhost:9004', //
+  publicPath: 'http://localhost:9004', // 如果不加publicPath，项目引入的资源是/static这种形式的，如果加上，项目引入的资源会变成http://localhost:9004/static这种形式
   devServer: {
     contentBase: path.join(__dirname, 'dist'), // 本地服务的内容是拿的dist
     headers: {
