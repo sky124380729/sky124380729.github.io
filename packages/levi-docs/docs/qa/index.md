@@ -19,6 +19,13 @@ set-ExecutionPolicy RemoteSigned
 Y
 ```
 
+## Windows10下更换Git用户名或密码
+
+- 打开`控制面板`
+- 找到`用户账户`
+- 找到`管理windows凭据`
+
+
 ## Windows下安装nvm，使用`nvm use`切换不成功问题解决
 
 nodejs 目录换一个就好

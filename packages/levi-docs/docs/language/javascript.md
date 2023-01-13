@@ -738,7 +738,6 @@ for(const val of todos) {
 }
 ```
 
-
 ### generator
 
 应用1: 发号器
@@ -831,7 +830,6 @@ const handlePernmissionSubmit = () => {
 
 ## 性能优化
 
-
 ### javascript中的垃圾
 
 - javascript内存管理是自动的
@@ -865,3 +863,41 @@ const handlePernmissionSubmit = () => {
 - 标记整理可以看做是标记清除的增强
 - 标记阶段的操作和标记清除算法一致
 - 清除阶段会先执行整理，移动对象位置
+
+## 关于JSON
+
+> 理解JSON最关键的一点是要把它理解为一种数据格式，而不是编程语言
+
+- JSON不可以设置`undefined`和`函数`
+- 同一个对象中不允许出现两个相同的属性
+- 对象和数组通常作为数组的顶级结构，然而直接写`5`或者`'Hello World!'`也是有效的JSON
+
+  - JSON.stringify()
+
+    - 第二个参数可以是数组或者函数，用来过滤属性，函数的话我们可以称之为替代函数(replacer)
+    - 第三个参数可以控制字符串缩进，最大值是10(10个单位缩进)，也可以直接给字符串，同样最多可以给长度为10的字符串，多了自动截断
+
+  - toJSON()方法
+
+    - 有时候，对象需要在JSON.stringify()上自定义JSON序列化，可以使用此方法
+    - 注意此方法不能使用箭头函数
+
+  - JSON.parse()
+    - 第二个参数可以是个函数，我们可以把它称之为还原函数(reviver)，与替代函数对应
+
+### `MutationObserver` 和 `ResizeObserver`
+
+- `ResizeObserver` 接口可以监听到 Element 的内容区域或 SVGElement的边界框改变。内容区域则需要减去内边距padding。
+- `MutationObserver` 和 `ResizeObserver` 接口提供了监视对DOM树所做更改的能力。它被设计为旧的Mutation Events功能的替代品，该功能是DOM3 Events规范的一部分。
+
+## js使用类型声明获得提示
+
+> [js-doc](http://shouce.jb51.net/jsdoc/tags-type.html)
+
+```js
+/** @type {import('caz').Template} */
+module.exports = {
+  name: 'sct',
+  version: '0.1.0'
+}
+```

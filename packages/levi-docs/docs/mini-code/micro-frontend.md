@@ -822,3 +822,11 @@ module.exports = {
   ```
 
   因此可以在全局访问到vue2
+
+- 文中的`libraryTarget`报出警告?
+
+  上述的方案相对不是最新的，`webpack`官方有下面这句话，可以自行尝试
+
+  :::warning
+  Please use `output.library.type` instead as we might drop support for `output.libraryTarget` in the future.
+  :::

@@ -10,23 +10,23 @@
 
 ```html
 <body>
-    <section></section>
-    <footer></footer>
+  <section></section>
+  <footer></footer>
 </body>
 ```
 
 ```css
 body {
-    display:flex;
-    flex-flow: column;
-    min-height:100%;
+  display:flex;
+  flex-flow: column;
+  min-height:100%;
 }
 section {
-    flex:1;
+  flex:1;
 }
 footer {
-    flex:0;
-    height:100px;
+  flex:0;
+  height:100px;
 }
 ```
 
