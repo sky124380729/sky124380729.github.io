@@ -70,6 +70,16 @@ export default defineConfig({
               { text: 'KMP', link: '/algorithm/kmp' },
             ]
           }
+        ],
+        '/interview': [
+          {
+            text: 'Knowledge',
+            collapsible: true,
+            items: [
+              { text: 'Restful', link: '/interview/restful' },
+              { text: 'Optimization', link: '/interview/optimization' }
+            ]
+          }
         ]
       },
       nav: [

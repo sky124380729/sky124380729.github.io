@@ -144,6 +144,11 @@ const config = {
       }
     ]
   },
+  externals: {
+    // 如果使用 webpack 这样的模块捆绑包，这可能会导致 Vue 的源代码绑定到插件中，
+    // 而且通常情况下，这并不是你所期望的，防止这种情况发生的一种常见做法是配置模块绑定器以将Vue从最终捆绑中排除
+    vue: 'Vue'
+  },
   plugins:[
     // 每次打包的时候先清空之前构建的目录，如(dist)
     new CleanWebpackPlugin(),

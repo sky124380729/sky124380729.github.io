@@ -1,5 +1,7 @@
 # Javascript
 
+[[toc]]
+
 ## call,apply,bind
 
 - apply通常用在需要数组转换为参数列表形式的参数传递
@@ -54,9 +56,9 @@ function fib(n) {
 function createFib() {
   const cache = [] // [!code hl]
   function fib(n) {
-    if(cache[n] !== undefined) return cache[n]
-    if(n === 1 || n === 2) return (cache[n] = 1)
-    else return (cache[n] = fib(n - 1) + fib(n - 2))
+  if(cache[n] !== undefined) return cache[n]
+  if(n === 1 || n === 2) return (cache[n] = 1)
+  else return (cache[n] = fib(n - 1) + fib(n - 2))
   }
   return fib
 }
@@ -107,7 +109,7 @@ factorial(5) // 120
 ```js
 function currying(fn, n) {
   return function (m) {
-    return fn.call(this, m, n);
+  return fn.call(this, m, n);
   };
 }
 
@@ -129,10 +131,737 @@ factorial(5) // 120
 function fibonacci(n) {
   let a = 1, b = 1, c = 1
   for(let i = 2; i <= n; i++) {
-    c = a + b
-    a = b
-    b = c
+  c = a + b
+  a = b
+  b = c
   }
   return c
 }
 ``` -->
+
+## event.target 和 event.currentTarget的区别
+
+- `event.target` 返回的是当前点击元素的节点
+- `event.currentTarget` 返回的始终是绑定事件的节点
+
+## 闭包的作用
+
+- 可以通过闭包返回的函数或者方法，来修改函数内部的数据
+- 创建一个私有空间，保护数据，外部想要访问数据，只能通过函数提供的方法，在提供的方法，可以设置一些校验规则，让数据变得更加安全
+
+## js的作用域是词法作用域(代码在写好的时候，变量的作用域就已经确定了)
+
+```js
+var num = 123;
+function f1(){
+  console.log(num);
+}
+function f2(){
+  var num = 456;
+  f1();
+}
+f2(); //123
+```
+
+## js是单线程的
+
+```js
+for(var i=0;i<arr.length;i++){
+  setTimeout(function(){
+  console.log(i)
+  },0)
+}
+```
+
+执行结果全是0，这是why？
+
+- 先把主任务(代码任务执行完毕)
+- 再去执行次要的任务(包括setTimeout和setInterval的回调)
+
+类似的
+
+```js
+for(var i=0;i<div.length;i++){
+  div[i].onclick = function(){
+  alert("我是第"+i+"个div");
+  }
+}
+```
+
+这里的alert出来的都是i的最后一个值,why?
+这是因为点击的时候代码已经执行完毕了，i已经变成最后一个了，除非你在代码执行的过程中点击(这是做不到的)
+
+## 伪数组特点
+
+- 必须要有length属性
+- 如果length属性值是0，那么这个对象有没有元素无所谓
+- 如果length属性值不为0，那么这个对象一定有（length-1）为下标的属性值
+
+## &&和||小技巧
+
+> 基础用法
+
+```js
+if(a>=5) {
+  alert(1)
+}
+```
+
+可以简化成
+
+```js
+a >= 5 && alert(1)
+```
+
+> 假如我们有一个需求，
+> 速度(speed)为5显示1个箭头(num)；
+> 速度为10显示2个箭头；
+> 速度为12显示3个箭头；
+> 速度为15显示4个箭头；
+> 其他都显示都显示0各箭头。
+
+传统的if elseif else 写法太low
+改进版的switch case 稍微进步一点，还是很low
+是时候用一行代码搞定了！
+
+```js
+var num = (speed == 5 && 1) || (speed == 10 && 2) ||(speed == 15 && 3) ||(speed == 20 && 4) || 0
+```
+
+让我们来更进一步
+
+```js
+var num = {'5':1,'10':2,'15':3,'20':4}[speed] || 0;
+```
+
+如果是判断区间的话则使用之前的方法
+
+```js
+var num = (speed > 20 && 4) || (speed > 15 && 3) || (speed > 10 && 2) || (speed > 5 && 1) || 0
+```
+
+## 生成uuid
+
+```js
+function generateUUID() {
+  var d = new Date().getTime();
+  if (window.performance && typeof window.performance.now === "function") {
+   d += performance.now(); //use high-precision timer if available
+  }
+  var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+   var r = (d + Math.random() * 16) % 16 | 0;
+   d = Math.floor(d / 16);
+   return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+  });
+  return uuid;
+}
+```
+
+## promise封装异步队列
+
+> 使用forEach函数
+
+```js
+function queue(things) {
+   let promise = Promise.resolve()
+   things.forEach(thing=>{
+  promise = promise.then(()=>{
+  return new Promise(resolve=>{
+   setTimeout(()=>{
+  console.log(thing)
+  resolve()
+   },1000)
+  })
+  })
+   })
+}
+```
+
+> 使用reduce函数
+
+```js
+function queue(things) {
+   things.reduce((promise,thing)=>{
+  return promise.then(()=>{
+  return new Promise(resolve=>{
+   setTimeout(()=>{
+  console.log(thing)
+  resolve()
+   },1000)
+  })
+  })
+   },Promise.resolve())
+}
+```
+
+## js平滑滚动到顶部
+
+- 最简单的方法(苹果上有毒)
+
+  ```js
+  window.scrollTo({
+  left: 0,
+  top: 0,
+  behavior: 'smooth'
+  })
+  ```
+
+- 最终方案
+
+  ```js
+  const scrollToTop = () => {
+  const sTop = document.documentElement.scrollTop || document.body.scrollTop
+  if (sTop > 0) {
+  window.requestAnimationFrame(scrollToTop)
+  window.scrollTo(0, sTop - sTop / 8)
+  }
+  }
+  scrollToTop()
+  ```
+
+## 两个并发执行的请求
+
+```js
+// 错误
+await a()
+await b()
+// 相当于
+a().then(() => b())
+```
+
+```js
+// 正确
+await Promise.all([a(), b()])
+```
+
+## 移除匿名事件绑定
+
+```js
+const ownAddEventListener = (scope, type, handler, capture) => {
+  scope.addEventListener(type, handler, capture);
+  return () => {
+  scope.removeEventListener(type, handler, capture);
+  }
+}
+// 然后，您可以像这样删除事件监听器：
+// Add event listener
+const disposer = ownAddEventListener(document.body, 'scroll', () => {
+  // do something
+}, false);
+// Remove event listener
+disposer();
+```
+
+## some和every函数可以提前停止循环
+
+## 数组变成hashMap实现性能优化
+
+> 例如对数组的操作
+
+```js
+
+const posts = [{ ...post }, { ...post }]
+
+// 查找数据
+const currentFile = posts.find( post => post.id === currentId)
+
+// 修改一个数据
+posts.map(post => {
+  if(post.id === currentId) {
+  return newPost
+  }else {
+  return post
+  }
+})
+
+// 删除一个数据
+posts.filter( post => post.id !== currentId )
+
+```
+
+> 转换成hashMap之后
+
+```js
+const posts = {
+  '1': { ...post },
+  '2': { ...post }
+}
+
+// 查找数据
+const currentFile = posts[currentId]
+
+// 修改一个数据
+posts[currentId].title = 'new title'
+
+// 删除一个数据
+delete posts[currentId]
+
+```
+
+## 关于纯函数
+
+### 概念
+
+- 纯函数：相同的输入永远会得到相同的输出，而且没有任何可观察的副作用。类似于数学中的函数(用来描述输入和输出之间的关系)，y=f(x)
+- lodash是一个纯函数的功能库，提供了对数组，数字，对象，字符串，函数等操作的一些方法
+- 数组的slice和splice分别是：纯函数和不纯的函数
+
+### 好处
+
+- 可缓存：因为纯函数对相同的输入始终由相同的结果，所以可以把纯函数的结果缓存起来
+
+```js
+// 求圆的面积
+function getArea(r) {
+  return Math.PI * r * r
+}
+// 模拟一个memoize函数
+function memoize(fn) {
+  let cache = {}
+  return function() {
+  let key = JSON.stringify(arguments)
+  cache[key] = cache[key] || fn.apply(this,arguments)
+  return cache[key]
+  }
+}
+const getAreaWithMemory = memoize(getArea)
+console.log(getAreaWithMemory(4))
+console.log(getAreaWithMemory(4))
+```
+
+- 可测试：纯函数让测试更方便
+- 并行处理：在多线程环境下并行操作共享内存数据可能出现意外情况，纯函数不需要访问共享的内存数据，所以并行环境下可以任意运行纯函数(Web Worker)
+
+## 柯里化
+
+当一个函数有多个参数的时候先传递一部分参数调用它(这部分参数以后永远不变)，然后返回一个新的函数接收剩余的参数，返回结果
+
+```js
+function getSum (a, b, c) {
+  return a + b + c
+}
+
+function curry (func) {
+  return function curriedFn(...args) {
+  // 判断实参和形参的个数
+  if(args.length < func.length) {
+  return function () {
+  return curriedFn(...args.concat(Array.from(arguments)))
+  }
+  }
+  return func(...args)
+  }
+}
+
+const c = curry(getSum)
+console.log(c(1, 2, 3))
+console.log(c(1)(2, 3))
+console.log(c(1)(2)(3))
+```
+
+## 函数组合
+
+- 函数组合(compose):如果一个函数要经过多个函数处理才能得到最终值，这个时候可以把中间过程的函数合并成一个函数
+- 函数就像是数据的管道，函数组合就是把这些管道连接起来，让数据穿过多个管道形成最终的结果
+- 函数组合默认是从右到左执行
+- 要满足结合律(数学上的)
+
+```js
+function flowRight(...fns) {
+  return function(value) {
+  while(fns.length) {
+  const fn = fns.pop()
+  value = fn(value)
+  }
+  return value
+  }
+}
+
+const reverse = arr => arr.reverse()
+
+const first = arr => arr[0]
+
+const toUpper = s => s.toUpperCase()
+
+const f = flowRight(toUpper, first, reverse)
+
+// 满足结合律
+// const f = flowRight(flowRight(toUpper, first), reverse)
+console.log(f(['hello','world','john']))
+```
+
+## loadsh/fp
+
+- loadsh的fp模块提供了实用的对 **函数式编程友好** 的方法
+- 提供了不可变 **auto-curried iteratee-first data-list** 的方法
+
+```js
+// loadsh 模块
+const _ = require('lodash')
+
+_.map(['a', 'b', 'c'], _.toUpper)
+_.map(['a', 'b', 'c'])
+
+// loadsh/fp 模块
+
+const fp = require('lodash/fp')
+
+fp.map(fp.toUpper,['a','b','c'])
+fp.map(fp.toUpper)(['a','b','c'])
+
+fp.split(' ', 'Hello World')
+fp.split(' ')('Hello World')
+
+```
+
+## Point Free
+
+> 我们可以把数据处理的过程定义成与数据无关的合成预算，不需要用到代表数据的那个参数，只要把简单的运算步骤合成到一起，在使用这种模式之前我们需要定义一些辅助的基本运算函数
+
+- 不需要指明处理的数据
+- 只需要合成运算过程
+- 需要定义一些辅助的基本运算函数
+
+```js
+const f = fp.flowRight(fp.join('-'), fp.map(_.toLower), fp.split(' '))
+```
+
+## Functor(函子)
+
+- 容器:包含值和值的变形关系(这个变形关系就是函数)
+- 函子:是一个特殊的容器，通过一个普通的对象来实现，该对象具有map方法，map方法可以运行一个函数对值进行处理(变形关系)
+
+```js
+class Container {
+  static of (value) {
+  return new Container(value)
+  }
+  constructor(value) {
+  this._value = value
+  }
+  map(fn) {
+  return Container.of(fn(this._value))
+  }
+}
+
+let r = Container.of(5).map(x => x + 2).map(x => x * x )
+```
+
+## JSON.stringify(value\[, replacer \[, space]])
+
+- value 将要序列化成 一个 JSON 字符串的值。
+- replacer 如果该参数是一个函数，则在序列化过程中，被序列化的值的每个属性都会经过该函数的转换和处理；如果该参数是一个数组，则只有包含在这个数组中的属性名才会被序列化到最终的 JSON 字符串中；如果该参数为 null 或者未提供，则对象所有的属性都会被序列化。
+- space 指定缩进用的空白字符串，用于美化输出（pretty-print）；如果参数是个数字，它代表有多少的空格；上限为10。该值若小于1，则意味着没有空格；如果该参数为字符串（当字符串长度超过10个字母，取其前10个字母），该字符串将被作为空格；如果该参数没有提供（或者为 null），将没有空格。
+
+```js
+const o = {
+  a: function() {},
+  b: undefined,
+  c: null
+}
+JSON.stringify(o) // "{"c":null}"
+```
+
+## ES MODULES基本特性
+
+```html
+<script type="module"></script>
+```
+
+- 自动采用严格模式
+- 每个ESM模块都是单独的私有作用域
+- ESM是通过CORS去请求外部JS模块的
+- ESM的script标签会延迟执行脚本，类似于添加defer属性
+
+## 关于export
+
+```js
+const name = 'levi'
+const age = 18
+// 此处不能误解为导出对象字面量，而这是一个固定的语法
+// 因此导入的时候也是固定语法， 不能解构
+export { name, age }
+// 而如果要导出对象字面量则需要加default
+export default { name, age }
+```
+
+```js
+// a.js
+// 导出的是引用，这里和node的commonjs不一样
+var name = 'jack'
+export { name }
+setTimeout(function() {
+  name = 'levi'
+}, 1000)
+```
+
+```js
+import { name } from './a.js'
+name = 'tom' // 这里会报错，因为模块是只读的
+console.log(name) // jack
+setTimeout(function() {
+  console.log(name) // levi
+}, 1500)
+
+```
+
+## 关于ESM 和 CommonJs
+
+区别
+
+- ESM可以导入commonJs模块
+- commonJs不可以导入ESM
+- commonJs始终只会导出一个默认成员
+
+commonJs中 `__filename` 和 `__dirname`在ESM中如何获取
+
+```js
+import { fileURLToPath } from 'url'
+import { dirname } from 'path'
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+console.log(__filename, __dirname)
+```
+
+## ESNEXT
+
+### 模板字符串的高级用法
+
+// 可以实现多语言或者检查不安全字符，或者实现小型模板引擎
+
+```js
+const name = 'tom'
+const gender = true
+
+function myTagFunc(strings, name ,gender) {
+  const sex = gender ? 'man' : 'woman'
+  // console.log(strings, name, gender)
+  return strings[0] + name + strings[1] + sex + strings[2]
+}
+
+const result = myTagFunc`hey, ${name} is a ${gender}`
+```
+
+### Symbol(最主要的作用就是为对象添加独一无二的属性标识符)
+
+使用symbol定义私有成员，外部无法访问
+
+```js
+// a.js ==========================
+const name = Symbol()
+const person = {
+  [name]: 'levi',
+  say() {
+  console.log(this[name])
+  }
+}
+export default person
+// b.js ==========================
+import person from './a.js'
+person.say()
+```
+
+Symbol.for
+
+```js
+console.log(
+  Symbol() === Symbol(), // false
+  Symbol('foo') === Symbol('foo'), // false
+  Symbol.for('foo') === Symbol.for('foo') // true
+)
+```
+
+Symbol.toStringTag
+
+```js
+const obj = {
+  [Symbol.toStringTag]: 'XObject'
+}
+console.log(obj.toString()) // [object XObject]
+```
+
+Symbol类型的属性名通过`for in`、`Object.keys`、`JSON.Stringify`都获取不到
+
+可以通过`Object.getOwnPropertySybols`获取到
+
+因此Symbol特别适合定义私有成员
+
+### for of
+
+遍历数组相比较于`forEach`，它可以通过`break`跳出循环。(`some`和`every`可以提前终止循环)
+
+### 迭代器设计模式
+
+```js
+// 迭代器设计模式
+
+// 场景：你我协同开发一个任务清单应用
+
+// 我的代码 ================================
+
+const todos = {
+  life: ['吃饭', '睡觉', '打豆豆'],
+  learn: ['语文', '数学', '外语'],
+  work: ['喝茶'],
+  // 普通模式
+  each(callback) {
+  const all = [].concat(this.life, this.learn, this.work)
+  for(const item of all) {
+    callback(item)
+  }
+  },
+  // 迭代器模式
+  [Symbol.iterator]() {
+  const all = [...this.life, ...this.learn, ...this.work]
+  let index = 0
+  return {
+    next() {
+    return {
+      value: all[index],
+      done: index++ >= all.length
+    }
+    }
+  }
+  }
+}
+
+
+// 你的代码 ================================
+todos.each(item => {
+  console.log(item)
+})
+
+console.log('------------------------------')
+
+for(const val of todos) {
+  console.log(val)
+}
+```
+
+
+### generator
+
+应用1: 发号器
+
+```js
+function * createIdMaker() {
+  let id = 1
+  while(true) {
+  yield id++
+  }
+}
+const idMaker = createIdMaker()
+console.log(idMaker.next().value)
+console.log(idMaker.next().value)
+console.log(idMaker.next().value)
+console.log(idMaker.next().value)
+```
+
+应用2： 实现iterator方法
+
+```js
+const todos = {
+  life: ['吃饭', '睡觉', '打豆豆'],
+  learn: ['语文', '数学', '外语'],
+  work: ['喝茶'],
+  [Symbol.iterator]: function *() {
+  const all = [...this.life, ...this.learn, ...this.work]
+  for(const item of all) {
+    yield item
+  }
+  }
+}
+
+for(const item of todos) {
+  console.log(item)
+}
+```
+
+### Object转Map技巧
+
+```js
+const obj = { a: 1 }
+console.log(new Map(Object.entries(obj)))
+```
+
+### padStart / padEnd
+
+```js
+const books = {
+  html: 5,
+  css: 16,
+  javascript: 128
+}
+
+for(const [name, count] of books) {
+  console.log(`${name.padEnd(16, '-')}|${count.toString().padStart(3, '0')}`)
+}
+// html------------|005
+// css-------------|016
+// javascript------|128
+```
+
+## 后端管理系统菜单树的设计
+
+- 传给后端的时候后端需要存两个字段`checkedList`和`halfCheckedList`
+
+```javascript
+const handlePernmissionSubmit = () => {
+  const nodes = this.$refs.tree.getCheckedNodes()
+  const halfKeys = this.$refs.tree.getHalfCheckedKeys()
+  const checkedKeys = []
+  const parentKeys = []
+  nodes.map(node => {
+  if(!node.children) {
+    checkedKeys.push(node.id)
+  }else {
+    parentKeys.push(node.id)
+  }
+  const data = {
+    id: this.roleId,
+    permissionList: {
+      checkedKeys,
+      halfCheckedKeys: parentKeys.concat(halfKeys)
+    }
+  }
+}
+```
+
+- 由于父子菜单是`check-strictly`，菜单下面有一个固定的`查看`按钮
+
+## 性能优化
+
+
+### javascript中的垃圾
+
+- javascript内存管理是自动的
+- 对象不再被引用时是垃圾
+- 对象不能从根上(全局作用域)访问到时是垃圾
+
+### 引用计数算法优点
+
+- 发现垃圾时立即回收
+- 最大限度减少程序卡顿时间
+
+### 引用计数算法缺点
+
+- 无法回收循环引用的对象
+- 时间开销大
+
+### 标记清除算法
+
+- 核心思想：分标记和清除两个阶段完成
+- 遍历所有对象找标记活动对象
+- 遍历所有对象清除没有标记对象
+- 回收相应的空间
+
+### 标记清除算法优缺点
+
+- 优点：相对于引用计数，解决了循环引用不能回收的问题
+- 缺点：回收完的空间碎片化，不能让空间最大化使用
+
+### 标记整理算法原理
+
+- 标记整理可以看做是标记清除的增强
+- 标记阶段的操作和标记清除算法一致
+- 清除阶段会先执行整理，移动对象位置

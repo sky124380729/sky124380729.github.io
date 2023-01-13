@@ -7,6 +7,10 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "scripts": {
+    "dev": "pnpm -F @levi/docs dev",
+    "build": "pnpm -F @levi/docs build"
+  },
   "dependencies": {
     "naive-ui": "^2.34.3"
   },
