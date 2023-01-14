@@ -50,6 +50,34 @@ module.exports = {
 
 but...多个子应用同时存在怎么办...
 
+- css-in-js
+
+## 父子应用通信
+
+- props
+- CustomEvent
+
+```js
+// add an appropriate event listener
+obj.addEventListener('cat', function(e) {
+  process(e.detail)
+})
+
+// create and dispatch the event
+var event = new CustomEvent('cat', {
+  detail: {
+    hazcheeseburger: true
+  }
+})
+obj.dispatchEvent(event)
+```
+
+## 子应用间通信
+
+- props
+  - 子应用1 - 父应用交互 - 子应用2
+- customevent
+
 ## 脚本示例
 
 > 获取所有项目目录并启动脚本
@@ -103,6 +131,26 @@ export const setMainLifecycle = (data) => lifecycle = data
 
 :::
 
+:::code-group
+
+```js [customevent/index.js]
+export class Custom {
+  // 事件监听
+  on(name, cb) {
+    window.addEventListener(name, e => cb(e.detail))
+  }
+  // 事件触发
+  emit(name, data) {
+    const event = new CustomEvent(name, {
+      detail: data
+    })
+    window.dispatchEvent(event)
+  }
+}
+```
+
+:::
+
 ::: code-group
 
 ```js [lifecycle/index.js]
@@ -145,7 +193,10 @@ export const beforeLoad = async (app) => {
 }
 
 export const mounted = async (app) => {
-  app && app.mount && app.mount()
+  app && app.mount && app.mount({
+    appInfo: app.appInfo,
+    entry: app.entry
+  })
   // 对应执行一下主应用的生命周期
   await runMainLifecycle('mounted')
 }
@@ -626,6 +677,16 @@ import { getList, setList } from './const/subApps'
 import { setMainLifecycle } from './const/lifecycle'
 import { currentApp } from './utils'
 import { rewriteRouter } from './router/rewriteRouter'
+import { Custom } from './cutomevent'
+
+const custom = new Custom()
+
+/* custom.on('test', (data) => {
+  console.log(data)
+}) */
+
+// 这样可以在子应用获取custom内容
+window.custom = custom
 
 rewriteRouter()
 
@@ -669,30 +730,36 @@ export { registerMicroApps, start } from './start'
 ::: code-group
 
 ```js [store/sub.js]
+import * as appInfo from '../store'
+
 export const subNavList = [
   {
     name: 'react15',
     activeRule: '/react15',
     container: '#micro-container',
-    entry: '//localhost:9002/'
+    entry: '//localhost:9002/',
+    appInfo
   },
   {
     name: 'react16',
     activeRule: '/react16',
     container: '#micro-container',
-    entry: '//localhost:9003/'
+    entry: '//localhost:9003/',
+    appInfo
   },
   {
     name: 'vue2',
     activeRule: '/vue2',
     container: '#micro-container',
-    entry: '//localhost:9004/'
+    entry: '//localhost:9004/',
+    appInfo
   },
   {
     name: 'vue3',
     activeRule: '/vue3',
     container: '#micro-container',
-    entry: '//localhost:9005/'
+    entry: '//localhost:9005/',
+    appInfo
   },
 ]
 ```
@@ -768,7 +835,11 @@ export const bootstrap = () => {
   console.log('开始加载')
 }
 
-export const mount = () => {
+export const mount = (app) => {
+  // 通过props传递下来的
+  app.appInfo.header.changeHeader(false)
+  // 通过customevent传递数据上去
+  window.custom.emit('test', { a: 1 })
   render()
   console.log('渲染成功')
 }
