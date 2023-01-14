@@ -6,6 +6,50 @@
 
 ![micro-frontend](/assets/imgs/micro-frontend.png)
 
+## javascript沙箱隔离
+
+- 通过`snapshot`方式实现沙箱隔离(详见下文)
+
+- 通过`proxy`方式实现沙箱隔离(详见下文)
+
+## css沙箱隔离
+
+- `css modules`
+
+::: code-group
+
+```js [webpack.config.js]
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.(cs|scs)s$/,
+        use: [MiniCssExtractPlugin.loader, {
+          loader: 'css-loader',
+          options: {
+            module: true // [!code hl]
+          }
+        }]
+      }
+    ]
+  }
+}
+```
+
+:::
+
+- `shadow dom` 很完美，但是是比较新的API，hmm...现在都2023了，应该用起来没啥毛病了吧...
+
+<<< @/public/demos/shadow-dom.html
+
+<iframe width="100%" src="/demos/shadow-dom.html"></iframe>
+
+- `minicss` MiniCssExtractPlugin
+
+使用的是`MiniCssExtractPlugin`将css文件打包成单独的文件，由于在是在子应用中加载`link`标签，所以子应用卸载之后`link`也会消失，实现了沙箱隔离
+
+but...多个子应用同时存在怎么办...
+
 ## 脚本示例
 
 > 获取所有项目目录并启动脚本
