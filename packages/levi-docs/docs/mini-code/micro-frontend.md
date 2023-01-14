@@ -77,7 +77,11 @@ export const lifecycle = async () => {
     return
   }
   // 如果有上一个子应用，需要调用上一个子应用的销毁方法
-  if(prevApp && prevApp.destroyed) {
+  if(prevApp && prevApp.unmount) {
+    // 沙箱销毁
+    if(prevApp.proxy) {
+      prevApp.proxy.inactive()
+    }
     await destroyed(prevApp)
   }
   // 执行下一个子应用的beforeLoad方法
@@ -97,13 +101,13 @@ export const beforeLoad = async (app) => {
 }
 
 export const mounted = async (app) => {
-  app && app.mounted && app.mounted()
+  app && app.mount && app.mount()
   // 对应执行一下主应用的生命周期
   await runMainLifecycle('mounted')
 }
 
 export const destroyed = async (app) => {
-  app && app.destroyed && app.destroyed()
+  app && app.unmount && app.unmount()
   // 对应执行一下主应用的生命周期
   await runMainLifecycle('destroyed')
 }
@@ -174,6 +178,7 @@ export const fetchResource = (url) => fetch(url).then(async res => await res.tex
 
 ```js [loader/index.js]
 import { fetchResource } from '../utils/fetchResource'
+import { sandBox } from '../sandbox'
 
 // 加载html的方法
 export const loadHtml = async (app) => {
@@ -186,7 +191,10 @@ export const loadHtml = async (app) => {
   if(!ct) {
     throw Error('容器不存在，请检查')
   }
-  ct.innerHTML = html
+  ct.innerHTML = dom
+  scripts.forEach(item => {
+    sandBox(app, item)
+  })
   return app
 }
 
@@ -255,7 +263,7 @@ export const getResources = async (root, entry) => {
 
 ```js [router/routerHandle.js]
 import { isTurnChild } from '../utils'
-import { lifecycle } from '.../lifecycle'
+import { lifecycle } from '../lifecycle'
 
 export const turnApp = async () => {
   if(isTurnChild()) {
@@ -286,7 +294,145 @@ export const rewriteRouter = () => {
 
 ::: code-group
 
+```js [sandbox/index.js]
+import { performScriptForEval } from './performScript'
+// import { SnapShotSandbox } from './snapShotSandbox'
+import { ProxySandbox } from './proxySandbox'
+
+const isCheckLifecycle = lifecycle => lifecycle && lifecycle.bootstrap && lifecycle.mount && lifecycle.unmount
+// 子应用生命周期和环境变量设置
+export const sandBox = (app, script) => {
+  const proxy = new ProxySandbox()
+  // 如果app上不存在这个对象，就赋值给app
+  if(!app.proxy) {
+    app.proxy = proxy
+  }
+  // 1. 设置环境变量
+  window.__MICRO_WEB__ = true
+  // 2. 运行js文件
+  const lifecycle = performScriptForEval(script, app.name, app.proxy.proxy)
+  // 库模式下window.vue3只是暴露了export的内容，需要将export导出的生命周期挂载到app应用锁
+  // 生命周期，挂载到app上，这样就可以在lifecycle中调用了
+  if(isCheckLifecycle(lifecycle)) {
+    app.bootstrap = lifecycle.bootstrap
+    app.mount = lifecycle.mount
+    app.unmount = lifecycle.unmount
+  }
+}
+```
+
 ```js [sandbox/performScript.js]
+export const performScriptForFunction = (script, appName, global) => {
+  // new Function本身就是一个函数体，所以外层不需要再用函数包裹
+  /* const scriptText = ` // [!code --]
+    ${script} // [!code --]
+    return window['${appName}'] // [!code --]
+  ` */
+  // 这里由于直接传global进去是个字符串会报错，所以使用的hack机制，使用window.proxy存一下
+  window.proxy = global
+  const scriptText = `
+    return ((window) => {
+      ${script}
+      return window['${appName}']
+    })(window.proxy)
+  `
+  // return new Function(scriptText).call(global, global) // [!code --]
+  return new Function(scriptText)() // [!code ++]
+}
+
+export const performScriptForEval = (script, appName, global) => {
+  // 在子应用的配置文件中开启了库模式，所以会在window暴露一个window.vue3这样的模块
+  // 这样就可以通过window.appName获取对应的内容
+  // 通过包装一层函数，可以实现既执行了脚本，又能获取到window.appName
+  /* const scriptText = ` // [!code --]
+    () => { // [!code --]
+      ${script} // [!code --]
+      return window['${appName}'] // [!code --]
+    } // [!code --]
+  ` */
+  window.proxy = global
+  const scriptText = `
+    ((window) => {
+      ${script}
+      return window['${appName}']
+    })(window.proxy)
+  `
+  // 这里的scriptText,使用eval之后还要对这个函数调用，使用call是为了修改this指向 // [!code --]
+  // return eval(scriptText).call(global, global) // [!code --]
+  return eval(scriptText) // [!code ++]
+}
+```
+
+```js [sandbox/proxySandbox.js]
+// 代理沙箱
+
+// 子应用的沙箱容器
+let defaultValue = {}
+
+export class ProxySandbox {
+  constructor() {
+    this.proxy = null
+    this.active()
+  }
+  // 沙箱激活
+  active() {
+    // 子应用需要设置属性
+    this.proxy = new Proxy(window, {
+      get(target, key) {
+        // 这里直接这么写，浏览器可能会报`Uncaught TypeError: Illegal invocation`
+        // 一般是由于代理函数之后this指向不对的问题
+        if(typeof target[key] === 'function') {
+          return target[key].bind(target)
+        }
+        return defaultValue[key] || target[key]
+      },
+      set(target, key, value) {
+        defaultValue[key] = value
+        return true
+      }
+    })
+  }
+  // 沙箱销毁
+  inactive() {
+    defaultValue = {}
+  }
+}
+```
+
+```js [sandbox/snapShotSandbox.js]
+// 快照沙箱（对全局变量设置为快照的形式，子应用切换之后所有全局变量设置为初始值）
+// 目前不推荐使用快照沙箱，原因有两点
+// 1. 由于要对整个window进行快照设置，性能是比较差
+// 2. 不支持多实例，一个页面显示多个子应用就不支持了
+export class SnapShotSandbox {
+  constructor() {
+    // 1. 代理对象
+    this.proxy = window
+    // 激活沙箱
+    this.active()
+  }
+  // 沙箱激活
+  active() {
+    // 创建一个沙箱快照
+    this.snapshot = new Map()
+    // 遍历全局环境
+    for(const key in window) {
+      this.snapshot[key] = window[key]
+    }
+  }
+  // 沙箱销毁
+  inactive() {
+    for(const key in window) {
+      if(window[key] !== this.snapshot[key]) {
+        // 还原操作
+        window[key] = this.snapshot[key]
+      }
+    }
+  }
+}
+```
+
+<!-- ```js [sandbox/performScript.js]
 // 执行应用的 js 内容 new Function 篇
 export const performScript = (script, appName, global) => {
   const scriptText =
@@ -356,9 +502,9 @@ export class ProxySandBox {
 ```
 
 ```js [sandbox/sandbox.js]
-import {ProxySandBox} from './proxySandBox';
-import {findAppByName} from '../util';
-import {performScriptForEval} from './performScript';
+import { ProxySandBox } from './proxySandBox';
+import { findAppByName } from '../util';
+import { performScriptForEval } from './performScript';
 
 // 检测是否漏掉了生命周期方法
 export const lackOfLifecycle = (lifecycles) => !lifecycles ||
@@ -424,7 +570,7 @@ export class SnapShotSandBox {
     }
   }
 }
-```
+``` -->
 
 :::
 
@@ -822,6 +968,10 @@ module.exports = {
   ```
 
   因此可以在全局访问到vue2
+
+- Uncaught TypeError: Illegal invocation？
+
+  这种错误一般都是调用浏览器内部函数的时候`this`指向不对的问题导致的
 
 - 文中的`libraryTarget`报出警告?
 

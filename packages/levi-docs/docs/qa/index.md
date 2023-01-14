@@ -25,7 +25,6 @@ Y
 - 找到`用户账户`
 - 找到`管理windows凭据`
 
-
 ## Windows下安装nvm，使用`nvm use`切换不成功问题解决
 
 nodejs 目录换一个就好
@@ -97,6 +96,26 @@ cd dist && scp -P 服务器端口号 -i 私钥的位置 -r * 用户名@服务器
 
 ```js
 hack: `${modifyVars.hack} @import (reference) "${resolve('src/design/config.less')}";`
+```
+
+## Uncaught TypeError: Illegal invocation?
+
+这种错误一般都是调用浏览器内部函数的时候`this`指向不对的问题导致的
+
+```js
+let defaultValue = {}
+this.proxy = new Proxy(window, {
+  get(target, key) {
+    if(typeof target[key] === 'function') {
+      return target[key].bind(target) // [!code hl]
+    }
+    return defaultValue[key] || target[key]
+  },
+  set(target, key, value) {
+    defaultValue[key] = value
+    return true
+  }
+})
 ```
 
 ## 插件模式下无法访问$route
