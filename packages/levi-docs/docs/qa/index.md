@@ -172,6 +172,38 @@ nginx -s stop
 - 后台开启 cors （不需要前端做任何改动）
 - 使用 nginx 转发请求
 
+## npm发布流程
+
+- 注册npm账号
+- 登录npm账号
+
+  ```bash
+  # 登录
+  npm login
+  # 检查当前登录状态
+  npm whoami
+  ```
+
+- 修改版本号
+
+  ```bash
+  # patch
+  npm version patch
+  # minor
+  npm version minor
+  # major
+  npm version major
+  ```
+
+- 发布/取消发布
+
+  ```bash
+  # 发布
+  npm publish
+  # 取消发布
+  npm unpublish
+  ```
+
 ## 如何调试源码
 
 - 找到package.json  import导入的就是module字段的文件，require导入的就是main字段的文件，没有module的话就是main

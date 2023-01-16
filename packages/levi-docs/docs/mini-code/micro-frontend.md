@@ -108,7 +108,7 @@ function runChild() {
 
 ## vue-cli + vue3创建的主应用
 
-> 微前端框架内容(文件夹名才能为micro，与src平级)
+> 微前端框架内容(文件夹名才能为micro，与src平级，后续单独拉出npm包发布)
 
 ::: code-group
 
@@ -281,7 +281,7 @@ export const loadHtml = async (app) => {
   let container = app.container // #id内容
   // 入口
   let entry = app.entry
-  const [dom, scripts] = await parseHtml(entry)
+  const [dom, scripts] = await parseHtml(entry, app.name)
   const ct = document.querySelector(container)
   if(!ct) {
     throw Error('容器不存在，请检查')
@@ -293,7 +293,13 @@ export const loadHtml = async (app) => {
   return app
 }
 
-export const parseHtml = async (entry) => {
+// 应用缓存(子应用的name作为key)
+const cache = {}
+
+export const parseHtml = async (entry, name) => {
+  if(cache[name]) {
+    return cache[name]
+  }
   const html = await fetchResource(entry)
   let allScript = []
   const div = document.createElement('div')
@@ -303,6 +309,8 @@ export const parseHtml = async (entry) => {
   // 获取所有外链的js资源
   const fetchedScripts = await Promise.all(scriptUrl.map(async item => fetchResource(item)))
   allScript = script.concat[fetchedScripts]
+  // 添加进缓存
+  cache[name] = [dom, allScript]
   return [dom, allScript]
 }
 
@@ -352,6 +360,18 @@ export const getResources = async (root, entry) => {
 }
 ```
 
+```js [loader/prefetch.js]
+import { getList } from '../const/subApps'
+import { parseHtml } from './index'
+
+export const prefetch = async () => {
+  // 1. 获取所有子应用列表 - 不包括当前正在显示的
+  const list = getList().filter(item => !window.location.pathname.startsWith(item.activeRule))
+  // 2. 预加载所有剩下的子应用
+  await Promise.all(list.map(async item => await parseHtml(item.entry, item.name)))
+}
+```
+
 :::
 
 ::: code-group
@@ -389,6 +409,43 @@ export const rewriteRouter = () => {
 
 ::: code-group
 
+```js [store/index.js]
+
+
+export const createStore = (initData = {}) => (() => {
+  let store = initData
+  // 管理所有的订阅者，依赖
+  const observers = []
+  // 获取store
+  const getStore = () => store
+  // 更新store
+  const update = (value) => {
+    // TODO: 这里目前只能比较基本数据类型
+    if(value !== store) {
+      // 执行store的操作
+      const oldValue = store
+      // 将store更新
+      store = value
+      // 通知所有订阅者
+      observers.forEach(async fn => await fn(store, oldValue))
+    }
+  }
+  // 添加订阅者
+  const subscribe = (fn) => {
+    observers.push(fn)
+  }
+  return {
+    getStore,
+    update,
+    subscribe
+  }
+})()
+```
+
+:::
+
+::: code-group
+
 ```js [sandbox/index.js]
 import { performScriptForEval } from './performScript'
 // import { SnapShotSandbox } from './snapShotSandbox'
@@ -406,7 +463,7 @@ export const sandBox = (app, script) => {
   window.__MICRO_WEB__ = true
   // 2. 运行js文件
   const lifecycle = performScriptForEval(script, app.name, app.proxy.proxy)
-  // 库模式下window.vue3只是暴露了export的内容，需要将export导出的生命周期挂载到app应用锁
+  // 库模式下window.vue3只是暴露了export的内容，需要将export导出的生命周期挂载到app应用中
   // 生命周期，挂载到app上，这样就可以在lifecycle中调用了
   if(isCheckLifecycle(lifecycle)) {
     app.bootstrap = lifecycle.bootstrap
@@ -677,6 +734,7 @@ import { getList, setList } from './const/subApps'
 import { setMainLifecycle } from './const/lifecycle'
 import { currentApp } from './utils'
 import { rewriteRouter } from './router/rewriteRouter'
+import { prefetch } from './loader/prefetch'
 import { Custom } from './cutomevent'
 
 const custom = new Custom()
@@ -712,6 +770,8 @@ export const start = () => {
     // 这里是为了防止多次触发turnApp，打个标记
     window.__CURRENT_SUB_APP__ = app.activeRule
   }
+  // 预加载 - 加载接下来的所有子应用，但是不显示
+  prefetch()
 }
 ```
 
@@ -721,6 +781,7 @@ export const start = () => {
 
 ```js [index.js]
 export { registerMicroApps, start } from './start'
+export { createStore } from './store'
 ```
 
 :::
@@ -765,7 +826,22 @@ export const subNavList = [
 ```
 
 ```js [util/index.js]
-import { registerMicroApps, start } from '../../micro'
+import { registerMicroApps, start, createStore } from '../../micro'
+
+// 以下store是测试代码，实际开发中是主子应用之间的数据监听
+const store = createStore()
+
+const storeData = store.getStore()
+
+store.subscribe((newValue, oldValue) => {
+  console.log(newValue, oldValue)
+})
+
+store.update({
+  // 目前框架内部是全量替换的，所以这里先要把原始数据加进来
+  ...storeData,
+  a: 1
+})
 
 export const registerApp = (list) => {
   // 注册到微前端框架里
