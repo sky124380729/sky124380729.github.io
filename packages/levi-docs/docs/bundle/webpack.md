@@ -2,6 +2,68 @@
 
 [[toc]]
 
+## 认识Webpack
+
+webpack is a `static module bundler` for `modern` JavaScript applications.
+
+事实上随着前端的快速发展，目前前端的开发已经变的越来越复杂了
+
+- 比如开发过程中我们需要通过`模块化`的方式来开发
+- 比如也会使用一些`高级的特性来加快我们的开发效率或者安全性`，比如通过ES6+、TypeScript开发脚本逻辑，通过sass、less等方式来编写css样式代码
+- 比如开发过程中，我们还希望`实时的监听文件的变化`来并且反映到浏览器上，提高开发的效率
+- 比如开发完成后我们还需要`将代码进行压缩、合并以及其他相关的优化`
+- etc...
+
+但是对于很多的前端开发者来说，并不需要思考这些问题，日常的开发中根本就没有面临这些问题
+
+- 这是因为目前前端开发我们通常都会直接使用三大框架来开发：`Vue、React、Angular`
+- 但是事实上，这三大框架的创建过程我们都是`借助于脚手架（CLI）`的
+- 事实上Vue-CLI、create-react-app、Angular-CLI都是基于`Webpack`来帮助我们支持模块化、less、TypeScript、打包优化等的
+
+## Webpack的安装
+
+webpack的安装分为两个: `webpack`,`webpack-cli`
+
+- 执行`webpack`命令，会执行`node_modules`目录下的`.bin`目录下的`webpack`
+- `webpack`在执行时是依赖`webpack-cli`的，如果没有安装就会报错
+- 而`webpack-cli`中执行代码时，才是真正利用`webpack`进行编译和打包的过程
+- 所以在安装`webpack`时，我们需要同时安装`webpack-cli`
+
+  :::tip
+  这里需要注意的是，第三方脚手架比如(vue-cli)事实上是没有使用`webpack-cli`的，而是类似于自己的`vue-service-cli`的东西
+  :::
+
+
+## 默认打包
+
+直接在目录下运行`webpack`命令，如果没有`src/index.js`，会报错，成功的话会生成一个`dist`文件夹，里面的代码被压缩和丑化了，但是其中引入存在`ES6`语法，比如箭头函数等，这是因为默认情况下
+`webpack`并不清楚我们打包后的文件是否要转换`ES5`，后续需要我们通过`babel`进行转换和设置
+
+当然，我们可以通过配置来指定入口，出口，指定配置文件等
+
+```bash
+npx webpack --entry ./src/main.js --output-path ./build --config wk.config.js
+```
+
+## webpakc-loader
+
+### loader是什么？
+
+- loader可以用于对`模块的源代码`进行转换
+- 我们可以将`css文件看成一个模块`，我们是`通过import来加载这个模块`的
+- 在加载这个模块时，`webpack`其实并不知道如何对其进行加载，我们必须指定对应的`loader`来完成这个功能
+
+### 如何使用loader
+
+- 内联方式（使用较少，因为不方便管理）
+
+  ```js
+  import 'css-loader!../css/style.css'
+  ```
+
+- CLI方式（webpack5中不再使用）
+- 配置方式
+
 ## Webpack配置参考
 
 ::: code-group

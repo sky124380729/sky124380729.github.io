@@ -16,39 +16,39 @@
 
 - `css modules`
 
-::: code-group
+  ::: code-group
 
-```js [webpack.config.js]
-module.exports = {
-  module: {
-    rules: [
-      {
-        test: /\.(cs|scs)s$/,
-        use: [MiniCssExtractPlugin.loader, {
-          loader: 'css-loader',
-          options: {
-            module: true // [!code hl]
-          }
-        }]
-      }
-    ]
+  ```js [webpack.config.js]
+  module.exports = {
+    module: {
+      rules: [
+        {
+          test: /\.(cs|scs)s$/,
+          use: [MiniCssExtractPlugin.loader, {
+            loader: 'css-loader',
+            options: {
+              module: true // [!code hl]
+            }
+          }]
+        }
+      ]
+    }
   }
-}
-```
+  ```
 
-:::
+  :::
 
 - `shadow dom` 很完美，但是是比较新的API，hmm...现在都2023了，应该用起来没啥毛病了吧...
 
-<<< @/public/demos/shadow-dom.html
+  <<< @/public/demos/shadow-dom.html
 
-<iframe width="100%" src="/demos/shadow-dom.html"></iframe>
+  <iframe width="100%" src="/demos/shadow-dom.html"></iframe>
 
 - `minicss` MiniCssExtractPlugin
 
-使用的是`MiniCssExtractPlugin`将css文件打包成单独的文件，由于在是在子应用中加载`link`标签，所以子应用卸载之后`link`也会消失，实现了沙箱隔离
+  使用的是`MiniCssExtractPlugin`将css文件打包成单独的文件，由于在是在子应用中加载`link`标签，所以子应用卸载之后`link`也会消失，实现了沙箱隔离
 
-but...多个子应用同时存在怎么办...
+  but...多个子应用同时存在怎么办...
 
 - css-in-js
 
@@ -57,20 +57,20 @@ but...多个子应用同时存在怎么办...
 - props
 - CustomEvent
 
-```js
-// add an appropriate event listener
-obj.addEventListener('cat', function(e) {
-  process(e.detail)
-})
+  ```js
+  // add an appropriate event listener
+  obj.addEventListener('cat', function(e) {
+    process(e.detail)
+  })
 
-// create and dispatch the event
-var event = new CustomEvent('cat', {
-  detail: {
-    hazcheeseburger: true
-  }
-})
-obj.dispatchEvent(event)
-```
+  // create and dispatch the event
+  var event = new CustomEvent('cat', {
+    detail: {
+      hazcheeseburger: true
+    }
+  })
+  obj.dispatchEvent(event)
+  ```
 
 ## 子应用间通信
 
@@ -410,8 +410,6 @@ export const rewriteRouter = () => {
 ::: code-group
 
 ```js [store/index.js]
-
-
 export const createStore = (initData = {}) => (() => {
   let store = initData
   // 管理所有的订阅者，依赖
@@ -1141,6 +1139,10 @@ module.exports = {
 ```
 
 :::
+
+## 关于qiankun
+
+- 其内部也是对`single-spa`的封装
 
 ## Q&A
 

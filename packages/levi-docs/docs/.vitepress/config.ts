@@ -19,7 +19,7 @@ export default defineConfig({
         '/framework': [
           {
             text: 'Vue',
-            collapsible: true,
+            collapsed: true,
             items: [
               { text: 'Knowledge Points', link: '/framework/vue/knowledge' },
               { text: 'Source Code', link: '/framework/vue/code' }
@@ -27,7 +27,7 @@ export default defineConfig({
           },
           {
             text: 'React',
-            collapsible: true,
+            collapsed: true,
             items: [
               { text: 'Knowledge Points', link: '/framework/react/knowledge' },
               { text: 'Source Code', link: '/framework/react/code' }
@@ -42,7 +42,7 @@ export default defineConfig({
           },
           {
             text: 'Micro Frontend',
-            collapsible: true,
+            collapsed: true,
             items: [
               { text: 'Knowledge Points', link: '/framework/micro-frontend/knowledge' },
               { text: 'Single SPA', link: '/framework/micro-frontend/single-spa' },
@@ -53,7 +53,7 @@ export default defineConfig({
         '/algorithm': [
           {
             text: 'Data Structure',
-            collapsible: true,
+            collapsed: true,
             items: [
               { text: 'Stack', link: '/algorithm/stack' },
               { text: 'Queue', link: '/algorithm/queue' },
@@ -63,7 +63,7 @@ export default defineConfig({
           },
           {
             text: 'Algorithm',
-            collapsible: true,
+            collapsed: true,
             items: [
               { text: 'Sort', link: '/algorithm/sort' },
               { text: 'Recursion', link: '/algorithm/recursion' },
@@ -74,7 +74,7 @@ export default defineConfig({
         '/interview': [
           {
             text: 'Knowledge',
-            collapsible: true,
+            collapsed: true,
             items: [
               { text: 'Restful', link: '/interview/restful' },
               { text: 'Optimization', link: '/interview/optimization' }
