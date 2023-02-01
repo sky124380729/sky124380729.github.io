@@ -44,3 +44,12 @@ iframe {
   content: '📜';
   @apply absolute left-0;
 }
+
+.vp-doc strong {
+  color: #ff5e00;
+  text-shadow: 1px 1px 3px #ff0508;
+}
+
+.vp-doc :not(pre) > code {
+  color: #0082ff;
+}
