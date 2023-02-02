@@ -174,7 +174,7 @@ npm install dotenv --save
 
 ::: code-group
 
-```text [.env]
+```bash [.env]
 S3_BUCKET="YOURS3BUCKET"
 SECRET_KEY="YOURSECRETKEYGOESHERE"
 ```

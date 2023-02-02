@@ -9,7 +9,8 @@
   "license": "ISC",
   "scripts": {
     "dev": "pnpm -F @levi/docs dev",
-    "build": "pnpm -F @levi/docs build"
+    "build": "pnpm -F @levi/docs build",
+    "serve": "pnpm -F @levi/docs serve"
   },
   "dependencies": {
     "naive-ui": "^2.34.3"

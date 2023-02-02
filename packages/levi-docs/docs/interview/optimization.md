@@ -61,7 +61,7 @@ http1x也支持请求体压缩，需要客户端和服务端商量好压缩和�
 
   - `Expires`(不常用，可以直接用Cache-Control，一般只会在需要向下兼容时候使用)
 
-  ```text
+  ```
   Expires: new Date('2022-02-12 23:10').toUTCString() //这里是绝对时间
   ```
 
@@ -71,7 +71,7 @@ http1x也支持请求体压缩，需要客户端和服务端商量好压缩和�
 
   - `Cache-Control`
 
-  ```text
+  ```
   Cache-Control: max-age=5  //这里的单位是s,这里也就是5秒之内强制缓存
   ```
 
@@ -87,7 +87,7 @@ http1x也支持请求体压缩，需要客户端和服务端商量好压缩和�
 
   一般对于不怎么会改变的文件，比如图片，CSS，js文件，设置public
 
-  ```text
+  ```
   Cache-Control:public,max-age:31536000
   ```
 
@@ -99,7 +99,7 @@ http1x也支持请求体压缩，需要客户端和服务端商量好压缩和�
 
   - `last-modified`
 
-  ```text
+  ```
   Cache-Control: no-cache
   last-modified: new Date('2022-02-12 23:10').toUTCString() //  绝对时间，一般取文件的修改时间
   ```
