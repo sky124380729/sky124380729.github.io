@@ -116,13 +116,28 @@
 
   ::: details 关于编译时加载
 
+  由于是编译时加载是静态分析，因此不支持动态导入
+
   ```js
-  // 由于是编译时加载是静态分析，因此不支持动态导入
-  // ok
-  import('./test.js')
-  // not ok
-  const path = '/.test.js'
-  import(path)
+  // success
+  import('./test.js').then()
+  // error
+  const foo = '/.test.js'
+  import(foo).then()
+  ```
+  webpack官网中有以下描述：
+
+  > 不能使用完全动态的 import 语句，例如 import(foo)。是因为 foo 可能是系统或项目中任何文件的任何路径。
+
+  import() 必须至少包含一些关于模块的路径信息。打包可以限定于一个特定的目录或文件集，以便于在使用动态表达式时 - 包括可能在 import() 调用中请求的每个模块。
+  例如， import(`./locale/${language}.json`) 会把 .locale 目录中的每个 .json 文件打包到新的 chunk 中。在运行时，计算完变量 language 后，就可以使用像 english.json 或 german.json 的任何文件。
+
+  ```js
+  // 想象我们有一个从 cookies 或其他存储中获取语言的方法
+  const language = detectVisitorLanguage();
+  import(`./locale/${language}.json`).then((module) => {
+    // do something with the translations
+  });
   ```
 
   :::
@@ -135,18 +150,18 @@
   (function(root, factory) {
     if (typeof module === 'object' && typeof module.exports === 'object') {
       console.log('是commonjs模块规范，nodejs环境')
-      module.exports = factory();
+      module.exports = factory(); // [!code focus]
     } else if (typeof define === 'function' && define.amd) {
       console.log('是AMD模块规范，如require.js')
-      define(factory)
+      define(factory) // [!code focus]
     } else if (typeof define === 'function' && define.cmd) {
       console.log('是CMD模块规范，如sea.js')
       define(function(require, exports, module) {
-        module.exports = factory()
+        module.exports = factory() // [!code focus]
       })
     } else {
       console.log('没有模块环境，直接挂载在全局对象上')
-      root.umdModule = factory();
+      root.umdModule = factory(); // [!code focus]
     }
   }(this, function() {
     return {
@@ -260,7 +275,7 @@ CDN引入
 
 `single-spa` 还会通过**生命周期**为这些过程提供对应的**钩子函数**。
 
-- 基座应用配置
+- 主应用配置
 
 ::: code-group
 
@@ -444,4 +459,124 @@ var app2 = (function() {})()
 
 那么我们有`single-spa`这种微前端解决方案，为什么还需要`qiankun`呢?
 
-相比于`single-spa`，`qiankun`他解决了JS沙盒环境，不需要我们自己去进行处理。在single-spa的开发过程中，我们需要自己手动的去写调用子应用JS的方法（如上面的 `createScript`方法），而`qiankun`不需要，乾坤只需要你传入响应的apps的配置即可，会帮助我们去加载。
+相比于`single-spa`，`qiankun`他解决了JS沙盒环境，不需要我们自己去进行处理。
+在single-spa的开发过程中，我们需要自己手动的去写调用子应用JS的方法（如上面的 `createScript`方法），而`qiankun`不需要，乾坤只需要你传入响应的apps的配置即可，会帮助我们去加载。
+
+- 主应用配置
+
+::: code-group
+
+```ts [registerApplication.ts]
+import { registerMicroApps, start } from 'qiankun';
+
+// 默认子应用
+export const applications = [
+  {
+    name: 'singleVue3', // app name registered
+    entry: 'http://localhost:5000',
+    container: '#micro-content',
+    activeRule: '/vue3-micro-app',
+  },
+  {
+    name: 'singleReact', // app name registered
+    entry: 'http://localhost:3000',
+    container: '#micro-content',
+    activeRule: '/react-micro-app',
+  },
+]
+
+// 注册子应用
+export const registerApps = (apps: any[] = applications) => {
+  registerMicroApps(applications);
+  start();
+}
+```
+
+:::
+
+- vue3子应用配置
+
+::: code-group
+
+```ts [main.ts]
+import { createApp } from 'vue'
+import type { App as AppType } from 'vue'
+import App from './App.vue'
+import router from './router'
+
+let instance: AppType
+
+function render(container?: string) {
+  instance = createApp(App)
+  // 这里的 container 已经是对应基座应用中的真实 DOM 节点，而不是 CSS 选择器
+  instance.use(router).mount(container || '#micro-vue-app')
+}
+
+// 当 window.singleVue3 不存在时，意味着是子应用单独运行
+if (!window.singleVue3) {
+  render();
+}
+
+// 子应用必须导出 以下生命周期 bootstrap、mount、unmount
+export const bootstrap = () => {
+  return Promise.resolve()
+};
+export const mount = (props: any) => {
+  render(props.container);
+  return Promise.resolve()
+};
+export const unmount = () => {
+  instance.unmount();
+  return Promise.resolve()
+};
+```
+
+:::
+
+- react子应用
+
+::: code-group
+
+```js [src/index.js]
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import './index.css'
+import App from './App'
+
+let root = null
+
+function render(props = {}) {
+  // 这里的 container 已经是对应基座应用中的真实 DOM 节点，而不是 CSS 选择器
+  const container = props.container || document.getElementById('root')
+
+  if(!container) return
+
+  root = ReactDOM.createRoot(container)
+
+  root.render(
+    <React.StrictMode>
+      <App {...props} />
+    </React.StrictMode>,
+  )
+}
+
+// 当 window.singleReact 不存在时，意味着是子应用单独运行
+if (!window.singleReact) {
+  render()
+}
+
+// 子应用必须导出 以下生命周期 bootstrap、mount、unmount
+export const bootstrap = () => {
+  return Promise.resolve()
+}
+export const mount = (props) => {
+  render(props)
+  return Promise.resolve()
+}
+export const unmount = () => {
+  root.unmount()
+  return Promise.resolve()
+}
+```
+
+:::
