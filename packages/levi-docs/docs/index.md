@@ -46,7 +46,7 @@ const members = [
 ]
 
 const columns = [
-  { title: '关于微前端的理解与实践', img: image0, link: '/columns/micro-frontend' },
+  { title: '关于微前端的理解与实践', img: image0, link: '/columns/micro-frontend/index' },
   { title: 'thinking...', img: image1, link: '' },
   { title: 'thinking...', img: image2, link: '' },
   { title: 'thinking...', img: image3, link: '' }
