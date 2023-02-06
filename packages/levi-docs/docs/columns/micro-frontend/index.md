@@ -185,9 +185,9 @@
   {
     "imports": {
       "moment": [
-      // 这里提供了兜底方案，如果CDN挂了会回退引用本地版本
-      "https://cdn.bootcdn.net/ajax/libs/moment.js/2.29.4/locale/zh-cn.js",
-      "/node_modules/moment/src/moment.js"
+        // 这里提供了兜底方案，如果CDN挂了会回退引用本地版本
+        "https://cdn.bootcdn.net/ajax/libs/moment.js/2.29.4/locale/zh-cn.js",
+        "/node_modules/moment/src/moment.js"
       ],
       "lodash": "/node_modules/lodash-es/lodash.js"
     }
@@ -276,6 +276,18 @@ CDN引入
   System.import('vue')
 </script>
 ```
+
+### SystemJS工程配置示例
+
+::: code-group
+
+<<< @/../../system-js/src/index.html
+
+<<< @/../../system-js/webpack.config.js
+
+<<< @/../../system-js/src/index.js
+
+:::
 
 ## [single-spa](https://single-spa.js.org/)
 
