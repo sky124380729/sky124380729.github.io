@@ -6,7 +6,7 @@
 
 微前端是一种类似于微服务的架构，是一种由独立交付的多个前端应用组成整体的架构风格，将前端应用分解成一些更小、更简单的能够独立开发、测试、部署的应用，而在用户看来仍然是内聚的单个产品。有一个基座应用（主应用），来管理各个子应用的加载和卸载。
 
-![](./1.webp)
+![image](./1.webp)
 
 微前端的三大核心原则：`独立开发`、`独立运行`、`独立部署`
 
@@ -117,6 +117,7 @@
   const foo = '/.test.js'
   import(foo).then()
   ```
+
   webpack官网中有以下描述：
 
   > 不能使用完全动态的 import 语句，例如 import(foo)。是因为 foo 可能是系统或项目中任何文件的任何路径。
@@ -162,7 +163,7 @@
   }))
   ```
 
-###  Import Maps
+### Import Maps
 
 在支持`type="module"`的浏览器中尝试写如下标签
 
@@ -172,6 +173,7 @@
   import { partition } from "lodash";
 </script>
 ```
+
 这样写会报错，原因是在浏览器中，`import`必须给出`相对或绝对的URL路径`。没有任何路径的模块被称为`裸（bare）模块`。在`import`中不允许这种模块。
 
 某些环境，像`Node.js`或者打包工具允许没有任何路径的裸模块，因为它们有自己查找模块的方法。但是浏览器尚不支持裸模块。
@@ -209,13 +211,15 @@
 
 目前关于`Import Maps`的兼容性：
 
-![](./2.jpg){data-zoomable}
+![image](./2.jpg){data-zoomable}
 
-### SystemJS
+## [SystemJS](https://github.com/systemjs/systemjs)
 
 `SystemJS`是一个**动态模块加载器**，它能够将原生`ES modules`转换成[System.register module format](https://github.com/systemjs/systemjs/blob/main/docs/system-register.md)来兼容那么不支持原生模块的浏览器
 
 简单点来说，就是有了`SystemJS`就可以在浏览器中使用各种模块化方式(包括`esm`,`cjs`,`amd`,`cmd`等)
+
+也可以理解成`import maps`的`pollyfill`(当然systemjs不仅仅只支持这个功能)，甚至可以支持`IE11`
 
 CDN引入
 
@@ -233,6 +237,36 @@ CDN引入
       "vue": "https://cdn.bootcss.com/vue/2.6.11/vue.js"
     }
   }
+</script>
+
+// 对于不支持esm的浏览器
+<script>
+  System.register(['vue'], {
+    let Vue = null
+    return {
+      setters: [
+        v => Vue = v.default
+      ],
+      execute() {
+        new Vue({
+          el: '#container',
+          data: { name: 'levi' }
+        })
+      }
+    }
+  })
+</script>
+
+
+
+// 对于支持esm的浏览器
+// 以下代码如果经过打包工具编译，实际还是会转换成System.register(['vue'])的形式
+<script>
+  import Vue from 'vue'
+  new Vue({
+    el: '#container',
+    data: { name: 'levi' }
+  })
 </script>
 
 <script>
@@ -264,7 +298,7 @@ CDN引入
 
 `single-spa` 还会通过**生命周期**为这些过程提供对应的**钩子函数**。
 
-### 主应用配置
+### single-spa主应用配置
 
 ::: code-group
 
@@ -451,7 +485,7 @@ var app2 = (function() {})()
 相比于`single-spa`，`qiankun`他解决了JS沙盒环境，不需要我们自己去进行处理。
 在single-spa的开发过程中，我们需要自己手动的去写调用子应用JS的方法（如上面的 `createScript`方法），而`qiankun`不需要，乾坤只需要你传入响应的apps的配置即可，会帮助我们去加载。
 
-### 主应用配置
+### qiankun主应用配置
 
 ::: code-group
 
@@ -575,7 +609,6 @@ export const unmount = () => {
 `Module Federation`中文直译为`模块联邦`，而在webpack官方文档中，其实并未给出其真正含义，但给出了使用该功能的motivation， 即动机，原文如下：
 
 > Multiple separate builds should form a single application. These separate builds should not have dependencies between each other, so they can be developed and deployed individually.
-
 > This is often known as Micro-Frontends, but is not limited to that.
 
 翻译成中文即
@@ -587,11 +620,11 @@ export const unmount = () => {
 - host：引用了其他应用的应用
 - remote：被其他应用所使用的应用
 
-![](./5.png)
+![image](./5.png)
 
 鉴于`mf`的能力，我们可以完全实现一个去中心化的应用部署群：每个应用是单独部署在各自的服务器，每个应用都可以引用其他应用，也能被其他应用所引用，即每个应用可以充当host的角色，亦可以作为remote出现，无中心应用的概念。
 
-![](./6.png)
+![image](./6.png)
 
 ### 配置介绍
 
@@ -767,4 +800,3 @@ __webpack_require__.l = (url, done, key, chunkId) => {
 <<< @/../../module-federation/cart/webpack.config.js
 
 :::
-
