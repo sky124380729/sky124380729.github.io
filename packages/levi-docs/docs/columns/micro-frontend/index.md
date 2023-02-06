@@ -678,8 +678,10 @@ __webpack_require__.e = function(chunkId) {
     return promises;
   }, []));
 };
+
 __webpack_require__.f.consumes = function(chunkId, promises) {
-  // 检查当前需要加载的chunk是否是在配置项中被声明为shared共享资源，如果在__webpack_require__.o上能找到对应资源，则直接使用，不再去请求资源
+  // 检查当前需要加载的chunk是否是在配置项中被声明为shared共享资源，
+  // 如果在__webpack_require__.o上能找到对应资源，则直接使用，不再去请求资源
   if(__webpack_require__.o(chunkMapping, chunkId)) {
     chunkMapping[chunkId].forEach(function(id) {
       if(__webpack_require__.o(installedModules, id)) return promises.push(installedModules[id]);
@@ -699,6 +701,45 @@ __webpack_require__.f.consumes = function(chunkId, promises) {
     });
   }
 }
+
+// 这里就是动态加载运行时chunk的逻辑了，核心就是动态创建script标签 // [!code hl]
+__webpack_require__.l = (url, done, key, chunkId) => {
+  if(inProgress[url]) { inProgress[url].push(done); return; }
+  var script, needAttach;
+  if(key !== undefined) {
+    var scripts = document.getElementsByTagName("script");
+    for(var i = 0; i < scripts.length; i++) {
+      var s = scripts[i];
+      if(s.getAttribute("src") == url || s.getAttribute("data-webpack") == dataWebpackPrefix + key) { script = s; break; }
+    }
+  }
+  if(!script) {
+    needAttach = true;
+    script = document.createElement('script');
+    script.charset = 'utf-8';
+    script.timeout = 120;
+    if (__webpack_require__.nc) {
+      script.setAttribute("nonce", __webpack_require__.nc);
+    }
+    script.setAttribute("data-webpack", dataWebpackPrefix + key);
+    script.src = url;
+  }
+  inProgress[url] = [done];
+  var onScriptComplete = (prev, event) => {
+    // avoid mem leaks in IE.
+    script.onerror = script.onload = null;
+    clearTimeout(timeout);
+    var doneFns = inProgress[url];
+    delete inProgress[url];
+    script.parentNode && script.parentNode.removeChild(script);
+    doneFns && doneFns.forEach((fn) => (fn(event)));
+    if(prev) return prev(event);
+  };
+  var timeout = setTimeout(onScriptComplete.bind(null, undefined, { type: 'timeout', target: script }), 120000);
+  script.onerror = onScriptComplete.bind(null, script.onerror);
+  script.onload = onScriptComplete.bind(null, script.onload);
+  needAttach && document.head.appendChild(script);
+};
 ```
 
 通读核心代码之后，可以得到如下总结：
