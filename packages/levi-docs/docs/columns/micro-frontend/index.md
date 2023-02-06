@@ -6,31 +6,23 @@
 
 微前端是一种类似于微服务的架构，是一种由独立交付的多个前端应用组成整体的架构风格，将前端应用分解成一些更小、更简单的能够独立开发、测试、部署的应用，而在用户看来仍然是内聚的单个产品。有一个基座应用（主应用），来管理各个子应用的加载和卸载。
 
-![image](./1.webp)
+![](./1.webp)
 
 微前端的三大核心原则：`独立开发`、`独立运行`、`独立部署`
 
 2. 为什么要使用微前端(**why**)
 
-- 2.1 增量迁移
+- 2.1 拆分巨石应用
 
-迁移是一项非常耗时且艰难的任务，比如有一个管理系统使用 AngularJS 开发维护已经有三年时
-间，但是随时间的推移和团队成员的变更，无论从开发成本还是用人需求上，AngularJS 已经不能
-满足要求，于是团队想要更新技术栈，想在其他框架中实现新的需求，但是现有项目怎么办？直接
-迁移是不可能的，在新的框架中完全重写也不太现实。
+比如有一个巨大的应用，为了降低开发和维护成本，分拆成多个小应用进行开发和部署，然后用一个平台将这些小应用集成起来
 
-- 2.2 独立发布
+- 2.2 整合其他系统
 
-在目前的单页应用架构中，使用组件构建用户界面，应用中的每个组件或功能开发完成或者bug修
-复完成后，每次都需要对整个产品重新进行构建和发布，任务耗时操作上也比较繁琐。
-在使用了微前端架构后，可以将不能的功能模块拆分成独立的应用，此时功能模块就可以单独构建
-单独发布了，构建时间也会变得非常快，应用发布后不需要更改其他内容应用就会自动更新，这意
-味着你可以进行频繁的构建发布操作了。
+比如制作一个企业管理平台，把已有的采购系统和财务系统统一接入这个平台
 
 - 2.3 允许单个团队做出技术决策
 
-因为微前端构架与框架无关，当一个应用由多个团队进行开发时，每个团队都可以使用自己擅长的
-技术栈进行开发，也就是它允许适当的让团队决策使用哪种技术，从而使团队协作变得不再僵硬。
+又比如一个应用使用vue框架开发，其中有一个比较独立的模块，开发者想尝试使用react框架来开发，等模块单独开发部署完，再把这个模块应用接回去
 
 3. 如何使用微前端(**how**)
 
@@ -217,7 +209,7 @@
 
 目前关于`Import Maps`的兼容性：
 
-![image](./2.jpg)
+![](./2.jpg){data-zoomable}
 
 ### SystemJS
 
@@ -251,10 +243,7 @@ CDN引入
 </script>
 ```
 
-
-## 开源微前端框架
-
-### [single-spa](https://single-spa.js.org/)
+## [single-spa](https://single-spa.js.org/)
 
 > `single-spa`推荐使用`浏览器内ES模块 + import maps` (或者`SystemJS`填充这些，如果你需要更好的浏览器支持)的设置
 
@@ -275,7 +264,7 @@ CDN引入
 
 `single-spa` 还会通过**生命周期**为这些过程提供对应的**钩子函数**。
 
-- 主应用配置
+### 主应用配置
 
 ::: code-group
 
@@ -350,7 +339,7 @@ new Vue({
 
 构建基座的核心是：配置子应用信息，通过`registerApplication`注册子应用，在基座工程挂载阶段`start`启动基座
 
-- 子应用配置
+### 子应用配置
 
 ::: code-group
 
@@ -453,7 +442,7 @@ var app2 = (function() {})()
 
 :::
 
-### [qiankun](https://qiankun.umijs.org/zh/guide)
+## [qiankun](https://qiankun.umijs.org/zh/guide)
 
 `qiankun`是一个基于`single-spa`的微前端实现库，目的是提供更简单、无痛的构建一个生产可用微前端架构系统。
 
@@ -462,7 +451,7 @@ var app2 = (function() {})()
 相比于`single-spa`，`qiankun`他解决了JS沙盒环境，不需要我们自己去进行处理。
 在single-spa的开发过程中，我们需要自己手动的去写调用子应用JS的方法（如上面的 `createScript`方法），而`qiankun`不需要，乾坤只需要你传入响应的apps的配置即可，会帮助我们去加载。
 
-- 主应用配置
+### 主应用配置
 
 ::: code-group
 
@@ -494,7 +483,7 @@ export const registerApps = (apps: any[] = applications) => {
 
 :::
 
-- vue3子应用配置
+### vue3子应用配置
 
 ::: code-group
 
@@ -533,7 +522,7 @@ export const unmount = () => {
 
 :::
 
-- react子应用
+### react子应用
 
 ::: code-group
 
@@ -580,3 +569,161 @@ export const unmount = () => {
 ```
 
 :::
+
+## [Module Federation](https://webpack.js.org/concepts/module-federation/)
+
+`Module Federation`中文直译为`模块联邦`，而在webpack官方文档中，其实并未给出其真正含义，但给出了使用该功能的motivation， 即动机，原文如下：
+
+> Multiple separate builds should form a single application. These separate builds should not have dependencies between each other, so they can be developed and deployed individually.
+
+> This is often known as Micro-Frontends, but is not limited to that.
+
+翻译成中文即
+
+> 多个独立的构建可以形成一个应用程序。这些独立的构建不会相互依赖，因此可以单独开发和部署它们。这通常被称为微前端，但并不仅限于此。
+
+结合以上，不难看出，`mf`实际想要做的事，便是把多个无相互依赖、单独部署的应用合并为一个。通俗点讲，即mf提供了能在当前应用中远程加载其他服务器上应用的能力。对此，可以引出下面两个概念：
+
+- host：引用了其他应用的应用
+- remote：被其他应用所使用的应用
+
+![](./5.png)
+
+鉴于`mf`的能力，我们可以完全实现一个去中心化的应用部署群：每个应用是单独部署在各自的服务器，每个应用都可以引用其他应用，也能被其他应用所引用，即每个应用可以充当host的角色，亦可以作为remote出现，无中心应用的概念。
+
+![](./6.png)
+
+### 配置介绍
+
+::: code-group
+
+```js [webpack.config.js]
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
+
+module.exports = {
+  plugins: [
+    new ModuleFederationPlugin({
+      // 必传值，即输出的模块名，被远程引用时路径为${name}/${expose}
+      name: 'leviBase',
+      // 声明全局变量的方式，name为umd的name
+      library: { type: 'var', name: 'leviBase' },
+      // 构建输出的文件名
+      filename: 'levi.js',
+      // 远程引用的应用名及其别名的映射，使用时以key值作为name
+      remotes: {
+        app_two: "app_two_remote",
+        app_three: "app_three_remote"
+      },
+      // 被远程引用时可暴露的资源路径及其别名
+      exposes: {
+        './Component1': 'src/components/Component1',
+        './Component2': 'src/components/Component2',
+      },
+      // 与其他应用之间可以共享的第三方依赖，使你的代码中不用重复加载同一份依赖
+      shared: ["react", "react-dom","react-router-dom"]
+    })
+  ]
+}
+```
+
+:::
+
+### 构建后的代码解析
+
+```js
+var moduleMap = {
+  "./components/Comonpnent1": function() {
+    return Promise.all([__webpack_require__.e("webpack_sharing_consume_default_react_react"), __webpack_require__.e("src_components_Close_index_tsx")]).then(function() { return function() { return (__webpack_require__(16499)); }; });
+  },
+};
+var get = function(module, getScope) {
+  __webpack_require__.R = getScope;
+  getScope = (
+    __webpack_require__.o(moduleMap, module)
+    ? moduleMap[module]()
+    : Promise.resolve().then(function() {
+      throw new Error('Module "' + module + '" does not exist in container.');
+    })
+  );
+  __webpack_require__.R = undefined;
+  return getScope;
+};
+var init = function(shareScope, initScope) {
+  if (!__webpack_require__.S) return;
+  var oldScope = __webpack_require__.S["default"];
+  var name = "default"
+  if(oldScope && oldScope !== shareScope) throw new Error("Container initialization failed as it has already been initialized with a different share scope");
+  __webpack_require__.S[name] = shareScope;
+  return __webpack_require__.I(name, initScope);
+}
+```
+
+可以看到，代码中包括三个部分:
+
+- moduleMap：通过`exposes`生成的模块集合
+- get: `host`通过该函数，可以拿到`remote`中的组件
+- init：`host`通过该函数将依赖注入`remote`中
+
+再看moduleMap，返回对应组件前，先通过`__webpack_require__.e`加载了其对应的依赖，让我们看看`__webpack_require__.e`做了什么:
+
+```js
+__webpack_require__.f = {};
+// This file contains only the entry chunk.
+// The chunk loading function for additional chunks
+__webpack_require__.e = function(chunkId) {
+  // 获取__webpack_require__.f中的依赖
+  return Promise.all(Object.keys(__webpack_require__.f).reduce(function(promises, key) {
+    __webpack_require__.f[key](chunkId, promises);
+    return promises;
+  }, []));
+};
+__webpack_require__.f.consumes = function(chunkId, promises) {
+  // 检查当前需要加载的chunk是否是在配置项中被声明为shared共享资源，如果在__webpack_require__.o上能找到对应资源，则直接使用，不再去请求资源
+  if(__webpack_require__.o(chunkMapping, chunkId)) {
+    chunkMapping[chunkId].forEach(function(id) {
+      if(__webpack_require__.o(installedModules, id)) return promises.push(installedModules[id]);
+      var onFactory = function(factory) {
+        installedModules[id] = 0;
+        __webpack_modules__[id] = function(module) {
+          delete __webpack_module_cache__[id];
+          module.exports = factory();
+        }
+      };
+      try {
+        var promise = moduleToHandlerMapping[id]();
+        if(promise.then) {
+          promises.push(installedModules[id] = promise.then(onFactory).catch(onError));
+        } else onFactory(promise);
+      } catch(e) { onError(e); }
+    });
+  }
+}
+```
+
+通读核心代码之后，可以得到如下总结：
+
+- 首先，`mf`会让`webpack`以`filename`作为文件名生成文件
+- 其次，文件中以`var`的形式暴露了一个名为`name`的全局变量，其中包含了`exposes`以及`shared`中配置的内容
+- 最后，作为`host`时，先通过`remote`的`init`方法将自身`shared`写入`remote`中，再通过`get`获取`remote`中`expose`的组件。
+而作为`remote`时，判断`host`中是否有可用的共享依赖，若有，则加载`host`的这部分依赖，若无，则加载自身依赖。
+
+### 应用场景
+
+英雄也怕无用武之地，让我们看看mf的应用场景有哪些
+
+- 微前端：通过`shared`以及`exposes`可以将多个应用引入同一应用中进行管理，由YY业务中台web前端组团队自主研发的`EMP微前端方案`就是基于`mf`的能力而实现的。
+- 资源复用，减少编译体积：可以将多个应用都用到的通用组件单独部署，通过`mf`的功能在`runtime`时引入到其他项目中，这样组件代码就不会编译到项目中，同时亦能满足多个项目同时使用的需求，一举两得。
+
+### 配置实践
+
+::: code-group
+
+<<< @/../../module-federation/container/webpack.config.js
+
+<<< @/../../module-federation/products/webpack.config.js
+
+<<< @/../../module-federation/cart/webpack.config.js
+
+:::
+

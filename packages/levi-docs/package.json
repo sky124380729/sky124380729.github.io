@@ -14,7 +14,8 @@
     "@codemirror/lang-javascript": "^6.1.2",
     "@codemirror/state": "^6.2.0",
     "@codemirror/view": "^6.7.1",
-    "codemirror": "^6.0.1"
+    "codemirror": "^6.0.1",
+    "medium-zoom": "^1.0.8"
   },
   "keywords": [],
   "author": "",

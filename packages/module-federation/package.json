@@ -1,0 +1,12 @@
+{
+  "name": "@levi/mf",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node ./start.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
