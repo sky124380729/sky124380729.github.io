@@ -1,0 +1,17 @@
+{
+  "name": "container",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon ./start.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "express": "^4.18.2",
+    "kolorist": "^1.7.0",
+    "nodemon": "^2.0.20"
+  }
+}

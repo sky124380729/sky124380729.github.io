@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>single-spa container</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "vue": "https://cdn.bootcdn.net/ajax/libs/vue/3.2.47/vue.esm-browser.js",
+        "vue-router": "https://cdn.bootcdn.net/ajax/libs/vue-router/4.1.6/vue-router.esm-browser.js",
+        "single-spa": "https://cdn.bootcdn.net/ajax/libs/single-spa/5.9.4/es2015/single-spa.dev.min.js",
+        "@vue/devtools-api": "https://unpkg.com/@vue/devtools-api@6.4.5/lib/esm/index.js"
+      }
+    }
+  </script>
+</head>
+<body>
+
+  <div id="main">
+    <ul>
+      <li @click="push('/app1')"><a href="javascript:void(0)">app1</a></li>
+      <li @click="push('/app2')"><a href="javascript:void(0)">app2</a></li>
+    </ul>
+  </div>
+  <div id="app">
+    我是子应用的容器
+  </div>
+
+  <script type="module">
+    import { createApp } from 'vue'
+    import { createRouter, createWebHistory, useRouter } from 'vue-router'
+    import { registerApplication, start } from 'single-spa'
+
+    const app = createApp({
+      setup() {
+        const { push } = useRouter()
+        return {
+          push
+        }
+      }
+    })
+
+    const router = createRouter({
+      history: createWebHistory(),
+      routes: [{ path: '/:pathMatch(.*)*', component: app }]
+    })
+
+    app.use(router)
+
+    document.addEventListener('DOMContentLoaded', () => app.mount('#main'))
+
+    // 远程加载子应用
+    function createScript(url) {
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.onload = resolve
+        script.onerror = reject
+        const firstScript = document.getElementsByTagName('script')[0]
+        firstScript.parentNode.insertBefore(script, firstScript)
+      })
+    }
+
+    // 加载子应用
+    function loadApp(url, globalVar, entry) {
+      return async () => {
+        for(let i = 0; i < entry.length; i++) {
+          await createScript(url + entry[i])
+        }
+        return window[globalVar]
+      }
+    }
+
+    // 子应用路由注册表
+    const apps = [
+      {
+        // 子应用名称
+        name: 'app1',
+        // 子应用加载函数
+        app: loadApp(
+          'http://localhost:10801',
+          'app1',
+          ["/js/chunk-vendors.js", "/js/app.js", "/js/about.js"]
+        ),
+        // 当路由满足条件时（返回true），激活（挂载）子应用
+        activeWhen: location => location.pathname.startsWith('/app1'),
+        // 传递给子应用的对象
+        customProps: {
+          container: '#container'
+        }
+      },
+      {
+        name: 'app2',
+        app: loadApp(
+          'http://localhost:10802',
+          'app2',
+          ["/js/chunk-vendors.js", "/js/app.js", "/js/about.js"]
+        ),
+        activeWhen: location => location.pathname.startsWith('/app2'),
+        customProps: {
+          container: '#container'
+        }
+      }
+    ]
+
+    apps.forEach(app => {
+      registerApplication(app)
+    })
+
+    start();
+  </script>
+</body>
+</html>

@@ -24,9 +24,9 @@
 
 又比如一个应用使用vue框架开发，其中有一个比较独立的模块，开发者想尝试使用react框架来开发，等模块单独开发部署完，再把这个模块应用接回去
 
-3. 如何使用微前端(**how**)
+3. 如何实现微前端(**how**)
 
-- 3.1 多个微应用如何进行组合？
+<!-- - 3.1 多个微应用如何进行组合？
 
 在微前端架构中，除了存在多个微应用以外，还存在一个`容器应用`，每个微应用都需要被注册到容器应用中。
 
@@ -44,7 +44,29 @@
 
 - 3.4 微应用与微应用之间如何实现框架和库的共享？
 
-通过`import-map`和`webpack`中的`externals`属性。
+通过`import-map`和`webpack`中的`externals`属性。 -->
+
+微前端的核心其实就是如何将各个应用进行整合，最容易想到的方案就是有个`容器应用`，然后通过`iframe`的形式进行将各个网页承载进来
+
+`iframe`确实是实现微前端的一种方案，它的优点和缺点都很突出
+
+::: tip 优点
+
+- 非常简单，使用没有任何心智负担
+- web应用隔离的非常完美，无论是js、css、dom都完全隔离开来
+
+:::
+
+::: danger 缺点
+
+- 路由状态丢失，刷新一下，iframe的url状态就丢失了
+- dom割裂严重，弹窗只能在iframe内部展示，无法覆盖全局
+- web应用之间通信非常困难
+- 每次打开白屏时间太长，对于SPA 应用来说无法接受
+
+:::
+
+基于以上，`iframe`在实现微前端的过程会变成非常的困难且体验不好，那么我们是否可以将每个网页都当成是一个`javascript`模块，通过`模块化`的方式导入和加载应用呢？
 
 ## 前置知识
 
@@ -312,76 +334,7 @@ CDN引入
 
 ### single-spa主应用配置
 
-::: code-group
-
-```js [main.js]
-import Vue from 'vue'
-import App from './App.vue'
-import router from './router'
-import { registerApplication, start } from 'single-spa'
-
-Vue.config.productionTip = false
-
-const mountApp = (url) => {
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script')
-    script.src = url
-    script.onload = resolve
-    script.onerror = reject
-    // 通过插入script标签的方式挂载子应用
-    const firstScript = document.getElementsByTagName('script')[0]
-    // 挂载子应用
-    firstScript.parentNode.insertBefore(script, firstScript)
-  })
-}
-
-const loadApp = (appRouter, appName) => {
-  // 远程加载子应用
-  return async () => {
-    //手动挂载子应用
-    await mountApp(appRouter + '/js/chunk-vendors.js') // [!code hl]
-    await mountApp(appRouter + '/js/app.js') // [!code hl]
-    // 获取子应用生命周期函数
-    return window[appName]
-  }
-}
-
-// 子应用列表
-const appList = [
-  {
-    // 子应用名称
-    name: 'app1',
-    // 挂载子应用
-    app: loadApp('http://localhost:8083', 'app1'), // [!code hl]
-    // 匹配该子路由的条件
-    activeWhen: location => location.pathname.startsWith('/app1'), // [!code hl]
-    // 传递给子应用的对象
-    customProps: {}
-  },
-  {
-    name: 'app2',
-    app: loadApp('http://localhost:8082', 'app2'),
-    activeWhen: location => location.pathname.startsWith('/app2'),
-    customProps: {}
-  }
-]
-
-// 注册子应用
-appList.map(item => {
-  registerApplication(item) // [!code hl]
-})
-
-// 注册路由并启动基座
-new Vue({
-  router,
-  mounted() {
-    start()
-  },
-  render: h => h(App)
-}).$mount('#app')
-```
-
-:::
+<<< @/../../single-spa/container/index.html
 
 构建基座的核心是：配置子应用信息，通过`registerApplication`注册子应用，在基座工程挂载阶段`start`启动基座
 
@@ -389,84 +342,9 @@ new Vue({
 
 ::: code-group
 
-```js [main.js]
-import Vue from 'vue'
-import App from './App.vue'
-import router from './router'
-import singleSpaVue from 'single-spa-vue'
+<<< @/../../single-spa/app1/src/main.js
 
-Vue.config.productionTip = false
-
-const appOptions = {
-  el: '#microApp',
-  router,
-  render: h => h(App)
-}
-
-// 支持应用独立运行、部署，不依赖于基座应用
-// 如果不是微应用环境，即启动自身挂载的方式
-if (!process.env.isMicro) {
-  // delete appOptions.el
-  new Vue(appOptions).$mount('#app')
-}
-// 基于基座应用，导出生命周期函数
-const appLifecycle = singleSpaVue({
-  Vue,
-  appOptions
-})
-
-// 抛出子应用生命周期
-// 启动生命周期函数
-export const bootstrap = (props)  => {
-  console.log('app2 bootstrap')
-  return appLifecycle.bootstrap(() => { })
-}
-// 挂载生命周期函数
-export const mount = (props) => {
-  console.log('app2 mount')
-  return appLifecycle.mount(() => { })
-}
-// 卸载生命周期函数
-export const unmount = (props) => {
-  console.log('app2 unmount')
-  return appLifecycle.unmount(() => { })
-}
-```
-
-```js [vue.config.js]
-const package = require('./package.json')
-
-module.exports = {
-  // 告诉子应用在这个地址加载静态资源，否则会去基座应用的域名下加载
-  publicPath: '//localhost:8082', // [!code hl]
-  // 开发服务器
-  devServer: {
-    port: 8082,
-    // 这里注意要支持跨域，否则主应用访问不到
-    headers: {
-      'Access-Control-Allow-Origin': '*', // [!code hl]
-    },
-  },
-  configureWebpack: {
-    // 导出umd格式的包，在全局对象上挂载属性package.name，基座应用需要通过这个
-    // 全局对象获取一些信息，比如子应用导出的生命周期函数
-    output: {
-      // library的值在所有子应用中需要唯一
-      // library: package.name,
-      // libraryTarget: 'umd'
-      library: {
-        name: package.name, // [!code hl]
-        type: 'umd' // [!code hl]
-      }
-    }
-}
-```
-
-```bash [.env.micro]
-NODE_ENV=development
-VUE_APP_BASE_URL=/app2
-isMicro=true
-```
+<<< @/../../single-spa/app1/vue.config.js
 
 :::
 
