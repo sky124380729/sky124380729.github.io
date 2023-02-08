@@ -201,7 +201,13 @@ module.exports = function (webpackEnv) {
     // These are the "entry points" to our application.
     // This means they will be the "root" imports that are included in JS bundle.
     entry: paths.appIndexJs,
+    // #region output
     output: {
+      // ---------------------------- single-spa ----------------------------
+      library: 'app2',
+      libraryTarget: 'umd',
+      globalObject: 'window',
+      // ---------------------------- single-spa ----------------------------
       // The build folder.
       path: paths.appBuild,
       // Add /* filename */ comments to generated require()s in the output.
@@ -229,6 +235,7 @@ module.exports = function (webpackEnv) {
         : isEnvDevelopment &&
           (info => path.resolve(info.absoluteResourcePath).replace(/\\/g, '/')),
     },
+    // #endregion output
     cache: {
       type: 'filesystem',
       version: createEnvironmentHash(env.raw),
@@ -419,7 +426,7 @@ module.exports = function (webpackEnv) {
                     },
                   ],
                 ],
-                
+
                 plugins: [
                   isEnvDevelopment &&
                     shouldUseReactRefresh &&
@@ -453,7 +460,7 @@ module.exports = function (webpackEnv) {
                 cacheDirectory: true,
                 // See #6846 for context on why cacheCompression is disabled
                 cacheCompression: false,
-                
+
                 // Babel sourcemaps are needed for debugging into node_modules
                 // code.  Without the options below, debuggers like VSCode
                 // show incorrect code and set breakpoints on the wrong lines.

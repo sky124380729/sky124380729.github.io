@@ -17,5 +17,6 @@ app.get('/app2', (req, res) => {
 })
 
 app.listen(port, () => {
-  console.log(kolorist.lightCyan(`Example app listening at http://localhost:${port}`))
+  const url = `http://localhost:${port}`
+  console.log(kolorist.lightCyan(`Example app listening at ${url}`))
 })

@@ -5,6 +5,14 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>single-spa container</title>
+  <style>
+    #container {
+      width: 80%;
+      margin: 20px auto;
+      border: 1px solid blueviolet;
+      padding: 20px;
+    }
+  </style>
   <script type="importmap">
     {
       "imports": {
@@ -24,7 +32,7 @@
       <li @click="push('/app2')"><a href="javascript:void(0)">app2</a></li>
     </ul>
   </div>
-  <div id="app">
+  <div id="container">
     我是子应用的容器
   </div>
 
@@ -96,7 +104,7 @@
         app: loadApp(
           'http://localhost:10802',
           'app2',
-          ["/js/chunk-vendors.js", "/js/app.js", "/js/about.js"]
+          ["/static/js/bundle.js"]
         ),
         activeWhen: location => location.pathname.startsWith('/app2'),
         customProps: {

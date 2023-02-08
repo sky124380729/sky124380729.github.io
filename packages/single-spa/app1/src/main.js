@@ -19,6 +19,7 @@ export const bootstrap = () => {
 }
 export const mount = (props) => {
   console.log(props, 'props')
+  render(props.container)
   return Promise.resolve()
 }
 export const unmount = () => {

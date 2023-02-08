@@ -338,7 +338,7 @@ CDN引入
 
 构建基座的核心是：配置子应用信息，通过`registerApplication`注册子应用，在基座工程挂载阶段`start`启动基座
 
-### 子应用配置
+### Vue子应用配置
 
 ::: code-group
 
@@ -347,6 +347,17 @@ CDN引入
 <<< @/../../single-spa/app1/vue.config.js
 
 :::
+
+### React 子应用配置
+
+::: code-group
+
+<<< @/../../single-spa/app2/src/index.js
+
+<<< @/../../single-spa/app2/config/webpack.config.js#output
+
+:::
+
 
 ::: details 为何要设置library?
 
