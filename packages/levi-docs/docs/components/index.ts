@@ -1,1 +1,1 @@
-export { default as Playground } from './playground.vue'
+export { default as Playground } from './Playground.vue'

@@ -103,6 +103,7 @@ export default defineConfig({
         { text: 'Mini Code', items: [
           { text: 'Vue2', link: '/mini-code/vue2' },
           { text: 'Vue3', link: '/mini-code/vue3' },
+          { text: 'vue-next-mini', link: '/mini-code/vue-next-mini' },
           { text: 'Vue-Router', link: '/mini-code/vue-router' },
           { text: 'Promise', link: '/mini-code/promise' },
           { text: 'Micro-Frontend', link: '/mini-code/micro-frontend' },

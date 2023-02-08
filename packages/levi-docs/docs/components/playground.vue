@@ -22,7 +22,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { dynamicImport } from '../utils'
-import Editor from './editor.vue'
+import Editor from './Editor.vue'
 
 const props = defineProps({
   module: {
