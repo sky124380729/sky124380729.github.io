@@ -56,9 +56,9 @@ function fib(n) {
 function createFib() {
   const cache = [] // [!code hl]
   function fib(n) {
-  if(cache[n] !== undefined) return cache[n]
-  if(n === 1 || n === 2) return (cache[n] = 1)
-  else return (cache[n] = fib(n - 1) + fib(n - 2))
+    if (cache[n] !== undefined) return cache[n]
+    if (n === 1 || n === 2) return (cache[n] = 1)
+    else return (cache[n] = fib(n - 1) + fib(n - 2))
   }
   return fib
 }
@@ -168,7 +168,7 @@ f2(); //123
 ```js
 for(var i=0;i<arr.length;i++){
   setTimeout(function(){
-  console.log(i)
+    console.log(i)
   },0)
 }
 ```
@@ -183,7 +183,7 @@ for(var i=0;i<arr.length;i++){
 ```js
 for(var i=0;i<div.length;i++){
   div[i].onclick = function(){
-  alert("我是第"+i+"个div");
+    alert("我是第"+i+"个div");
   }
 }
 ```
@@ -244,17 +244,18 @@ var num = (speed > 20 && 4) || (speed > 15 && 3) || (speed > 10 && 2) || (speed 
 
 ```js
 function generateUUID() {
-  var d = new Date().getTime();
-  if (window.performance && typeof window.performance.now === "function") {
-   d += performance.now(); //use high-precision timer if available
+  var d = new Date().getTime()
+  if (window.performance && typeof window.performance.now === 'function') {
+    d += performance.now() //use high-precision timer if available
   }
   var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-   var r = (d + Math.random() * 16) % 16 | 0;
-   d = Math.floor(d / 16);
-   return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-  });
-  return uuid;
+    var r = (d + Math.random() * 16) % 16 | 0
+    d = Math.floor(d / 16)
+    return (c == 'x' ? r : (r & 0x3) | 0x8).toString(16)
+  })
+  return uuid
 }
+
 ```
 
 ## promise封装异步队列
@@ -263,17 +264,17 @@ function generateUUID() {
 
 ```js
 function queue(things) {
-   let promise = Promise.resolve()
-   things.forEach(thing=>{
-  promise = promise.then(()=>{
-  return new Promise(resolve=>{
-   setTimeout(()=>{
-  console.log(thing)
-  resolve()
-   },1000)
+  let promise = Promise.resolve()
+  things.forEach((thing) => {
+    promise = promise.then(() => {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          console.log(thing)
+          resolve()
+        }, 1000)
+      })
+    })
   })
-  })
-   })
 }
 ```
 
@@ -281,16 +282,16 @@ function queue(things) {
 
 ```js
 function queue(things) {
-   things.reduce((promise,thing)=>{
-  return promise.then(()=>{
-  return new Promise(resolve=>{
-   setTimeout(()=>{
-  console.log(thing)
-  resolve()
-   },1000)
-  })
-  })
-   },Promise.resolve())
+  things.reduce((promise, thing) => {
+    return promise.then(() => {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          console.log(thing)
+          resolve()
+        }, 1000)
+      })
+    })
+  }, Promise.resolve())
 }
 ```
 
@@ -300,9 +301,9 @@ function queue(things) {
 
   ```js
   window.scrollTo({
-  left: 0,
-  top: 0,
-  behavior: 'smooth'
+    left: 0,
+    top: 0,
+    behavior: 'smooth'
   })
   ```
 
@@ -312,9 +313,9 @@ function queue(things) {
   const scrollToTop = () => {
   const sTop = document.documentElement.scrollTop || document.body.scrollTop
   if (sTop > 0) {
-  window.requestAnimationFrame(scrollToTop)
-  window.scrollTo(0, sTop - sTop / 8)
-  }
+    window.requestAnimationFrame(scrollToTop)
+    window.scrollTo(0, sTop - sTop / 8)
+    }
   }
   scrollToTop()
   ```
@@ -340,7 +341,7 @@ await Promise.all([a(), b()])
 const ownAddEventListener = (scope, type, handler, capture) => {
   scope.addEventListener(type, handler, capture);
   return () => {
-  scope.removeEventListener(type, handler, capture);
+    scope.removeEventListener(type, handler, capture);
   }
 }
 // 然后，您可以像这样删除事件监听器：
@@ -368,9 +369,9 @@ const currentFile = posts.find( post => post.id === currentId)
 // 修改一个数据
 posts.map(post => {
   if(post.id === currentId) {
-  return newPost
+    return newPost
   }else {
-  return post
+    return post
   }
 })
 
@@ -418,10 +419,10 @@ function getArea(r) {
 // 模拟一个memoize函数
 function memoize(fn) {
   let cache = {}
-  return function() {
-  let key = JSON.stringify(arguments)
-  cache[key] = cache[key] || fn.apply(this,arguments)
-  return cache[key]
+  return function () {
+    let key = JSON.stringify(arguments)
+    cache[key] = cache[key] || fn.apply(this, arguments)
+    return cache[key]
   }
 }
 const getAreaWithMemory = memoize(getArea)
@@ -437,19 +438,19 @@ console.log(getAreaWithMemory(4))
 当一个函数有多个参数的时候先传递一部分参数调用它(这部分参数以后永远不变)，然后返回一个新的函数接收剩余的参数，返回结果
 
 ```js
-function getSum (a, b, c) {
+function getSum(a, b, c) {
   return a + b + c
 }
 
-function curry (func) {
+function curry(func) {
   return function curriedFn(...args) {
-  // 判断实参和形参的个数
-  if(args.length < func.length) {
-  return function () {
-  return curriedFn(...args.concat(Array.from(arguments)))
-  }
-  }
-  return func(...args)
+    // 判断实参和形参的个数
+    if (args.length < func.length) {
+      return function () {
+        return curriedFn(...args.concat(Array.from(arguments)))
+      }
+    }
+    return func(...args)
   }
 }
 
@@ -468,26 +469,26 @@ console.log(c(1)(2)(3))
 
 ```js
 function flowRight(...fns) {
-  return function(value) {
-  while(fns.length) {
-  const fn = fns.pop()
-  value = fn(value)
-  }
-  return value
+  return function (value) {
+    while (fns.length) {
+      const fn = fns.pop()
+      value = fn(value)
+    }
+    return value
   }
 }
 
-const reverse = arr => arr.reverse()
+const reverse = (arr) => arr.reverse()
 
-const first = arr => arr[0]
+const first = (arr) => arr[0]
 
-const toUpper = s => s.toUpperCase()
+const toUpper = (s) => s.toUpperCase()
 
 const f = flowRight(toUpper, first, reverse)
 
 // 满足结合律
 // const f = flowRight(flowRight(toUpper, first), reverse)
-console.log(f(['hello','world','john']))
+console.log(f(['hello', 'world', 'john']))
 ```
 
 ## loadsh/fp
@@ -533,18 +534,20 @@ const f = fp.flowRight(fp.join('-'), fp.map(_.toLower), fp.split(' '))
 
 ```js
 class Container {
-  static of (value) {
-  return new Container(value)
+  static of(value) {
+    return new Container(value)
   }
   constructor(value) {
-  this._value = value
+    this._value = value
   }
   map(fn) {
-  return Container.of(fn(this._value))
+    return Container.of(fn(this._value))
   }
 }
 
-let r = Container.of(5).map(x => x + 2).map(x => x * x )
+let r = Container.of(5)
+  .map((x) => x + 2)
+  .map((x) => x * x)
 ```
 
 ## JSON.stringify(value\[, replacer \[, space]])
@@ -652,7 +655,7 @@ const name = Symbol()
 const person = {
   [name]: 'levi',
   say() {
-  console.log(this[name])
+    console.log(this[name])
   }
 }
 export default person
@@ -705,37 +708,37 @@ const todos = {
   work: ['喝茶'],
   // 普通模式
   each(callback) {
-  const all = [].concat(this.life, this.learn, this.work)
-  for(const item of all) {
-    callback(item)
-  }
+    const all = [].concat(this.life, this.learn, this.work)
+    for (const item of all) {
+      callback(item)
+    }
   },
   // 迭代器模式
   [Symbol.iterator]() {
-  const all = [...this.life, ...this.learn, ...this.work]
-  let index = 0
-  return {
-    next() {
+    const all = [...this.life, ...this.learn, ...this.work]
+    let index = 0
     return {
-      value: all[index],
-      done: index++ >= all.length
+      next() {
+        return {
+          value: all[index],
+          done: index++ >= all.length
+        }
+      }
     }
-    }
-  }
   }
 }
 
-
 // 你的代码 ================================
-todos.each(item => {
+todos.each((item) => {
   console.log(item)
 })
 
 console.log('------------------------------')
 
-for(const val of todos) {
+for (const val of todos) {
   console.log(val)
 }
+
 ```
 
 ### generator
@@ -746,7 +749,7 @@ for(const val of todos) {
 function * createIdMaker() {
   let id = 1
   while(true) {
-  yield id++
+    yield id++
   }
 }
 const idMaker = createIdMaker()
@@ -764,10 +767,10 @@ const todos = {
   learn: ['语文', '数学', '外语'],
   work: ['喝茶'],
   [Symbol.iterator]: function *() {
-  const all = [...this.life, ...this.learn, ...this.work]
-  for(const item of all) {
-    yield item
-  }
+    const all = [...this.life, ...this.learn, ...this.work]
+    for(const item of all) {
+      yield item
+    }
   }
 }
 
@@ -805,7 +808,7 @@ for(const [name, count] of books) {
 - 传给后端的时候后端需要存两个字段`checkedList`和`halfCheckedList`
 
 ```javascript
-const handlePernmissionSubmit = () => {
+const handlePermissionSubmit = () => {
   const nodes = this.$refs.tree.getCheckedNodes()
   const halfKeys = this.$refs.tree.getHalfCheckedKeys()
   const checkedKeys = []
@@ -885,7 +888,7 @@ const handlePernmissionSubmit = () => {
   - JSON.parse()
     - 第二个参数可以是个函数，我们可以把它称之为还原函数(reviver)，与替代函数对应
 
-### `MutationObserver` 和 `ResizeObserver`
+## `MutationObserver` 和 `ResizeObserver`
 
 - `ResizeObserver` 接口可以监听到 Element 的内容区域或 SVGElement的边界框改变。内容区域则需要减去内边距padding。
 - `MutationObserver` 和 `ResizeObserver` 接口提供了监视对DOM树所做更改的能力。它被设计为旧的Mutation Events功能的替代品，该功能是DOM3 Events规范的一部分。
@@ -901,3 +904,80 @@ module.exports = {
   version: '0.1.0'
 }
 ```
+
+## 关于Reflect
+
+```js
+const p1 = {
+  lastName: '张',
+  firstName: '三',
+  get fullName() {
+    return this.lastName + this.firstName
+  }
+}
+
+const p2 = {
+  lastName: '李',
+  firstName: '四',
+  get fullName() {
+    return this.lastName + this.firstName
+  }
+}
+
+console.log(p1.fullName) // 张三
+console.log(Reflect.get(p1, 'fullName')) // 张三
+console.log(Reflect.get(p1, 'fullName', p2)) // 李四
+```
+
+由此可以看出，`Reflect.get`中，如果`target`对象中指定了`getter`，如上文的`get fullName()`， `receiver`则为`getter`调用时的`this`值
+
+```js
+const p1 = {
+  lastName: '张',
+  firstName: '三',
+  get fullName() {
+    return this.lastName + this.firstName
+  }
+}
+
+const proxy = new Proxy(p1, {
+  get(target, key, receiver) {
+    console.log('getter行为被触发')
+    return target[key]
+  }
+})
+
+console.log(proxy.fullName) // 张三
+```
+
+这里可以看到`getter`行为被触发执行了**1**次，但是实际上，proxy.fullName触发了`getter`，
+`fullName`中的`this`如果指向的是`proxy`的话，应该会执行**3**次才对
+
+这里问题的关键就在于`this`的问题
+
+所以我们一般会看到如下写法
+
+```js
+const p1 = {
+  lastName: '张',
+  firstName: '三',
+  get fullName() {
+    return this.lastName + this.firstName
+  }
+}
+
+const proxy = new Proxy(p1, {
+  get(target, key, receiver) {
+    console.log('getter行为被触发')
+    return Reflect.get(target, key, receiver)
+  }
+})
+
+console.log(proxy.fullName) // 张三
+```
+
+这里通过`Reflect.get`的第三个参数，将**被代理对象**中`getter`方法的`this`指向转为了**代理对象**
+
+总结来说，当我们希望监听代理对象的`getter`和`setter`时，**不应该**直接使用`target[key]`，因为它在某些时候，可能是不可靠的，如上例
+
+利用`Reflect`使用`receiver`作为`this`，便可以达到预期的结果

@@ -22,7 +22,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { dynamicImport } from '../utils'
-import Editor from './Editor.vue'
+import Editor from './editor.vue'
 
 const props = defineProps({
   module: {
@@ -79,7 +79,7 @@ const run = async () => {
   }
   const [path, mod = 'default'] = props.module.split('#')
   const module = dynamicImport(path)
-  module().then((m:any) => {
+  module().then((m: any) => {
     const runner = new Function(code.value!)()
     runner(m[mod])
   })
@@ -89,10 +89,10 @@ const clear = () => {
   log.value = ''
 }
 
-const reset = () => {
-  // 这里暂时不生效
-  raw.value = props.code.toString()
-}
+// const reset = () => {
+//   // 这里暂时不生效
+//   raw.value = props.code.toString()
+// }
 </script>
 
 <style lang="scss" scoped>
