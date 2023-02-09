@@ -23,6 +23,7 @@
       }
     }
   </script>
+  <script src="https://cdn.jsdelivr.net/npm/systemjs/dist/system.js"></script>
 </head>
 <body>
 
@@ -74,7 +75,7 @@
     // 加载子应用
     function loadApp(url, globalVar, entry) {
       return async () => {
-        for(let i = 0; i < entry.length; i++) {
+        for (let i = 0; i < entry.length; i++) {
           await createScript(url + entry[i])
         }
         return window[globalVar]
@@ -87,13 +88,9 @@
         // 子应用名称
         name: 'app1',
         // 子应用加载函数
-        app: loadApp(
-          'http://localhost:10801',
-          'app1',
-          ["/js/chunk-vendors.js", "/js/app.js", "/js/about.js"]
-        ),
+        app: loadApp('http://localhost:10801', 'app1', ['/js/chunk-vendors.js', '/js/app.js', '/js/about.js']),
         // 当路由满足条件时（返回true），激活（挂载）子应用
-        activeWhen: location => location.pathname.startsWith('/app1'),
+        activeWhen: (location) => location.pathname.startsWith('/app1'),
         // 传递给子应用的对象
         customProps: {
           container: '#container'
@@ -101,23 +98,23 @@
       },
       {
         name: 'app2',
-        app: loadApp(
-          'http://localhost:10802',
-          'app2',
-          ["/static/js/bundle.js"]
-        ),
-        activeWhen: location => location.pathname.startsWith('/app2'),
+        // 由于app2导出的是umd模块，因此不能直接使用`import`，这里演示了一下SystemJS的用法
+        // 当然，也可以继续使用如上的loadApp函数使用jsonp的方式
+        app: () => System.import('http://localhost:10802/static/js/bundle.js'),
+        activeWhen: (location) => location.pathname.startsWith('/app2'),
         customProps: {
           container: '#container'
         }
       }
     ]
 
-    apps.forEach(app => {
+    apps.forEach((app) => {
       registerApplication(app)
     })
 
-    start();
+    start()
+
   </script>
+
 </body>
 </html>

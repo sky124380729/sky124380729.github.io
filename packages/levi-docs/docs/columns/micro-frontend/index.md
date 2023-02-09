@@ -235,6 +235,8 @@
 
 ![image](./2.jpg){data-zoomable}
 
+可以看到`Firefox`直到`2022-12-13`才对`import maps`的特性予以支持！
+
 ## [SystemJS](https://github.com/systemjs/systemjs)
 
 `SystemJS`是一个**动态模块加载器**，它能够将原生`ES modules`转换成[System.register module format](https://github.com/systemjs/systemjs/blob/main/docs/system-register.md)来兼容那么不支持原生模块的浏览器
@@ -261,53 +263,70 @@ CDN引入
   }
 </script>
 
-// 对于不支持esm的浏览器
-<script>
-  System.register(['vue'], {
-    let Vue = null
-    return {
-      setters: [
-        v => Vue = v.default
-      ],
-      execute() {
-        new Vue({
-          el: '#container',
-          data: { name: 'levi' }
-        })
-      }
-    }
-  })
-</script>
-
-
-
-// 对于支持esm的浏览器
-// 以下代码如果经过打包工具编译，实际还是会转换成System.register(['vue'])的形式
-<script>
-  import Vue from 'vue'
-  new Vue({
-    el: '#container',
-    data: { name: 'levi' }
-  })
-</script>
-
-<script>
-  // 通过systemjs来引入别的文件
-  System.import('./test.js')
-  // 直接通过名称引用
-  System.import('vue')
-</script>
+<!-- 以下两种写法对于system-js来说是等价的 -->
+<script type="systemjs-module" src="./entry.js"></script>
+<script>System.import('/entry.js')</script>
 ```
 
+::: info ===
+
+Woo! 乍一看，这里的写法和浏览器原生的`import maps`完全一样！
+实际上，`import maps`特性本身就是`systemjs`的作者给`Chrome`提的`feature`【作者youtube视频中提到】，而后才渐渐被各大浏览器实现
+:::
+
+由于`script`标签不使用`type="module"`而是使用`type="systemjs-module"`，浏览器并不认识`import`和`export`，因此需要对代码进行改造
+
+::: code-group
+
+```js [entry.js]
+import Vue from 'vue'
+
+new Vue({
+  el: '#container',
+  data: { name: 'levi' }
+})
+```
+
+:::
+
+改为以下代码
+
+::: code-group
+
+```js [entry.js]
+System.register(['vue'], {
+  let Vue = null
+  return {
+    setters: [
+      v => Vue = v.default
+    ],
+    execute() {
+      new Vue({
+        el: '#container',
+        data: { name: 'levi' }
+      })
+    }
+  }
+})
+```
+
+:::
+
 ### SystemJS工程配置示例
+
+> blog中运行(**【需要本文章的源码仓库】**)
+
+```bash
+pnpm -F @levi/sj dev
+```
 
 ::: code-group
 
 <<< @/../../system-js/src/index.html
 
-<<< @/../../system-js/webpack.config.js
-
 <<< @/../../system-js/src/index.js
+
+<<< @/../../system-js/webpack.config.js
 
 :::
 
@@ -316,6 +335,10 @@ CDN引入
 > `single-spa`推荐使用`浏览器内ES模块 + import maps` (或者`SystemJS`填充这些，如果你需要更好的浏览器支持)的设置
 
 `single-spa`是一个将多个单页面应用聚合为一个整体应用的`JavaScript`微前端框架
+
+::: warning
+在使用single-spa时，不必使用SystemJS，不过为了能够独立部署各应用，很多示例和教程会推荐使用SystemJS。
+:::
 
 - 核心原理
 
@@ -331,6 +354,14 @@ CDN引入
 4. 卸载 (unmounted)
 
 `single-spa` 还会通过**生命周期**为这些过程提供对应的**钩子函数**。
+
+### single-spa配置实践
+
+> blog中运行(**【需要本文章的源码仓库】**)
+
+```bash
+pnpm -F @levi/ss dev
+```
 
 ### single-spa主应用配置
 
@@ -357,7 +388,6 @@ CDN引入
 <<< @/../../single-spa/app2/config/webpack.config.js#output
 
 :::
-
 
 ::: details 为何要设置library?
 
@@ -690,7 +720,13 @@ __webpack_require__.l = (url, done, key, chunkId) => {
 - 微前端：通过`shared`以及`exposes`可以将多个应用引入同一应用中进行管理，由YY业务中台web前端组团队自主研发的`EMP微前端方案`就是基于`mf`的能力而实现的。
 - 资源复用，减少编译体积：可以将多个应用都用到的通用组件单独部署，通过`mf`的功能在`runtime`时引入到其他项目中，这样组件代码就不会编译到项目中，同时亦能满足多个项目同时使用的需求，一举两得。
 
-### 配置实践
+### Module Federation配置实践
+
+> blog中运行(**【需要本文章的源码仓库】**)
+
+```bash
+pnpm -F @levi/mf dev
+```
 
 ::: code-group
 

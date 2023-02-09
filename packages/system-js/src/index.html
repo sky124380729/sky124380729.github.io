@@ -17,8 +17,8 @@
   </head>
   <body>
     <div id="root"></div>
-    <script>
-        System.import("./index.js")
-    </script>
+    <!-- 以下两种写法是完全等价的 -->
+    <!-- <script type="systemjs-module" src="./index.js"></script> -->
+    <script>System.import("./index.js")</script>
   </body>
 </html>
