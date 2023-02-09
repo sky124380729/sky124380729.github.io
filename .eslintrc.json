@@ -34,6 +34,7 @@
     "vue/multi-word-component-names": 0,
     "vue/require-default-prop": 0,
     // 给vue-next-mini项目使用的
-    "vue/prefer-import-from-vue": 0
+    "vue/prefer-import-from-vue": 0,
+    "@typescript-eslint/no-this-alias": 0
   }
 }

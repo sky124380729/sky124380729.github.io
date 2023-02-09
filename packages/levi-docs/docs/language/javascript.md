@@ -685,7 +685,7 @@ console.log(obj.toString()) // [object XObject]
 
 Symbol类型的属性名通过`for in`、`Object.keys`、`JSON.Stringify`都获取不到
 
-可以通过`Object.getOwnPropertySybols`获取到
+可以通过`Object.getOwnPropertySymbols`获取到
 
 因此Symbol特别适合定义私有成员
 
@@ -981,3 +981,45 @@ console.log(proxy.fullName) // 张三
 总结来说，当我们希望监听代理对象的`getter`和`setter`时，**不应该**直接使用`target[key]`，因为它在某些时候，可能是不可靠的，如上例
 
 利用`Reflect`使用`receiver`作为`this`，便可以达到预期的结果
+
+## 关于WeakMap
+
+- 弱引用： 不会影响垃圾回收机制。 即：`WeakMap`的key**不再存在任何引用时**，会直接被回收
+- 强引用：会影响垃圾回收机制。 存在强引用的对象`永远不会被回收`
+
+```js
+let obj = {
+  name: '张三'
+}
+
+const map = new Map()
+
+map.set(obj, 'value')
+
+obj = null
+
+console.log(map)
+```
+
+这时我们发现，对于`obj`的引用置为`null`，也就是不再有着对于`obj`的引用，`map`中依然保存着`obj`对象，
+这便是`强引用`影响了垃圾回收
+
+```js
+let obj = {
+  name: '张三'
+}
+
+const map = new WeakMap()
+
+map.set(obj, 'value')
+
+obj = null
+
+console.log(map)
+```
+
+我们发现，这时候打印`map`并没有任何内容，也就是`obj`被回收了，也就是`弱引用`不影响垃圾回收
+
+::: tip
+Vue中就是使用`WeakMap`将被代理对象存起来，一旦被代理对象被清空，`proxy`对象也就没有存在的价值了
+:::

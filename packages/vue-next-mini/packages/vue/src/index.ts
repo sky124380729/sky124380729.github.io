@@ -1,3 +1,1 @@
-import { isArray } from '@vue/shared'
-
-console.log(isArray)
+export { reactive, effect } from '@vue/reactivity'
