@@ -4,7 +4,8 @@ const path = require('path')
 const filePath = {
   container: path.join(__dirname, './container'),
   app1: path.join(__dirname, './app1'),
-  app2: path.join(__dirname, './app2')
+  app2: path.join(__dirname, './app2'),
+  app3: path.join(__dirname, './app3')
 }
 
 // cd 子应用的目录 npm start 启动项目

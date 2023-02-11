@@ -31,6 +31,7 @@
     <ul>
       <li @click="push('/app1')"><a href="javascript:void(0)">app1</a></li>
       <li @click="push('/app2')"><a href="javascript:void(0)">app2</a></li>
+      <li @click="push('/app3')"><a href="javascript:void(0)">app3</a></li>
     </ul>
   </div>
   <div id="container">
@@ -105,6 +106,11 @@
         customProps: {
           container: '#container'
         }
+      },
+      {
+        name:'app3',
+        app: () => import('http://localhost:10803/assets/main.js'),
+        activeWhen: (location) => location.pathname.startsWith('/app3'),
       }
     ]
 
