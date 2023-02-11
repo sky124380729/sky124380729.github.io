@@ -109,8 +109,15 @@
       },
       {
         name:'app3',
-        app: () => import('http://localhost:10803/assets/main.js'),
+        app: () => {
+          const res = import('http://localhost:10803/assets/main.js')
+          window.app3 = res
+          return res
+        },
         activeWhen: (location) => location.pathname.startsWith('/app3'),
+        customProps: {
+          container: '#container'
+        }
       }
     ]
 
