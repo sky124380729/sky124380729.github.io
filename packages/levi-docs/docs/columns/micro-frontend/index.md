@@ -294,6 +294,13 @@ new Vue({
 ::: code-group
 
 ```js [entry.js]
+import Vue from 'vue' // [!code --]
+
+new Vue({ // [!code --]
+  el: '#container', // [!code --]
+  data: { name: 'levi' } // [!code --]
+}) // [!code --]
+
 System.register(['vue'], {
   let Vue = null
   return {
@@ -394,13 +401,23 @@ pnpm -F @levi/ss dev
 webpack打包出来的代码默认是以下形式的
 
 ```js
-(function() {})()
+(function() {
+  var test = 1
+  return {
+    test
+  }
+})()
 ```
 
 如果设置了library.name，就相当于以下代码
 
 ```js
-var app2 = (function() {})()
+var app2 = (function() {
+  var test = 1
+  return {
+    test
+  }
+})()
 ```
 
 因此就可以直接访问`window.app2`
@@ -413,8 +430,8 @@ var app2 = (function() {})()
 
 那么我们有`single-spa`这种微前端解决方案，为什么还需要`qiankun`呢?
 
-相比于`single-spa`，`qiankun`他解决了JS沙盒环境，不需要我们自己去进行处理。
-在single-spa的开发过程中，我们需要自己手动的去写调用子应用JS的方法（如上面的 `createScript`方法），而`qiankun`不需要，乾坤只需要你传入响应的apps的配置即可，会帮助我们去加载。
+相比于`single-spa`，`qiankun`他解决了**JS沙盒环境**，不需要我们自己去进行处理。
+在`single-spa`的开发过程中，我们需要自己手动的去写调用子应用JS的方法（如上面的`createScript`方法），而`qiankun`不需要，乾坤只需要你传入响应的apps的配置即可，会帮助我们去加载。
 
 ### qiankun主应用配置
 
@@ -423,117 +440,462 @@ var app2 = (function() {})()
 ```ts [registerApplication.ts]
 import { registerMicroApps, start } from 'qiankun';
 
-// 默认子应用
-export const applications = [
+registerMicroApps([
   {
-    name: 'singleVue3', // app name registered
-    entry: 'http://localhost:5000',
-    container: '#micro-content',
-    activeRule: '/vue3-micro-app',
+    name: 'reactApp',
+    entry: '//localhost:3000',
+    container: '#container',
+    activeRule: '/app-react',
   },
   {
-    name: 'singleReact', // app name registered
-    entry: 'http://localhost:3000',
-    container: '#micro-content',
-    activeRule: '/react-micro-app',
+    name: 'vueApp',
+    entry: '//localhost:8080',
+    container: '#container',
+    activeRule: '/app-vue',
   },
-]
-
-// 注册子应用
-export const registerApps = (apps: any[] = applications) => {
-  registerMicroApps(applications);
-  start();
-}
+  {
+    name: 'angularApp',
+    entry: '//localhost:4200',
+    container: '#container',
+    activeRule: '/app-angular',
+  },
+]);
+// 启动 qiankun
+start();
 ```
 
 :::
 
-### vue3子应用配置
+### react16子应用配置
 
 ::: code-group
 
-```ts [main.ts]
-import { createApp } from 'vue'
-import type { App as AppType } from 'vue'
-import App from './App.vue'
-import router from './router'
+```js [src/public-path.js]
+if (window.__POWERED_BY_QIANKUN__) {
+  __webpack_public_path__ = window.__INJECTED_PUBLIC_PATH_BY_QIANKUN__;
+}
+```
 
-let instance: AppType
+```js [app.js]
+<BrowserRouter basename={window.__POWERED_BY_QIANKUN__ ? '/app-react' : '/'}>
+```
 
-function render(container?: string) {
-  instance = createApp(App)
-  // 这里的 container 已经是对应基座应用中的真实 DOM 节点，而不是 CSS 选择器
-  instance.use(router).mount(container || '#micro-vue-app')
+```js [index/js]
+import './public-path';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './App';
+
+function render(props) {
+  const { container } = props;
+  ReactDOM.render(<App />, container ? container.querySelector('#root') : document.querySelector('#root'));
 }
 
-// 当 window.singleVue3 不存在时，意味着是子应用单独运行
-if (!window.singleVue3) {
+if (!window.__POWERED_BY_QIANKUN__) {
+  render({});
+}
+
+export async function bootstrap() {
+  console.log('[react16] react app bootstraped');
+}
+
+export async function mount(props) {
+  console.log('[react16] props from main framework', props);
+  render(props);
+}
+
+export async function unmount(props) {
+  const { container } = props;
+  ReactDOM.unmountComponentAtNode(container ? container.querySelector('#root') : document.querySelector('#root'));
+}
+```
+
+```js [config/webpack.config.js]
+const { name } = require('./package');
+
+module.exports = {
+  webpack: (config) => {
+    config.output.library = `${name}-[name]`;
+    config.output.libraryTarget = 'umd';
+    config.output.jsonpFunction = `webpackJsonp_${name}`;
+    config.output.globalObject = 'window';
+
+    return config;
+  },
+
+  devServer: (_) => {
+    const config = _;
+
+    config.headers = {
+      'Access-Control-Allow-Origin': '*',
+    };
+    config.historyApiFallback = true;
+    config.hot = false;
+    config.watchContentBase = false;
+    config.liveReload = false;
+
+    return config;
+  }
+};
+```
+
+:::
+
+### vue2子应用配置
+
+::: code-group
+
+```js [src/public-path.js]
+if (window.__POWERED_BY_QIANKUN__) {
+  __webpack_public_path__ = window.__INJECTED_PUBLIC_PATH_BY_QIANKUN__;
+}
+```
+
+```js [main.js]
+import './public-path';
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+import App from './App.vue';
+import routes from './router';
+import store from './store';
+
+Vue.config.productionTip = false;
+
+let router = null;
+let instance = null;
+function render(props = {}) {
+  const { container } = props;
+  router = new VueRouter({
+    base: window.__POWERED_BY_QIANKUN__ ? '/app-vue/' : '/',
+    mode: 'history',
+    routes,
+  });
+
+  instance = new Vue({
+    router,
+    store,
+    render: (h) => h(App),
+  }).$mount(container ? container.querySelector('#app') : '#app');
+}
+
+// 独立运行时
+if (!window.__POWERED_BY_QIANKUN__) {
   render();
 }
 
-// 子应用必须导出 以下生命周期 bootstrap、mount、unmount
-export const bootstrap = () => {
-  return Promise.resolve()
-};
-export const mount = (props: any) => {
-  render(props.container);
-  return Promise.resolve()
-};
-export const unmount = () => {
-  instance.unmount();
-  return Promise.resolve()
+export async function bootstrap() {
+  console.log('[vue] vue app bootstraped');
+}
+export async function mount(props) {
+  console.log('[vue] props from main framework', props);
+  render(props);
+}
+export async function unmount() {
+  instance.$destroy();
+  instance.$el.innerHTML = '';
+  instance = null;
+  router = null;
+}
+```
+
+```js [vue.config.js]
+const { name } = require('./package');
+module.exports = {
+  devServer: {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
+  },
+  configureWebpack: {
+    output: {
+      library: `${name}-[name]`,
+      libraryTarget: 'umd', // 把微应用打包成 umd 库格式
+      jsonpFunction: `webpackJsonp_${name}`,
+    },
+  },
 };
 ```
 
 :::
 
-### react子应用
+### 原理分析
+
+相比于`single-spa`，我们发现这里加载子应用的时候不需要指定子应用依赖的`js`文件，那么`qiankun`是如何知道当前子应用需要依赖什么`js`文件的呢？
+
+其实就是通过[html-import-entry](https://github.com/kuitos/import-html-entry)加载并解析子应用的HTML
+
+在基座应用中通过调用 `registerMicroApps(...)` 函数注册子应用时，其内部实际上是通过`single-spa`中的`registerApplication(...)`函数来实现的，其内容如下：
 
 ::: code-group
 
-```js [src/index.js]
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import './index.css'
-import App from './App'
+```ts [qiankun\src\apis.ts]
+import {
+  mountRootParcel,
+  registerApplication, // [!code hl]
+  start as startSingleSpa
+} from 'single-spa'
+import { loadApp } from './loader'
 
-let root = null
+export function registerMicroApps<T extends ObjectType>(
+  apps: Array<RegistrableApp<T>>,
+  lifeCycles?: FrameworkLifeCycles<T>
+) {
+  // 每个子应用只会被注册一次
+  const unregisteredApps = apps.filter((app) => {
+    return !microApps.some((registeredApp) => registeredApp.name === app.name)
+  })
 
-function render(props = {}) {
-  // 这里的 container 已经是对应基座应用中的真实 DOM 节点，而不是 CSS 选择器
-  const container = props.container || document.getElementById('root')
+  microApps = [...microApps, ...unregisteredApps]
 
-  if(!container) return
+  unregisteredApps.forEach((app) => {
+    const { name, activeRule, loader = noop, props, ...appConfig } = app
 
-  root = ReactDOM.createRoot(container)
+    // 真正注册子应用的地方，通过 loadApp 加载并解析子应用对应的 html 模板
+    registerApplication({ // [!code hl]
+      name,
+      app: async () => {
+        loader(true)
+        await frameworkStartedDefer.promise
 
-  root.render(
-    <React.StrictMode>
-      <App {...props} />
-    </React.StrictMode>,
-  )
+        const { mount, ...otherMicroAppConfigs } = (
+          await loadApp(  // [!code hl]
+            { name, props, ...appConfig },  // [!code hl]
+            frameworkConfiguration,  // [!code hl]
+            lifeCycles  // [!code hl]
+          )  // [!code hl]
+        )()
+
+        return {
+          mount: [
+            async () => loader(true),
+            ...toArray(mount),
+            async () => loader(false)
+          ],
+          ...otherMicroAppConfigs
+        }
+      },
+      activeWhen: activeRule,
+      customProps: props
+    })
+  })
 }
 
-// 当 window.singleReact 不存在时，意味着是子应用单独运行
-if (!window.singleReact) {
-  render()
-}
+```
 
-// 子应用必须导出 以下生命周期 bootstrap、mount、unmount
-export const bootstrap = () => {
-  return Promise.resolve()
-}
-export const mount = (props) => {
-  render(props)
-  return Promise.resolve()
-}
-export const unmount = () => {
-  root.unmount()
-  return Promise.resolve()
+```ts [qiankun\src\loader.ts]
+import { importEntry } from 'import-html-entry';
+
+export async function loadApp<T extends ObjectType>(
+  app: LoadableApp<T>,
+  configuration: FrameworkConfiguration = {},
+  lifeCycles?: FrameworkLifeCycles<T>,
+): Promise<ParcelConfigObjectGetter> {
+  const { entry, name: appName } = app;
+  ...
+  const {
+    singular = false,
+    sandbox = true,
+    excludeAssetFilter,
+    globalContext = window,
+    ...importEntryOpts
+  } = configuration;
+
+  // get the entry html content and script executor
+  const {
+    template,
+    execScripts,
+    assetPublicPath
+  } = await importEntry(entry, importEntryOpts); // [!code hl]
+  ...
 }
 ```
 
 :::
+
+我们再来看`importEntry`做了什么
+
+::: code-group
+
+```ts [import-html-entry/src/index.js]
+export function importEntry(entry, opts = {}) {
+  const { fetch = defaultFetch, getTemplate = defaultGetTemplate, postProcessTemplate } = opts
+  const getPublicPath = opts.getPublicPath || opts.getDomain || defaultGetPublicPath
+
+  if (!entry) {
+    throw new SyntaxError('entry should not be empty!')
+  }
+
+  // html entry
+
+  // 这里的entry的schema如下
+  // string | { scripts?: string[]; styles?: string[]; html?: string }
+  if (typeof entry === 'string') {
+    return importHTML(entry, { // [!code hl]
+      fetch, // [!code hl]
+      getPublicPath, // [!code hl]
+      getTemplate, // [!code hl]
+      postProcessTemplate // [!code hl]
+    }) // [!code hl]
+  }
+
+  // config entry
+  if (Array.isArray(entry.scripts) || Array.isArray(entry.styles)) {
+    ...
+  } else {
+    throw new SyntaxError('entry scripts or styles should be array!')
+  }
+}
+
+// 已经嵌入的html缓存
+const embedHTMLCache = {};
+export default function importHTML(url, opts = {}) {
+  // 不传入任何值得话就是使用的window.fetch
+  let fetch = defaultFetch
+  ...
+  return (
+    embedHTMLCache[url] ||
+    (embedHTMLCache[url] = fetch(url)
+      .then((response) => readResAsString(response, autoDecodeResponse))
+      .then((html) => {
+        const assetPublicPath = getPublicPath(url)
+        // 解析html内容
+        const {
+          template,
+          scripts,
+          entry,
+          styles
+        } = processTpl(getTemplate(html), assetPublicPath, postProcessTemplate) // [!code hl]
+
+        return getEmbedHTML(template, styles, { fetch }).then((embedHTML) => ({
+          template: embedHTML,
+          assetPublicPath,
+          getExternalScripts: () => getExternalScripts(scripts, fetch),
+          getExternalStyleSheets: () => getExternalStyleSheets(styles, fetch),
+          execScripts: (proxy, strictGlobal, opts = {}) => {
+            if (!scripts.length) {
+              return Promise.resolve()
+            }
+            return execScripts(entry, scripts, proxy, {
+              fetch,
+              strictGlobal,
+              ...opts
+            })
+          }
+        }))
+      }))
+  )
+}
+```
+
+:::
+
+这里的核心是`processTpl`，我们继续来看`processTpl`究竟做了什么
+
+::: code-group
+
+```ts [import-html-entry/src/process-tpl.js]
+export const genIgnoreAssetReplaceSymbol = url =>
+`<!-- ignore asset ${url || 'file'} replaced by import-html-entry -->`;
+
+// 这里的tpl就是html字符串
+export default function processTpl(tpl, baseURI, postProcessTemplate) {
+  let scripts = [];
+  const styles = [];
+  let entry = null;
+  const temp = tpl
+    // 移除注释
+    .replace(HTML_COMMENT_REGEX, '')
+    .replace(LINK_TAG_REGEX, match => {
+      // 修改css link
+      ...
+      return match
+    })
+    .replace(STYLE_TAG_REGEX, match => {
+      // 处理style标签
+      ...
+      return match
+    })
+    .replace(ALL_SCRIPT_REGEX, (match, scriptTag) => {
+      ...
+      // 如果是外部标签
+      if (SCRIPT_TAG_REGEX.test(match) && scriptTag.match(SCRIPT_SRC_REGEX)) {
+        if (matchedScriptSrc) {
+          const asyncScript = !!scriptTag.match(SCRIPT_ASYNC_REGEX);
+          ...
+          scripts.push( // [!code hl]
+            asyncScript ?  // [!code hl]
+              { async: true, src: matchedScriptSrc } :  // [!code hl]
+              matchedScriptSrc // [!code hl]
+          ); // [!code hl]
+          return genScriptReplaceSymbol(matchedScriptSrc, asyncScript);
+        }
+      } else {
+        // 如果是内联标签，获取标签内容
+        const code = getInlineCode(match)
+        // 当标签内部全是注释的时候，就不要了
+        const isPureCommentBlock = code.split(/[\r\n]+/).every(line => {
+          return !line.trim() || line.trim().startsWith('//')
+        });
+        if (!isPureCommentBlock) {
+          scripts.push(match);  // [!code hl]
+        }
+        return inlineScriptReplaceSymbol;
+      }
+
+    })
+
+  scripts = scripts.filter(function (script) {
+    // filter empty script
+    return !!script;
+  });
+
+  let tplResult = {
+    template,
+    scripts,
+    styles,
+    // set the last script as entry if have not set
+    entry: entry || scripts[scripts.length - 1],
+  };
+  ...
+  return tplResult;
+}
+```
+
+:::
+
+最终在执行的时候，都是通过`evalCode`函数运行`js`代码
+
+::: code-group
+
+```js [import-html-entry/src/utils.js]
+// 缓存
+const evalCache = {};
+export function evalCode(scriptSrc, code) {
+  const key = scriptSrc
+  if (!evalCache[key]) {
+    const functionWrappedCode = `(function(){${code}})`
+    evalCache[key] = (0, eval)(functionWrappedCode) // [!code hl]
+  }
+  const evalFunc = evalCache[key]
+  evalFunc.call(window)
+}
+```
+
+:::
+
+> 最终我们发现，乾坤大致就是通过`window.fetch(可自定义)`获取入口`html`文件，通过一系列的正则表达式，解析`html`字符串中的内容，生成`scripts`、`styles`和`template`，最终通过`eval`函数来执行求中的`js`代码
+
+细心的小伙伴一定发现了一个问题，那就是`eval`**不支持**`export`和`import`！
+
+不支持`export`和`import`，也就意味着`qiankun`**不支持**像`vite`和`parcel`这类打包工具构建的项目
+
+随着`vite`的火热发展，越来越多的开发者开始使用`vite`构建项目，该问题无疑是限制了`qiankun`的发展
+
+在`qiankun`的`discussions`栏目有一个有趣的讨论[qiankun 3.0 Roadmap](https://github.com/umijs/qiankun/discussions/1378)
+
+自2021年4月份依赖，`qiankun 3.0`完成的唯一一件事就是设计了一个新`logo` ~
+
+
 
 ## [Module Federation](https://webpack.js.org/concepts/module-federation/)
 

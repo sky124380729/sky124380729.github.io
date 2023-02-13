@@ -89,7 +89,11 @@
         // 子应用名称
         name: 'app1',
         // 子应用加载函数
-        app: loadApp('http://localhost:10801', 'app1', ['/js/chunk-vendors.js', '/js/app.js', '/js/about.js']),
+        app: loadApp(
+          'http://localhost:10801',
+          'app1',
+          ['/js/chunk-vendors.js', '/js/app.js', '/js/about.js']
+        ),
         // 当路由满足条件时（返回true），激活（挂载）子应用
         activeWhen: (location) => location.pathname.startsWith('/app1'),
         // 传递给子应用的对象
