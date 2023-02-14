@@ -130,7 +130,7 @@
 
   ::: details 关于编译时加载
 
-  由于是编译时加载是静态分析，因此不支持动态导入
+  由于是编译时加载是静态分析，因此在`webpack`等打包工具中，不支持完全动态的`import`语句
 
   ```js
   // success
@@ -142,10 +142,10 @@
 
   webpack官网中有以下描述：
 
-  > 不能使用完全动态的 import 语句，例如 import(foo)。是因为 foo 可能是系统或项目中任何文件的任何路径。
+  > It is not possible to use a fully dynamic import statement, such as import(foo). Because foo could potentially be any path to any file in your system or project..
 
-  import() 必须至少包含一些关于模块的路径信息。打包可以限定于一个特定的目录或文件集，以便于在使用动态表达式时 - 包括可能在 import() 调用中请求的每个模块。
-  例如， import(`./locale/${language}.json`) 会把 .locale 目录中的每个 .json 文件打包到新的 chunk 中。在运行时，计算完变量 language 后，就可以使用像 english.json 或 german.json 的任何文件。
+  `import()`必须至少包含一些关于模块的路径信息。打包可以限定于一个特定的目录或文件集，以便于在使用动态表达式时 - 包括可能在`import()`调用中请求的每个模块。
+  例如， import(`./locale/${language}.json`) 会把`.locale`目录中的每个`.json`文件打包到新的`chunk`中。在运行时，计算完变量`language`后，就可以使用像`english.json`或`german.json`的任何文件。
 
   ```js
   // 想象我们有一个从 cookies 或其他存储中获取语言的方法
@@ -895,8 +895,6 @@ export function evalCode(scriptSrc, code) {
 
 自2021年4月份依赖，`qiankun 3.0`完成的唯一一件事就是设计了一个新`logo` ~
 
-
-
 ## [Module Federation](https://webpack.js.org/concepts/module-federation/)
 
 `Module Federation`中文直译为`模块联邦`，而在webpack官方文档中，其实并未给出其真正含义，但给出了使用该功能的motivation， 即动机，原文如下：
@@ -1097,5 +1095,12 @@ pnpm -F @levi/mf dev
 <<< @/../../module-federation/products/webpack.config.js
 
 <<< @/../../module-federation/cart/webpack.config.js
+
+:::
+
+::: mermaid
+
+sequenceDiagram
+User->>Server: Request page
 
 :::
