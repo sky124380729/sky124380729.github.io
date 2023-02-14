@@ -3,6 +3,7 @@
     <router-link to="/">Home</router-link> |
     <router-link to="/about">About</router-link>
   </nav>
+  <p className="test">我是测试样式的标签</p>
   <router-view />
 </template>
 

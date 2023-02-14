@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
+import './style.css'
 
 let app = null
 
@@ -26,3 +27,6 @@ export const unmount = () => {
   app.unmount()
   return Promise.resolve()
 }
+
+// global test
+window.levi = 'app1'

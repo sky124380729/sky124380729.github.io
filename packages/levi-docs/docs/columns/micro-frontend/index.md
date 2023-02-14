@@ -6,7 +6,7 @@
 
 微前端是一种类似于微服务的架构，是一种由独立交付的多个前端应用组成整体的架构风格，将前端应用分解成一些更小、更简单的能够独立开发、测试、部署的应用，而在用户看来仍然是内聚的单个产品。有一个基座应用（主应用），来管理各个子应用的加载和卸载。
 
-![image](./1.webp)
+![image](./assets/1.webp)
 
 微前端的三大核心原则：`独立开发`、`独立运行`、`独立部署`
 
@@ -233,7 +233,7 @@
 
 目前关于`Import Maps`的兼容性：
 
-![image](./2.jpg){data-zoomable}
+![image](./assets/2.jpg){data-zoomable}
 
 可以看到`Firefox`直到`2022-12-13`才对`import maps`的特性予以支持！
 
@@ -351,7 +351,7 @@ pnpm -F @levi/sj dev
 
 在`基座 (主) 应用`中注册所有 App 的路由，single-spa 保存各子应用的路由映射关系，充当微前端控制器`Controler`，当对应的`URL`变换时，除了匹配`基座应用`本身的路由外，还会匹配 子应用 路由并加载渲染子应用
 
-![image](./3.jpg)
+![image](./assets/3.jpg)
 
 子应用会经过如下过程:
 
@@ -423,6 +423,12 @@ var app2 = (function() {
 因此就可以直接访问`window.app2`
 
 :::
+
+在上述demo中，存在着几个比较明显的缺陷：
+
+- `js`全局环境被污染了(`window.levi`)
+- `css`没有做到隔离(`.test类`)
+- 需要手动引入各个资源(`app方法`)
 
 ## [qiankun](https://qiankun.umijs.org/zh/guide)
 
@@ -964,7 +970,12 @@ module.exports = {
 
   - css沙箱隔离
 
-    - `shadowDom`实现隔离
+    - `shadowDom`实现隔离（这里不演示qiankun具体的实现，只演示什么是shadowDom）
+
+      <<< @/public/demos/shadow-dom.html
+
+      <iframe width="100%" src="/demos/shadow-dom.html"></iframe>
+
     - `prefix`限定`CSS`规则
 
   - js沙箱隔离
@@ -1061,20 +1072,20 @@ module.exports = {
 - host：引用了其他应用的应用
 - remote：被其他应用所使用的应用
 
-![image](./5.png)
+![image](./assets/5.png)
 
 鉴于`mf`的能力，我们可以完全实现一个去中心化的应用部署群：每个应用是单独部署在各自的服务器，每个应用都可以引用其他应用，也能被其他应用所引用，即每个应用可以充当host的角色，亦可以作为remote出现，无中心应用的概念。
 
-![image](./6.png)
+![image](./assets/6.png)
 
 我们再来看看`webpack5`与之前版本的模块管理对比图，以助于更好的理解
 
 webpack5之前
 
-![image](./mf1.webp)
+![image](./assets/mf1.webp)
 
 webpack5
-![image](./mf2.webp)
+![image](./assets/mf2.webp)
 
 ### 配置介绍
 
@@ -1256,6 +1267,145 @@ pnpm -F @levi/mf dev
 <<< @/../../module-federation/cart/webpack.config.js
 
 :::
+
+## 自己实现微前端框架
+
+- ### 路由劫持
+
+  ::: code-group
+
+  <<< @/../../test-micro-web/src/router/rewriteRouter.js
+
+  <<< @/../../test-micro-web/src/util/index.js {3-13}
+
+  :::
+
+- ### 加载子应用
+
+  - 加载html资源
+
+    <<< @/../../test-micro-web/src/util/fetchResources.js
+
+  - 解析html资源
+
+    <<< @/../../test-micro-web/src/htmlLoader/htmlLoader.js
+
+  - 执行js脚本
+
+    <<< @/../../test-micro-web/src/sandbox/performScript.js {18-33}
+
+- ### 沙箱隔离
+
+  - js沙箱隔离
+
+    - 快照沙箱
+
+      <<< @/../../test-micro-web/src/sandbox/snapshotSandBox.js
+
+    - 代理沙箱
+
+      <<< @/../../test-micro-web/src/sandbox/proxySandBox.js
+
+    - 代码自查
+
+      避免操作`window`对象
+
+  - css隔离
+
+    - shadowDom
+    - prefix css（框架处理或者团队做约束）
+    - [BEM](https://bemcss.com/) （团队做好约束）
+
+      ```css
+      .table {}
+      .table__header {}
+      .table__body {}
+      .button--success {}
+      .button--error {}
+      ```
+
+    - style scoped （团队做好约束）
+
+      ```vue
+      <style scoped>
+      .red {
+        color: red;
+      }
+      </style>
+      ```
+
+    - css in js
+
+      - emotion
+
+        ```jsx
+        /** @jsx jsx */
+        import { jsx } from '@emotion/react'
+
+        let SomeComponent = props => {
+          return (
+            <div
+              css={{
+                color: 'hotpink'
+              }}
+              {...props}
+            />
+          )
+        }
+        ```
+
+      - styled-components
+
+        ```tsx
+        const Button = styled.button`
+          color: grey;
+        `;
+        ```
+
+    - css modules
+
+      ::: code-group
+
+      ```jsx
+      import styles from "./Header.module.css";
+
+      export default function Header() {
+        return <h2 className={styles.title}>Header 组件</h2>;
+      }
+      ```
+
+      ```js [webpack.config.js]
+      module.exports = {
+        module: {
+          rules: [
+            {
+              test: /\.(cs|scs)s$/,
+              use: [MiniCssExtractPlugin.loader, {
+                loader: 'css-loader',
+                options: {
+                  module: true // [!code hl]
+                }
+              }]
+            }
+          ]
+        }
+      }
+      ```
+
+      :::
+
+    - 使用`minicss` MiniCssExtractPlugin
+
+      使用的是MiniCssExtractPlugin将css文件打包成单独的文件，由于在是在子应用中加载link标签，所以子应用卸载之后link也会消失，实现了沙箱隔离
+
+      但是同时加载多个子应用也会有缺陷
+
+- ### 应用通信
+
+  - props
+  - customevent
+
+    <<< @/../../test-micro-web/src/event/index.js
 
 ## 当前比较成熟的微前端方案
 

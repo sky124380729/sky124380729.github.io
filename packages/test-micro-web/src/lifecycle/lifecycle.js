@@ -19,13 +19,13 @@ export const lifecycle = async () => {
   // 还原 prevApp 快照。
   // prevApp.sandBox.active()
 
-  await boostrap(nextApp)
+  await bootstrap(nextApp)
 
   await mount(nextApp)
 }
 
 // 装载应用
-export const boostrap = async (app) => {
+export const bootstrap = async (app) => {
   await runMainLifeCycle('beforeLoad', app)
 
   // 获取子应用的dom结构
@@ -44,7 +44,7 @@ export const mount = async (app) => {
 export const unmount = async (app) => {
   app && app.unmount && (await app.unmount(app))
 
-  await runMainLifeCycle('destoryed', app)
+  await runMainLifeCycle('destroyed', app)
 }
 
 // 执行主应用生命周期

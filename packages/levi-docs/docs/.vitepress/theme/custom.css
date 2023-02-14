@@ -45,9 +45,17 @@ iframe {
   @apply absolute left-0;
 }
 
+
+@keyframes scatter {
+  0% { color: #c0ff28; }
+  50% { color: #ff5e00; }
+  100% { color: #c0ff28; }
+}
+
 .vp-doc strong {
-  color: #ff5e00;
-  text-shadow: 1px 1px 3px #ff0508;
+  text-shadow: 1px 1px 2px #000000;
+  font-size: 18px;
+  animation: scatter 3s infinite linear;
 }
 
 .vp-doc :not(pre) > code {

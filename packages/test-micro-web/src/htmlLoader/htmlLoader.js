@@ -77,10 +77,10 @@ export const getResources = (root, app) => {
 
 // 加载和渲染html
 export const htmlLoader = async (app) => {
-  const { container: cantainerName, entry, name } = app
+  const { container: containerName, entry, name } = app
   let [dom, scriptsArray] = await parseHtml(entry, name)
 
-  let container = document.querySelector(cantainerName)
+  let container = document.querySelector(containerName)
   if (!container) {
     throw Error(` ${name} 的容器不存在，请查看是否正确指定`)
   }
