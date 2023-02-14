@@ -430,7 +430,7 @@ var app2 = (function() {
 
 那么我们有`single-spa`这种微前端解决方案，为什么还需要`qiankun`呢?
 
-相比于`single-spa`，`qiankun`他解决了**JS沙盒环境**，不需要我们自己去进行处理。
+相比于`single-spa`，`qiankun`他解决了**JS沙盒环境**，**CSS沙箱环境**，不需要我们自己去进行处理。
 在`single-spa`的开发过程中，我们需要自己手动的去写调用子应用JS的方法（如上面的`createScript`方法），而`qiankun`不需要，乾坤只需要你传入响应的apps的配置即可，会帮助我们去加载。
 
 ### qiankun主应用配置
@@ -618,286 +618,436 @@ module.exports = {
 
 :::
 
-### 原理分析
+### 核心原理解析
 
-相比于`single-spa`，我们发现这里加载子应用的时候不需要指定子应用依赖的`js`文件，那么`qiankun`是如何知道当前子应用需要依赖什么`js`文件的呢？
+- 路由劫持
 
-其实就是通过[html-import-entry](https://github.com/kuitos/import-html-entry)加载并解析子应用的HTML
+  `qiankun`的路由劫持主要还是通过`single-spa`，这里以后做讲述
 
-在基座应用中通过调用 `registerMicroApps(...)` 函数注册子应用时，其内部实际上是通过`single-spa`中的`registerApplication(...)`函数来实现的，其内容如下：
+- 加载子应用
 
-::: code-group
+  在讲述`single-spa`的章节中有介绍，要在基座应用中注册子应用，需要制定每个子应用对应的`url`，以及如何加载子应用依赖的`js`文件等，
 
-```ts [qiankun\src\apis.ts]
-import {
-  mountRootParcel,
-  registerApplication, // [!code hl]
-  start as startSingleSpa
-} from 'single-spa'
-import { loadApp } from './loader'
+  相比于`single-spa`，我们发现`qiankun`加载子应用的时候不需要指定子应用依赖的`js`文件，只需要指定`entry`就可以，那么它是如何实现的呢？
 
-export function registerMicroApps<T extends ObjectType>(
-  apps: Array<RegistrableApp<T>>,
-  lifeCycles?: FrameworkLifeCycles<T>
-) {
-  // 每个子应用只会被注册一次
-  const unregisteredApps = apps.filter((app) => {
-    return !microApps.some((registeredApp) => registeredApp.name === app.name)
-  })
+  其实就是通过[html-import-entry](https://github.com/kuitos/import-html-entry)加载并解析子应用的HTML
 
-  microApps = [...microApps, ...unregisteredApps]
+  在基座应用中通过调用 `registerMicroApps(...)` 函数注册子应用时，其内部实际上是通过`single-spa`中的`registerApplication(...)`函数来实现的，其内容如下：
 
-  unregisteredApps.forEach((app) => {
-    const { name, activeRule, loader = noop, props, ...appConfig } = app
+  ::: code-group
 
-    // 真正注册子应用的地方，通过 loadApp 加载并解析子应用对应的 html 模板
-    registerApplication({ // [!code hl]
-      name,
-      app: async () => {
-        loader(true)
-        await frameworkStartedDefer.promise
+  ```ts [qiankun\src\apis.ts]
+  import {
+    mountRootParcel,
+    registerApplication, // [!code hl]
+    start as startSingleSpa
+  } from 'single-spa'
+  import { loadApp } from './loader'
 
-        const { mount, ...otherMicroAppConfigs } = (
-          await loadApp(  // [!code hl]
-            { name, props, ...appConfig },  // [!code hl]
-            frameworkConfiguration,  // [!code hl]
-            lifeCycles  // [!code hl]
-          )  // [!code hl]
-        )()
-
-        return {
-          mount: [
-            async () => loader(true),
-            ...toArray(mount),
-            async () => loader(false)
-          ],
-          ...otherMicroAppConfigs
-        }
-      },
-      activeWhen: activeRule,
-      customProps: props
+  export function registerMicroApps<T extends ObjectType>(
+    apps: Array<RegistrableApp<T>>,
+    lifeCycles?: FrameworkLifeCycles<T>
+  ) {
+    // 每个子应用只会被注册一次
+    const unregisteredApps = apps.filter((app) => {
+      return !microApps.some((registeredApp) => registeredApp.name === app.name)
     })
-  })
-}
 
-```
+    microApps = [...microApps, ...unregisteredApps]
 
-```ts [qiankun\src\loader.ts]
-import { importEntry } from 'import-html-entry';
+    unregisteredApps.forEach((app) => {
+      const { name, activeRule, loader = noop, props, ...appConfig } = app
 
-export async function loadApp<T extends ObjectType>(
-  app: LoadableApp<T>,
-  configuration: FrameworkConfiguration = {},
-  lifeCycles?: FrameworkLifeCycles<T>,
-): Promise<ParcelConfigObjectGetter> {
-  const { entry, name: appName } = app;
-  ...
-  const {
-    singular = false,
-    sandbox = true,
-    excludeAssetFilter,
-    globalContext = window,
-    ...importEntryOpts
-  } = configuration;
+      // 真正注册子应用的地方，通过 loadApp 加载并解析子应用对应的 html 模板
+      registerApplication({ // [!code hl]
+        name,
+        app: async () => {
+          loader(true)
+          await frameworkStartedDefer.promise
 
-  // get the entry html content and script executor
-  const {
-    template,
-    execScripts,
-    assetPublicPath
-  } = await importEntry(entry, importEntryOpts); // [!code hl]
-  ...
-}
-```
+          const { mount, ...otherMicroAppConfigs } = (
+            await loadApp(  // [!code hl]
+              { name, props, ...appConfig },  // [!code hl]
+              frameworkConfiguration,  // [!code hl]
+              lifeCycles  // [!code hl]
+            )  // [!code hl]
+          )()
 
-:::
-
-我们再来看`importEntry`做了什么
-
-::: code-group
-
-```ts [import-html-entry/src/index.js]
-export function importEntry(entry, opts = {}) {
-  const { fetch = defaultFetch, getTemplate = defaultGetTemplate, postProcessTemplate } = opts
-  const getPublicPath = opts.getPublicPath || opts.getDomain || defaultGetPublicPath
-
-  if (!entry) {
-    throw new SyntaxError('entry should not be empty!')
-  }
-
-  // html entry
-
-  // 这里的entry的schema如下
-  // string | { scripts?: string[]; styles?: string[]; html?: string }
-  if (typeof entry === 'string') {
-    return importHTML(entry, { // [!code hl]
-      fetch, // [!code hl]
-      getPublicPath, // [!code hl]
-      getTemplate, // [!code hl]
-      postProcessTemplate // [!code hl]
-    }) // [!code hl]
-  }
-
-  // config entry
-  if (Array.isArray(entry.scripts) || Array.isArray(entry.styles)) {
-    ...
-  } else {
-    throw new SyntaxError('entry scripts or styles should be array!')
-  }
-}
-
-// 已经嵌入的html缓存
-const embedHTMLCache = {};
-export default function importHTML(url, opts = {}) {
-  // 不传入任何值得话就是使用的window.fetch
-  let fetch = defaultFetch
-  ...
-  return (
-    embedHTMLCache[url] ||
-    (embedHTMLCache[url] = fetch(url)
-      .then((response) => readResAsString(response, autoDecodeResponse))
-      .then((html) => {
-        const assetPublicPath = getPublicPath(url)
-        // 解析html内容
-        const {
-          template,
-          scripts,
-          entry,
-          styles
-        } = processTpl(getTemplate(html), assetPublicPath, postProcessTemplate) // [!code hl]
-
-        return getEmbedHTML(template, styles, { fetch }).then((embedHTML) => ({
-          template: embedHTML,
-          assetPublicPath,
-          getExternalScripts: () => getExternalScripts(scripts, fetch),
-          getExternalStyleSheets: () => getExternalStyleSheets(styles, fetch),
-          execScripts: (proxy, strictGlobal, opts = {}) => {
-            if (!scripts.length) {
-              return Promise.resolve()
-            }
-            return execScripts(entry, scripts, proxy, {
-              fetch,
-              strictGlobal,
-              ...opts
-            })
+          return {
+            mount: [
+              async () => loader(true),
+              ...toArray(mount),
+              async () => loader(false)
+            ],
+            ...otherMicroAppConfigs
           }
+        },
+        activeWhen: activeRule,
+        customProps: props
+      })
+    })
+  }
+
+  ```
+
+  ```ts [qiankun\src\loader.ts]
+  import { importEntry } from 'import-html-entry';
+
+  export async function loadApp<T extends ObjectType>(
+    app: LoadableApp<T>,
+    configuration: FrameworkConfiguration = {},
+    lifeCycles?: FrameworkLifeCycles<T>,
+  ): Promise<ParcelConfigObjectGetter> {
+    const { entry, name: appName } = app;
+    ...
+    const {
+      singular = false,
+      sandbox = true,
+      excludeAssetFilter,
+      globalContext = window,
+      ...importEntryOpts
+    } = configuration;
+
+    // get the entry html content and script executor
+    const {
+      template,
+      execScripts,
+      assetPublicPath
+    } = await importEntry(entry, importEntryOpts); // [!code hl]
+    ...
+  }
+  ```
+
+  :::
+
+  我们再来看`importEntry`做了什么
+
+  ::: code-group
+
+  ```ts [import-html-entry/src/index.js]
+  export function importEntry(entry, opts = {}) {
+    const { fetch = defaultFetch, getTemplate = defaultGetTemplate, postProcessTemplate } = opts
+    const getPublicPath = opts.getPublicPath || opts.getDomain || defaultGetPublicPath
+
+    if (!entry) {
+      throw new SyntaxError('entry should not be empty!')
+    }
+
+    // html entry
+
+    // 这里的entry的schema如下
+    // string | { scripts?: string[]; styles?: string[]; html?: string }
+    if (typeof entry === 'string') {
+      return importHTML(entry, { // [!code hl]
+        fetch, // [!code hl]
+        getPublicPath, // [!code hl]
+        getTemplate, // [!code hl]
+        postProcessTemplate // [!code hl]
+      }) // [!code hl]
+    }
+
+    // config entry
+    if (Array.isArray(entry.scripts) || Array.isArray(entry.styles)) {
+      ...
+    } else {
+      throw new SyntaxError('entry scripts or styles should be array!')
+    }
+  }
+
+  // 已经嵌入的html缓存
+  const embedHTMLCache = {};
+  export default function importHTML(url, opts = {}) {
+    // 不传入任何值得话就是使用的window.fetch
+    let fetch = defaultFetch
+    ...
+    return (
+      embedHTMLCache[url] ||
+      (embedHTMLCache[url] = fetch(url)
+        .then((response) => readResAsString(response, autoDecodeResponse))
+        .then((html) => {
+          const assetPublicPath = getPublicPath(url)
+          // 解析html内容
+          const {
+            template,
+            scripts,
+            entry,
+            styles
+          } = processTpl(getTemplate(html), assetPublicPath, postProcessTemplate) // [!code hl]
+
+          return getEmbedHTML(template, styles, { fetch }).then((embedHTML) => ({
+            template: embedHTML,
+            assetPublicPath,
+            getExternalScripts: () => getExternalScripts(scripts, fetch),
+            getExternalStyleSheets: () => getExternalStyleSheets(styles, fetch),
+            execScripts: (proxy, strictGlobal, opts = {}) => {
+              if (!scripts.length) {
+                return Promise.resolve()
+              }
+              return execScripts(entry, scripts, proxy, {
+                fetch,
+                strictGlobal,
+                ...opts
+              })
+            }
+          }))
         }))
-      }))
-  )
-}
-```
+    )
+  }
+  ```
 
-:::
+  :::
 
-这里的核心是`processTpl`，我们继续来看`processTpl`究竟做了什么
+  这里的核心是`processTpl`，我们继续来看`processTpl`究竟做了什么
 
-::: code-group
+  ::: code-group
 
-```ts [import-html-entry/src/process-tpl.js]
-export const genIgnoreAssetReplaceSymbol = url =>
-`<!-- ignore asset ${url || 'file'} replaced by import-html-entry -->`;
+  ```ts [import-html-entry/src/process-tpl.js]
+  export const genIgnoreAssetReplaceSymbol = url =>
+  `<!-- ignore asset ${url || 'file'} replaced by import-html-entry -->`;
 
-// 这里的tpl就是html字符串
-export default function processTpl(tpl, baseURI, postProcessTemplate) {
-  let scripts = [];
-  const styles = [];
-  let entry = null;
-  const temp = tpl
-    // 移除注释
-    .replace(HTML_COMMENT_REGEX, '')
-    .replace(LINK_TAG_REGEX, match => {
-      // 修改css link
-      ...
-      return match
-    })
-    .replace(STYLE_TAG_REGEX, match => {
-      // 处理style标签
-      ...
-      return match
-    })
-    .replace(ALL_SCRIPT_REGEX, (match, scriptTag) => {
-      ...
-      // 如果是外部标签
-      if (SCRIPT_TAG_REGEX.test(match) && scriptTag.match(SCRIPT_SRC_REGEX)) {
-        if (matchedScriptSrc) {
-          const asyncScript = !!scriptTag.match(SCRIPT_ASYNC_REGEX);
-          ...
-          scripts.push( // [!code hl]
-            asyncScript ?  // [!code hl]
-              { async: true, src: matchedScriptSrc } :  // [!code hl]
-              matchedScriptSrc // [!code hl]
-          ); // [!code hl]
-          return genScriptReplaceSymbol(matchedScriptSrc, asyncScript);
+  // 这里的tpl就是html字符串
+  export default function processTpl(tpl, baseURI, postProcessTemplate) {
+    let scripts = [];
+    const styles = [];
+    let entry = null;
+    const temp = tpl
+      // 移除注释
+      .replace(HTML_COMMENT_REGEX, '')
+      .replace(LINK_TAG_REGEX, match => {
+        // 修改css link
+        ...
+        return match
+      })
+      .replace(STYLE_TAG_REGEX, match => {
+        // 处理style标签
+        ...
+        return match
+      })
+      .replace(ALL_SCRIPT_REGEX, (match, scriptTag) => {
+        ...
+        // 如果是外部标签
+        if (SCRIPT_TAG_REGEX.test(match) && scriptTag.match(SCRIPT_SRC_REGEX)) {
+          if (matchedScriptSrc) {
+            const asyncScript = !!scriptTag.match(SCRIPT_ASYNC_REGEX);
+            ...
+            scripts.push( // [!code hl]
+              asyncScript ?  // [!code hl]
+                { async: true, src: matchedScriptSrc } :  // [!code hl]
+                matchedScriptSrc // [!code hl]
+            ); // [!code hl]
+            return genScriptReplaceSymbol(matchedScriptSrc, asyncScript);
+          }
+        } else {
+          // 如果是内联标签，获取标签内容
+          const code = getInlineCode(match)
+          // 当标签内部全是注释的时候，就不要了
+          const isPureCommentBlock = code.split(/[\r\n]+/).every(line => {
+            return !line.trim() || line.trim().startsWith('//')
+          });
+          if (!isPureCommentBlock) {
+            scripts.push(match);  // [!code hl]
+          }
+          return inlineScriptReplaceSymbol;
         }
-      } else {
-        // 如果是内联标签，获取标签内容
-        const code = getInlineCode(match)
-        // 当标签内部全是注释的时候，就不要了
-        const isPureCommentBlock = code.split(/[\r\n]+/).every(line => {
-          return !line.trim() || line.trim().startsWith('//')
-        });
-        if (!isPureCommentBlock) {
-          scripts.push(match);  // [!code hl]
-        }
-        return inlineScriptReplaceSymbol;
+
+      })
+
+    scripts = scripts.filter(function (script) {
+      // filter empty script
+      return !!script;
+    });
+
+    let tplResult = {
+      template,
+      scripts,
+      styles,
+      // set the last script as entry if have not set
+      entry: entry || scripts[scripts.length - 1],
+    };
+    ...
+    return tplResult;
+  }
+  ```
+
+  :::
+
+  最终在执行的时候，都是通过`evalCode`函数运行`js`代码
+
+  ::: code-group
+
+  ```js [import-html-entry/src/utils.js]
+  // 缓存
+  const evalCache = {};
+  export function evalCode(scriptSrc, code) {
+    const key = scriptSrc
+    if (!evalCache[key]) {
+      const functionWrappedCode = `(function(){${code}})`
+      evalCache[key] = (0, eval)(functionWrappedCode) // [!code hl]
+    }
+    const evalFunc = evalCache[key]
+    evalFunc.call(window)
+  }
+  ```
+
+  :::
+
+  > 最终我们发现，乾坤大致就是通过`window.fetch(可自定义)`获取入口`html`文件，通过一系列的正则表达式，解析`html`字符串中的内容，生成`scripts`、`styles`和`template`，最终通过`eval`函数来执行求中的`js`代码
+
+  细心的小伙伴一定发现了一个问题，那就是`eval`**不支持**`export`和`import`！
+
+  不支持`export`和`import`，也就意味着`qiankun`**不支持**像`vite`和`parcel`这类打包工具构建的项目！
+
+  随着`vite`的火热发展，越来越多的开发者开始使用`vite`构建项目，该问题无疑是限制了`qiankun`的发展
+
+  在`qiankun`的`discussions`栏目有一个有趣的讨论[qiankun 3.0 Roadmap](https://github.com/umijs/qiankun/discussions/1378)
+
+  自2021年4月份依赖，`qiankun 3.0`完成的唯一一件事就是设计了一个新`logo` ~
+
+- 沙箱隔离
+
+  `沙箱`的目的是为了隔离子应用间`脚本`和`样式`的影响，即需要针对子应用的`<style>`、`<link>`、`<script>`等类型的标签进行特殊处理，而处理时机分为两种
+
+  1. 在`初始化加载`时，因为初始化加载子应用时，需要加载其对应的`脚本和样式`
+  2. 在子应用正在`运行时`，因为子应用运行时可能会`动态添加脚本和样式`(例如`vue-router`中`路由懒加载`，都是运行时才会加载对应的脚本)
+
+  - 重写`appendChild`、`insertBefore`、`removeChild`等原生方法
+
+    以便于可以监听`新添加/删除`的节点，并对`<style>`、`<link>`、`<script>`等标签进行处理。
+
+    ::: code-group [qiankun\src\sandbox\patchers\dynamicAppend\common.ts]
+
+    ```ts [qiankun\src\sandbox\patchers\dynamicAppend\common.ts]
+    export function patchHTMLDynamicAppendPrototypeFunctions(
+      isInvokedByMicroApp: (element: HTMLElement) => boolean,
+      containerConfigGetter: (element: HTMLElement) => ContainerConfig
+    ) {
+      // 只在 appendChild 和 insertBefore 没有被重写时进行重写
+      if (
+        HTMLHeadElement.prototype.appendChild === rawHeadAppendChild &&
+        HTMLBodyElement.prototype.appendChild === rawBodyAppendChild &&
+        HTMLHeadElement.prototype.insertBefore === rawHeadInsertBefore
+      ) {
+        // 重写方法
+        HTMLHeadElement.prototype.appendChild = getOverwrittenAppendChildOrInsertBefore({
+          rawDOMAppendOrInsertBefore: rawHeadAppendChild,
+          containerConfigGetter,
+          isInvokedByMicroApp,
+          target: 'head'
+        }) as typeof rawHeadAppendChild
+
+        // 重写方法
+        HTMLBodyElement.prototype.appendChild = getOverwrittenAppendChildOrInsertBefore(...) as typeof rawBodyAppendChild
+
+        // 重写方法
+        HTMLHeadElement.prototype.insertBefore = getOverwrittenAppendChildOrInsertBefore(...) as typeof rawHeadInsertBefore
       }
 
+      // 只在 removeChild 没有被重写时进行重写
+      if (
+        HTMLHeadElement.prototype.removeChild === rawHeadRemoveChild &&
+        HTMLBodyElement.prototype.removeChild === rawBodyRemoveChild
+      ) {
+        // 重写方法
+        HTMLHeadElement.prototype.removeChild = getNewRemoveChild(rawHeadRemoveChild, containerConfigGetter, 'head')
+        HTMLBodyElement.prototype.removeChild = getNewRemoveChild(rawBodyRemoveChild, containerConfigGetter, 'body')
+      }
+
+      // 恢复重写前的方法
+      return function unpatch() {
+        HTMLHeadElement.prototype.appendChild = rawHeadAppendChild
+        ...
+      }
+    }
+    ```
+
+    :::
+
+  - css沙箱隔离
+
+    - `shadowDom`实现隔离
+    - `prefix`限定`CSS`规则
+
+  - js沙箱隔离
+
+    - `LegacySandbox`
+    - `ProxySandbox`
+    - `SnapshotSandbox`
+
+- 应用通信
+
+  `qiankun`中应用通信可以通过[initGlobalState(state)](https://qiankun.umijs.org/zh/api#initglobalstatestate)的方式实现，它用于定义全局状态，并返回通信方法，官方建议在主应用使用，微应用通过`props`获取通信方法。
+
+  ::: code-group
+
+  ```ts [qiankun/src/globalState.ts]
+  let globalState: Record<string, any> = {}
+
+  const deps: Record<string, OnGlobalStateChangeCallback> = {}
+
+  // 触发全局监听
+  function emitGlobal(state: Record<string, any>, prevState: Record<string, any>) {
+    Object.keys(deps).forEach((id: string) => {
+      if (deps[id] instanceof Function) {
+        deps[id](cloneDeep(state), cloneDeep(prevState))
+      }
     })
-
-  scripts = scripts.filter(function (script) {
-    // filter empty script
-    return !!script;
-  });
-
-  let tplResult = {
-    template,
-    scripts,
-    styles,
-    // set the last script as entry if have not set
-    entry: entry || scripts[scripts.length - 1],
-  };
-  ...
-  return tplResult;
-}
-```
-
-:::
-
-最终在执行的时候，都是通过`evalCode`函数运行`js`代码
-
-::: code-group
-
-```js [import-html-entry/src/utils.js]
-// 缓存
-const evalCache = {};
-export function evalCode(scriptSrc, code) {
-  const key = scriptSrc
-  if (!evalCache[key]) {
-    const functionWrappedCode = `(function(){${code}})`
-    evalCache[key] = (0, eval)(functionWrappedCode) // [!code hl]
   }
-  const evalFunc = evalCache[key]
-  evalFunc.call(window)
-}
-```
 
-:::
+  export function initGlobalState(state: Record<string, any> = {}) {
+    ...
+    const prevGlobalState = cloneDeep(globalState)
+    globalState = cloneDeep(state)
+    emitGlobal(globalState, prevGlobalState)
 
-> 最终我们发现，乾坤大致就是通过`window.fetch(可自定义)`获取入口`html`文件，通过一系列的正则表达式，解析`html`字符串中的内容，生成`scripts`、`styles`和`template`，最终通过`eval`函数来执行求中的`js`代码
+    return getMicroAppStateActions(`global-${+new Date()}`, true)
+  }
 
-细心的小伙伴一定发现了一个问题，那就是`eval`**不支持**`export`和`import`！
+  export function getMicroAppStateActions(id: string, isMaster?: boolean): MicroAppStateActions {
+    return {
 
-不支持`export`和`import`，也就意味着`qiankun`**不支持**像`vite`和`parcel`这类打包工具构建的项目
+      // 全局依赖监听
+      onGlobalStateChange(callback: OnGlobalStateChangeCallback, fireImmediately?: boolean) {
+        deps[id] = callback
+        if (fireImmediately) {
+          const cloneState = cloneDeep(globalState)
+          callback(cloneState, cloneState)
+        }
+      },
+      // setGlobalState 更新 store 数据
+      setGlobalState(state: Record<string, any> = {}) {
+        const changeKeys: string[] = []
+        const prevGlobalState = cloneDeep(globalState)
+        globalState = cloneDeep(
+          Object.keys(state).reduce((_globalState, changeKey) => {
+            if (isMaster || _globalState.hasOwnProperty(changeKey)) {
+              changeKeys.push(changeKey)
+              return Object.assign(_globalState, { [changeKey]: state[changeKey] })
+            }
+            return _globalState
+          }, globalState)
+        )
+        emitGlobal(globalState, prevGlobalState)
+        return true
+      },
 
-随着`vite`的火热发展，越来越多的开发者开始使用`vite`构建项目，该问题无疑是限制了`qiankun`的发展
+      // 注销该应用下的依赖
+      offGlobalStateChange() {
+        delete deps[id]
+        return true
+      }
+    }
+  }
+  ```
 
-在`qiankun`的`discussions`栏目有一个有趣的讨论[qiankun 3.0 Roadmap](https://github.com/umijs/qiankun/discussions/1378)
+  :::
 
-自2021年4月份依赖，`qiankun 3.0`完成的唯一一件事就是设计了一个新`logo` ~
+  其实不用翻开源码，大家也能明白这就是妥妥的`发布订阅模式`
+
+  它和我们在`vue2`中使用的`EventBus`核心原理其实是一样的，只不过做了一些应用场景的边界判断
 
 ## [Module Federation](https://webpack.js.org/concepts/module-federation/)
 
-`Module Federation`中文直译为`模块联邦`，而在webpack官方文档中，其实并未给出其真正含义，但给出了使用该功能的motivation， 即动机，原文如下：
+`Module Federation`是`webpack5`所提供的功能，中文直译为`模块联邦`，而在webpack官方文档中，其实并未给出其真正含义，但给出了使用该功能的`motivation`，即动机，原文如下：
 
 > Multiple separate builds should form a single application. These separate builds should not have dependencies between each other, so they can be developed and deployed individually.
 > This is often known as Micro-Frontends, but is not limited to that.
@@ -916,6 +1066,15 @@ export function evalCode(scriptSrc, code) {
 鉴于`mf`的能力，我们可以完全实现一个去中心化的应用部署群：每个应用是单独部署在各自的服务器，每个应用都可以引用其他应用，也能被其他应用所引用，即每个应用可以充当host的角色，亦可以作为remote出现，无中心应用的概念。
 
 ![image](./6.png)
+
+我们再来看看`webpack5`与之前版本的模块管理对比图，以助于更好的理解
+
+webpack5之前
+
+![image](./mf1.webp)
+
+webpack5
+![image](./mf2.webp)
 
 ### 配置介绍
 
@@ -1098,9 +1257,9 @@ pnpm -F @levi/mf dev
 
 :::
 
-::: mermaid
+## 当前比较成熟的微前端方案
 
-sequenceDiagram
-User->>Server: Request page
-
-:::
+- 基于`single-spa`的 [qiankun](https://qiankun.umijs.org/zh/guide)
+- 基于`module-federation`的 [EMP](https://github.com/efoxTeam/emp)
+- 基于`webComponents`的 [micro-app](https://micro-zoe.github.io/micro-app/)
+- 基于`webComponents`+`iframe`的 [wujie](https://wujie-micro.github.io/doc/)
