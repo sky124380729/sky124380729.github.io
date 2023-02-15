@@ -191,7 +191,7 @@
 
 ```html
 <script type="module">
-  import moment from "moment";
+  import { createApp } from "vue";
   import { partition } from "lodash";
 </script>
 ```
@@ -200,16 +200,24 @@
 
 某些环境，像`Node.js`或者打包工具允许没有任何路径的裸模块，因为它们有自己查找模块的方法。但是浏览器尚不支持裸模块。
 
+以下这样写也是可以的
+
+```html
+<script type="module">
+  import vue from "https://cdn.bootcdn.net/ajax/libs/vue/3.2.47/vue.esm-browser.js"
+</script>
+```
+
 但是如果有了`Import Maps`
 
 ```html
 <script type="importmap">
   {
     "imports": {
-      "moment": [
+      "vue": [
         // 这里提供了兜底方案，如果CDN挂了会回退引用本地版本
-        "https://cdn.bootcdn.net/ajax/libs/moment.js/2.29.4/locale/zh-cn.js",
-        "/node_modules/moment/src/moment.js"
+        "https://cdn.bootcdn.net/ajax/libs/vue/3.2.47/vue.esm-browser.js",
+        "/node_modules/vue/dist/vue.esm-browser.js"
       ],
       "lodash": "/node_modules/lodash-es/lodash.js"
     }
@@ -217,8 +225,8 @@
 </script>
 
 <script type="module">
-  import moment from "moment"
-  import { partition } from "lodash"
+  import { reactive, effect } from 'vue'
+  import { partition } from 'lodash'
 </script>
 ```
 
@@ -226,7 +234,7 @@
 
 ```html
 <script type="module">
-  import moment from "/node_modules/moment/src/moment.js"
+  import vue from "https://cdn.bootcdn.net/ajax/libs/vue/3.2.47/vue.esm-browser.js"
   import { partition } from "/node_modules/lodash-es/lodash.js"
 </script>
 ```
@@ -301,16 +309,16 @@ new Vue({ // [!code --]
   data: { name: 'levi' } // [!code --]
 }) // [!code --]
 
-System.register(['vue'], {
+System.register(['vue'], function () {
   let Vue = null
   return {
-    setters: [
-      v => Vue = v.default
-    ],
+    setters: [(v) => (Vue = v.default)],
     execute() {
       new Vue({
         el: '#container',
-        data: { name: 'levi' }
+        data: function () {
+          return { name: 'levi' }
+        }
       })
     }
   }
@@ -349,7 +357,7 @@ pnpm -F @levi/sj dev
 
 - 核心原理
 
-在`基座 (主) 应用`中注册所有 App 的路由，single-spa 保存各子应用的路由映射关系，充当微前端控制器`Controler`，当对应的`URL`变换时，除了匹配`基座应用`本身的路由外，还会匹配 子应用 路由并加载渲染子应用
+在`基座 (主) 应用`中注册所有 App 的路由，single-spa 保存各子应用的路由映射关系，充当微前端控制器`Controller`，当对应的`URL`变换时，除了匹配`基座应用`本身的路由外，还会匹配`子应用`路由并加载渲染子应用
 
 ![image](./assets/3.jpg)
 
