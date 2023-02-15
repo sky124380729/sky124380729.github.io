@@ -12,14 +12,14 @@ module.exports = {
     // 将products自身当做模块暴露出去
     new ModuleFederationPlugin({
       // 模块文件名称，其他应用引入当前模块时需要加载的文件的名字
-      filename:'remoteEntry.js',
+      filename: 'remoteEntry.js',
       // 模块名称，具有唯一性，相当于single-spa中的组织名称
       // 目前标注@deprecated，后续需要查查文档
       name: 'products',
       // 当前导出模块的内容
       exposes: {
         // react17+要加上./
-        "./index": "./src/bootstrap"
+        './index': './src/bootstrap'
       },
       // 如果多个子应用都使用了相同的包，为了不让他们重复加载，可以将他们设置为共享模块
       shared: {

@@ -341,7 +341,7 @@ pnpm -F @levi/sj dev
 
 <<< @/../../system-js/src/index.js
 
-<<< @/../../system-js/webpack.config.js
+<<< @/../../system-js/webpack.config.js{9,41,42}
 
 :::
 
@@ -978,12 +978,7 @@ module.exports = {
 
   - css沙箱隔离
 
-    - `shadowDom`实现隔离（这里不演示qiankun具体的实现，只演示什么是shadowDom）
-
-      <<< @/public/demos/shadow-dom.html
-
-      <iframe width="100%" src="/demos/shadow-dom.html"></iframe>
-
+    - `shadowDom`实现隔离
     - `prefix`限定`CSS`规则
 
   - js沙箱隔离
@@ -1075,14 +1070,14 @@ module.exports = {
 
 > 多个独立的构建可以形成一个应用程序。这些独立的构建不会相互依赖，因此可以单独开发和部署它们。这通常被称为微前端，但并不仅限于此。
 
-结合以上，不难看出，`mf`实际想要做的事，便是把多个无相互依赖、单独部署的应用合并为一个。通俗点讲，即mf提供了能在当前应用中远程加载其他服务器上应用的能力。对此，可以引出下面两个概念：
+结合以上，不难看出，`mf`实际想要做的事，便是把多个无相互依赖、单独部署的应用合并为一个。通俗点讲，即`mf`提供了能在当前应用中远程加载其他服务器上应用的能力。对此，可以引出下面两个概念：
 
-- host：引用了其他应用的应用
-- remote：被其他应用所使用的应用
+- **host**：引用了其他应用的应用
+- **remote**：被其他应用所使用的应用
 
 ![image](./assets/5.png)
 
-鉴于`mf`的能力，我们可以完全实现一个去中心化的应用部署群：每个应用是单独部署在各自的服务器，每个应用都可以引用其他应用，也能被其他应用所引用，即每个应用可以充当host的角色，亦可以作为remote出现，无中心应用的概念。
+鉴于`mf`的能力，我们可以完全实现一个**去中心化**的应用部署群：每个应用是单独部署在各自的服务器，每个应用都可以引用其他应用，也能被其他应用所引用，即每个应用可以充当`host`的角色，亦可以作为`remote`出现，`无中心应用`的概念。
 
 ![image](./assets/6.png)
 
@@ -1095,7 +1090,7 @@ webpack5之前
 webpack5
 ![image](./assets/mf2.webp)
 
-### 配置介绍
+### 基本配置介绍
 
 ::: code-group
 
@@ -1131,13 +1126,63 @@ module.exports = {
 
 :::
 
+### Module Federation配置实践
+
+> blog中运行(**【需要本文章的源码仓库】**)
+
+```bash
+pnpm -F @levi/mf dev
+```
+
+<div class="filename">container</div>
+
+::: code-group
+
+<<< @/../../module-federation/container/src/index.js
+
+<<< @/../../module-federation/container/src/bootstrap.js
+
+<<< @/../../module-federation/container/webpack.config.js
+
+:::
+
+<div class="filename">products</div>
+
+::: code-group
+
+<<< @/../../module-federation/products/src/index.js
+
+<<< @/../../module-federation/products/src/bootstrap.js
+
+<<< @/../../module-federation/products/webpack.config.js
+
+:::
+
+<div class="filename">cart</div>
+
+::: code-group
+
+<<< @/../../module-federation/cart/src/index.js
+
+<<< @/../../module-federation/cart/src/bootstrap.js
+
+<<< @/../../module-federation/cart/webpack.config.js
+
+:::
+
 ### 构建后的代码解析
 
 ```js
 var moduleMap = {
-  "./components/Comonpnent1": function() {
-    return Promise.all([__webpack_require__.e("webpack_sharing_consume_default_react_react"), __webpack_require__.e("src_components_Close_index_tsx")]).then(function() { return function() { return (__webpack_require__(16499)); }; });
+  "./index": function() {
+    return Promise.all([
+      __webpack_require__.e("..."),
+      __webpack_require__.e("...")
+    ]).then(function() { return function() { return (__webpack_require__(16499)); }; });
   },
+  "./test": function() {
+    ...
+  }
 };
 var get = function(module, getScope) {
   __webpack_require__.R = getScope;
@@ -1258,24 +1303,6 @@ __webpack_require__.l = (url, done, key, chunkId) => {
 - 微前端：通过`shared`以及`exposes`可以将多个应用引入同一应用中进行管理，由YY业务中台web前端组团队自主研发的`EMP微前端方案`就是基于`mf`的能力而实现的。
 - 资源复用，减少编译体积：可以将多个应用都用到的通用组件单独部署，通过`mf`的功能在`runtime`时引入到其他项目中，这样组件代码就不会编译到项目中，同时亦能满足多个项目同时使用的需求，一举两得。
 
-### Module Federation配置实践
-
-> blog中运行(**【需要本文章的源码仓库】**)
-
-```bash
-pnpm -F @levi/mf dev
-```
-
-::: code-group
-
-<<< @/../../module-federation/container/webpack.config.js
-
-<<< @/../../module-federation/products/webpack.config.js
-
-<<< @/../../module-federation/cart/webpack.config.js
-
-:::
-
 ## 自己实现微前端框架
 
 - ### 路由劫持
@@ -1321,6 +1348,11 @@ pnpm -F @levi/mf dev
   - css隔离
 
     - shadowDom
+
+      <<< @/public/demos/shadow-dom.html
+
+      <iframe width="100%" src="/demos/shadow-dom.html"></iframe>
+
     - prefix css（框架处理或者团队做约束）
     - [BEM](https://bemcss.com/) （团队做好约束）
 

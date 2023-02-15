@@ -5,22 +5,20 @@ import faker from 'faker'
 
 // 添加一个挂载方法
 function mount(el) {
-    let products = ""
+  let products = ''
 
-    for(let i = 1; i <= 5; i++) {
-        products += `<div>${faker.commerce.productName()}</div>`
-    }
+  for (let i = 1; i <= 5; i++) {
+    products += `<div>${faker.commerce.productName()}</div>`
+  }
 
-    el.innerHTML = products
+  el.innerHTML = products
 }
 
 // 只有在开发环境运行子应用代码
-if(process.env.NODE_ENV === 'development') {
-    const el = document.querySelector('#dev-products')
-    // 这里加判断是为了防止容器应用运行这段代码报错
-    if(el) mount(el)
+if (process.env.NODE_ENV === 'development') {
+  const el = document.querySelector('#dev-products')
+  // 这里加判断是为了防止容器应用运行这段代码报错
+  if (el) mount(el)
 }
 
 export { mount }
-
-

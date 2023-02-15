@@ -22,10 +22,10 @@ features:
 <script setup>
 import { VPTeamMembers } from 'vitepress/theme'
 import { useRouter } from 'vitepress'
-import image0 from '/assets/wallpapers/wallpaper0.jpeg'
-import image1 from '/assets/wallpapers/wallpaper1.png'
-import image2 from '/assets/wallpapers/wallpaper2.png'
-import image3 from '/assets/wallpapers/wallpaper3.png'
+import image0 from '/assets/wallpapers/w1.jpg'
+import image1 from '/assets/wallpapers/w2.jpg'
+import image2 from '/assets/wallpapers/w3.jpg'
+import image3 from '/assets/wallpapers/w4.jpg'
 
 // segmentfault 图标
 const SF_SVG = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0px" y="0px" width="32px" height="32px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve">  <image id="image0" width="32" height="32" x="0" y="0" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABGdBTUEAALGPC/xhBQAAACBjSFJN AAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAABUFBMVEUAml4AmmEAmmEKnWch p3UOn2kBmmFavZja8Oj////k9O6X1b5xxqfW7uUXo2/1+/h8y61Kt46h2cRAs4hwxqYfpnRyx6eA zLD9/v16yqz+/v4Vom5dvpqQ07p3yapYvJcRoGspqnqJ0LUoqXkrq3sCmmIFm2SU1Lz2+/mx4M4y rX9qw6IPn2qe2MJZvZhtxaQNn2k9sobp9vGp3Mmy4M/h8+zY7+ZvxaXz+vdUu5VLt48gpnQdpXIi p3Z+y68QoGpuxaVTupTZ7+dev5sJnWYDm2IHnGXX7+bx+faS07smqXj4/PpnwqB0x6gGnGTn9fBH tox2yKoInWVVu5XM6t+75NR4yavJ6d2u3swsq3yj2sXj8+0LnmeP0rk2r4L6/fuv383r9/L0+vgw rX4+sofV7uTs9/NNuJCCzbEMnmiR07q/5dfQ7OHA5tei2sVpw6LzH4wMAAAAAnRSTlNJ424rirYA AAABYktHRAnx2aXsAAAAB3RJTUUH5wIBCC0dSNbSEQAAAVFJREFUOMuFk+dbwjAQxkvAahSwCipu Uako4N64rRNB3Atx7/X/f/OuLWlTbXpfcuPX3t37JJLkIwLzSeI6EsTD3AB/oEoAyNU1lNLaOlcg SHULuQHhegNQ3IAGrDZGok1uQDMCYcEWLVCPidZsBaDNCbR3KJ1d3di1J96LLfri/QkLUAeS+tyx wSGSohVLW0CGJYfJCPNHGTCG4fjE5BSdTpAZBvgZgFPNwg/luXlC0lkFmy0EFmUGLEEmucy2WMHP ZfsWq5hZW9fMXBTDDTuwuaX33N7JWkqqnA67IWOs3B5GeXQLvFBaft9AihAcoHPolFo9Osb8Cbin 6GhOAJAzvEbm1oYIFaBwfoHHJeSv4EQdaMkOBGnuOlJWbiB/a8rCA3dM3fsH8z7wwOOTWX9+wfAV 3TduSLn4/vH59f1jTFZOgal/t/jfvAHPx+v1/H8BCaQqrGJXXckAAAAldEVYdGRhdGU6Y3JlYXRl ADIwMjMtMDItMDFUMDg6NDU6MjkrMDA6MDA0dnXXAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDIzLTAy LTAxVDA4OjQ1OjI5KzAwOjAwRSvNawAAACh0RVh0ZGF0ZTp0aW1lc3RhbXAAMjAyMy0wMi0wMVQw ODo0NToyOSswMDowMBI+7LQAAAAASUVORK5CYII="/>
@@ -47,9 +47,9 @@ const members = [
 
 const columns = [
   { title: '关于微前端的理解与实践', img: image0, link: '/columns/micro-frontend/index' },
-  { title: 'thinking...', img: image1, link: '' },
-  { title: 'thinking...', img: image2, link: '' },
-  { title: 'thinking...', img: image3, link: '' }
+  { title: '手撕Promise', img: image1, link: '/mini-code/promise' },
+  { title: '关于KMP的理解', img: image2, link: '/algorithm/kmp' },
+  { title: '一些不错的npm包', img: image3, link: '/links/plugins' }
 ]
 </script>
 
@@ -62,7 +62,7 @@ const columns = [
     show-arrow
   >
     <n-carousel-item v-for="column in columns" @click="go(column.link)" :style="{ width: '60%' }">
-      <div class="carousel-img" :style="`background: url(${column.img})`">
+      <div class="carousel-img" :style="`background: url(${column.img}) no-repeat center`">
         {{ column.title }}
       </div>
     </n-carousel-item>
@@ -82,7 +82,8 @@ const columns = [
   font-weight: bold;
   font-size: 26px;
   cursor: pointer;
-  background-size: 100% 100%;
+  padding: 0 30px;
+  background-size: cover !important;
 }
 </style>
 

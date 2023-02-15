@@ -15,8 +15,8 @@ module.exports = {
       remotes: {
         // 字符串"products"和被导入模块的name属性对应
         // 属性products是映射别名，是在当前应用中导入该模块时使用的名字
-        products: "products@http://localhost:7081/remoteEntry.js",
-        cart: "cart@http://localhost:7082/remoteEntry.js"
+        products: 'products@http://localhost:7081/remoteEntry.js',
+        cart: 'cart@http://localhost:7082/remoteEntry.js'
       }
     }),
     new HtmlWebpackPlugin({
