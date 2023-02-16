@@ -119,7 +119,7 @@
   ms.default(1000)
   ```
 
-  esm 是未来的趋势，目前一些 CDN 厂商，前端构建工具均致力于 cjs 模块向 esm 的转化，比如 skypack、 snowpack、vite 等。
+  `esm`是未来的趋势，目前一些`CDN`厂商，前端构建工具均致力于`cjs`模块向`esm`的转化，比如`skypack`、`snowpack`、`vite`等。
 
   目前，在浏览器与 node.js 中均原生支持 esm。
 
@@ -204,7 +204,7 @@
 
 ```html
 <script type="module">
-  import vue from "https://cdn.bootcdn.net/ajax/libs/vue/3.2.47/vue.esm-browser.js"
+  import { createApp } from "https://cdn.bootcdn.net/ajax/libs/vue/3.2.47/vue.esm-browser.js"
 </script>
 ```
 
@@ -214,11 +214,7 @@
 <script type="importmap">
   {
     "imports": {
-      "vue": [
-        // 这里提供了兜底方案，如果CDN挂了会回退引用本地版本
-        "https://cdn.bootcdn.net/ajax/libs/vue/3.2.47/vue.esm-browser.js",
-        "/node_modules/vue/dist/vue.esm-browser.js"
-      ],
+      "vue": "https://cdn.bootcdn.net/ajax/libs/vue/3.2.47/vue.esm-browser.js",
       "lodash": "/node_modules/lodash-es/lodash.js"
     }
   }
@@ -909,7 +905,7 @@ module.exports = {
 
   细心的小伙伴一定发现了一个问题，那就是`eval`**不支持**`export`和`import`！
 
-  不支持`export`和`import`，也就意味着`qiankun`**不支持**像`vite`和`parcel`这类打包工具构建的项目！
+  不支持`export`和`import`，也就意味着`qiankun`**不支持**像`vite`和`snowpack`这类打包工具构建的项目！
 
   随着`vite`的火热发展，越来越多的开发者开始使用`vite`构建项目，该问题无疑是限制了`qiankun`的发展
 
