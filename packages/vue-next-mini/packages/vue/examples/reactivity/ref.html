@@ -15,21 +15,21 @@
   </div>
 
   <script>
-    const { reactive, effect } = Vue
+    const { ref, effect } = Vue
 
-    const obj = reactive({
+    const obj = ref({
       name: '张三'
     })
 
     effect(() => {
-      document.querySelector('#p1').innerText = obj.name
-    })
-    effect(() => {
-      document.querySelector('#p2').innerText = obj.name
+      // 这里触发了RefImpl 的 get value
+      document.querySelector('#p1').innerText = obj.value.name
     })
 
     setTimeout(() => {
-      obj.name = '李四'
+      // 这里其实也是触发了RefImpl 的 get value
+      // 只有使用obj.value = xxx 才是触发RefImpl 的 set value
+      obj.value.name = '李四'
     }, 2000)
 </script>
 </body>

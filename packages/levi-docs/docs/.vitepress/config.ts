@@ -16,6 +16,13 @@ export default defineConfig({
         { icon: 'github', link: 'https://github.com/sky124380729/notebook' }
       ],
       sidebar: {
+        'mini-code/vue-next-mini': [
+          { text: 'reactivity', link: '/mini-code/vue-next-mini/reactivity' },
+          { text: 'compiler-core', link: '/mini-code/vue-next-mini/compiler-core' },
+          { text: 'compiler-dom', link: '/mini-code/vue-next-mini/compiler-dom' },
+          { text: 'runtime-core', link: '/mini-code/vue-next-mini/runtime-core' },
+          { text: 'runtime-dom', link: '/mini-code/vue-next-mini/runtime-dom' },
+        ],
         '/framework': [
           {
             text: 'Vue',
@@ -103,7 +110,7 @@ export default defineConfig({
         { text: 'Mini Code', items: [
           { text: 'Vue2', link: '/mini-code/vue2' },
           { text: 'Vue3', link: '/mini-code/vue3' },
-          { text: 'vue-next-mini', link: '/mini-code/vue-next-mini' },
+          { text: 'vue-next-mini', link: '/mini-code/vue-next-mini/index' },
           { text: 'Vue-Router', link: '/mini-code/vue-router' },
           { text: 'Promise', link: '/mini-code/promise' },
           { text: 'Micro-Frontend', link: '/mini-code/micro-frontend' },
