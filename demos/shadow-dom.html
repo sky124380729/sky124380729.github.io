@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>shadow-dom</title>
+</head>
+<body>
+  <div id="box1"></div>
+  <div id="box2"></div>
+
+  <script>
+  const box1 = document.getElementById('box1')
+  // 开启shadow dom模式
+  const shadow1 = box1.attachShadow({ mode: 'open' })
+
+  const one = document.createElement('div')
+  one.className = 'one'
+  one.innerText = '第一个内容'
+
+  const style1 = document.createElement('style')
+
+  style1.textContent = `
+    .one {
+      color: red;
+    }
+  `
+  shadow1.appendChild(one)
+  shadow1.appendChild(style1)
+
+  // ==============================================
+
+  const box2 = document.getElementById('box2')
+  // 开启shadow dom模式
+  const shadow2 = box2.attachShadow({ mode: 'open' })
+
+  const two = document.createElement('div')
+  two.className = 'one'
+  two.innerText = '第二个内容'
+
+  const style2 = document.createElement('style')
+
+  style2.textContent = `
+    .one {
+      color: blue;
+    }
+  `
+  shadow2.appendChild(two)
+  shadow2.appendChild(style2)
+  </script>
+
+</body>
+</html>
