@@ -44,6 +44,7 @@ export function trackEffects(dep: Dep) {
 }
 
 // 触发依赖
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function trigger(target: object, key: unknown, newValue: unknown) {
   const depsMap = targetMap.get(target)
   if (!depsMap) return
