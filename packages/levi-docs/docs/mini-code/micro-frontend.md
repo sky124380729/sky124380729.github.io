@@ -42,7 +42,7 @@
 
   <<< @/public/demos/shadow-dom.html
 
-  <iframe width="100%" src="/demos/shadow-dom.html"></iframe>
+  <iframe width="100%" src="/notebook/demos/shadow-dom.html"></iframe>
 
 - `minicss` MiniCssExtractPlugin
 

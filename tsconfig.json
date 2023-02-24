@@ -12,7 +12,7 @@
     "isolatedModules": true,
     "esModuleInterop": true,
     "lib": ["ESNext", "DOM"],
-    "types": ["naive-ui/volar"],
+    "types": ["node", "naive-ui/volar"],
     "skipLibCheck": true,
     "paths": {
       "#/*": ["snippets/*"]

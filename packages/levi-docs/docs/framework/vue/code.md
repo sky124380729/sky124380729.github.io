@@ -6,7 +6,7 @@ Vue是一套`运行时` + `编译时`框架
 
 <<< @/public/demos/render.html
 
-<iframe width="100%" src="/demos/render.html"></iframe>
+<iframe width="100%" src="/notebook/demos/render.html"></iframe>
 
 ## compile函数
 
@@ -14,13 +14,13 @@ Vue是一套`运行时` + `编译时`框架
 
 <<< @/public/demos/compiler.html
 
-<iframe width="100%" src="/demos/compiler.html"></iframe>
+<iframe width="100%" src="/notebook/demos/compiler.html"></iframe>
 
 ## reactivity
 
 <<< @/public/demos/reactivity/reactive.html
 
-<iframe width="100%" src="/demos/reactivity/reactive.html"></iframe>
+<iframe width="100%" src="/notebook/demos/reactivity/reactive.html"></iframe>
 
 ## vue2
 
