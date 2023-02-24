@@ -1347,7 +1347,7 @@ __webpack_require__.l = (url, done, key, chunkId) => {
 
       <<< @/public/demos/shadow-dom.html
 
-     <iframe width="100%" src="/notebook/demos/shadow-dom.html"></iframe>
+     <iframe width="100%" src="/demos/shadow-dom.html"></iframe>
 
     - prefix css（框架处理或者团队做约束）
     - [BEM](https://bemcss.com/) （团队做好约束）

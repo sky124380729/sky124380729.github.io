@@ -1,7 +1,6 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
-    base: '/notebook',
     head: [
       ['link', { rel: 'shortcut icon', href: '/favicon.ico'} ],
     ],
