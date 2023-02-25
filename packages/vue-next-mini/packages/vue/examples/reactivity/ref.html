@@ -1,35 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
   <script src="../../dist/vue.js"></script>
 </head>
 <body>
-
   <div id="app">
     <p id="p1"></p>
     <p id="p2"></p>
   </div>
-
   <script>
     const { ref, effect } = Vue
-
-    const obj = ref({
-      name: '张三'
-    })
-
+    // 复杂数据类型
+    const obj = ref({ name: '张三' })
+    // 基本数据类型
+    const count = ref(0)
     effect(() => {
-      // 这里触发了RefImpl 的 get value
+      // 这里触发了 RefImpl 的 get value
       document.querySelector('#p1').innerText = obj.value.name
     })
-
+    effect(() => {
+      // 这里触发了 RefImpl 的 get value
+      document.querySelector('#p2').innerText = count.value
+    })
     setTimeout(() => {
-      // 这里其实也是触发了RefImpl 的 get value
+      // 这里其实也是触发了 RefImpl 的 get value，然后执行了 reactive 的 setter
       // 只有使用obj.value = xxx 才是触发RefImpl 的 set value
       obj.value.name = '李四'
+      // 这里就比较明显的触发了 RefImpl 的 set value，也就触发了依赖更新
+      count.value = 1
     }, 2000)
 </script>
 </body>

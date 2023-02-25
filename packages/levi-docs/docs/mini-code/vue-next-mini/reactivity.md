@@ -3,6 +3,7 @@
 ## reactive
 
 ::: code-group
+<<< @/../../vue-next-mini/packages/vue/examples/reactivity/reactive.html
 <<< @/../../vue-next-mini/packages/reactivity/src/reactive.ts
 <<< @/../../vue-next-mini/packages/reactivity/src/effect.ts
 <<< @/../../vue-next-mini/packages/reactivity/src/baseHandlers.ts
@@ -21,6 +22,7 @@
 ## ref
 
 ::: code-group
+<<< @/../../vue-next-mini/packages/vue/examples/reactivity/ref.html
 <<< @/../../vue-next-mini/packages/reactivity/src/ref.ts
 :::
 
@@ -31,5 +33,42 @@
    1. 复杂数据类型：转化为`reactive`函数返回其`proxy`实例
    2. 简单数据类型：不做处理
 3. 当访问`ref.value`的时候，会调用`RefImpl`的`get value`，触发`trackRefValue`函数进行依赖收集，并返回`this._value`
+4. 当使用`ref.value = xxx`设置值得时候，会调用`RefImpl`的`set value`，使用`triggerRefValue`来触发依赖
+:::
+
+::: warning 注意
+
+需要注意的是，`ref`对于**简单数据类型**的值，它是通过`Object.defineProperty`或者`Proxy`来监听的吗？
+
+并不是，它是通过`RefImpl`类的`get value`和`set value`的**主动触发**来做响应式，因此在使用`ref`的时候，必须要使用`.value`
+
+也就是说`ref`对于**简单数据类型没有**所谓的监听
+
+:::
+
+## computed
+
+::: code-group
+<<< @/../../vue-next-mini/packages/vue/examples/reactivity/computed.html
+:::
+
+::: tip 总结
+
+由以上代码可知，整个计算属性的逻辑是非常复杂的：
+
+1. 整个事件由 `obj.name = '李四'`开始
+2. 触发了`proxy`实例的`setter`
+3. 执行`trigger`，**第一次触发依赖**
+4. 注意，此时`effect`包含调度器属性，所以会触发调度器
+5. 调度器执行`ComputedRefImpl`的构造函数中传入的匿名函数
+6. 在匿名函数中会**再次触发依赖**
+7. 即：**两次触发依赖**
+8. 最后执行:
+
+  ```js
+  () => {
+    return '姓名：' + obj.name
+  }
+  ```
 
 :::

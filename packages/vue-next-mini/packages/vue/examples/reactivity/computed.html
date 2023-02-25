@@ -6,18 +6,17 @@
 <body>
   <div id="app">
     <p id="p1"></p>
-    <p id="p2"></p>
   </div>
   <script>
-    const { reactive, effect } = Vue
+    const { reactive, effect, computed } = Vue
     const obj = reactive({
       name: '张三'
     })
-    effect(() => {
-      document.querySelector('#p1').innerText = obj.name
+    const computedObj = computed(() => {
+      return '姓名：' + obj.name
     })
     effect(() => {
-      document.querySelector('#p2').innerText = obj.name
+      document.querySelector('#p1').innerText = computedObj.value
     })
     setTimeout(() => {
       obj.name = '李四'
