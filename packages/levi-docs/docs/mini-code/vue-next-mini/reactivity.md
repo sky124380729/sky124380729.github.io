@@ -50,6 +50,7 @@
 
 ::: code-group
 <<< @/../../vue-next-mini/packages/vue/examples/reactivity/computed.html
+<<< @/../../vue-next-mini/packages/reactivity/src/computed.ts
 :::
 
 ::: tip 总结
