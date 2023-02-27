@@ -27,5 +27,6 @@
     "unref",
     "vitepress",
     "vnode"
-  ]
+  ],
+  "svn.ignoreMissingSvnWarning": true
 }

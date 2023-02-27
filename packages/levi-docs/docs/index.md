@@ -49,7 +49,7 @@ const columns = [
   { title: '关于微前端的理解与实践', img: image0, link: '/columns/micro-frontend/index' },
   { title: '手撕Promise', img: image1, link: '/mini-code/promise' },
   { title: '关于KMP的理解', img: image2, link: '/algorithm/kmp' },
-  { title: '一些不错的npm包', img: image3, link: '/links/plugins' }
+  { title: '前端性能优化', img: image3, link: '/columns/perform-optimize/index' }
 ]
 </script>
 
