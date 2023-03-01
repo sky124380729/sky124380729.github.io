@@ -9,11 +9,11 @@ export default defineConfig({
     themeConfig: {
       logo: '/logo.svg',
       editLink: {
-        pattern: 'https://github.com/sky124380729/notebook/tree/master/packages/levi-docs/docs/:path',
+        pattern: 'https://github.com/sky124380729/sky124380729.github.io/tree/master/packages/levi-docs/docs/:path',
         text: 'Edit this page on github'
       },
       socialLinks: [
-        { icon: 'github', link: 'https://github.com/sky124380729/notebook' }
+        { icon: 'github', link: 'https://github.com/sky124380729/sky124380729.github.io' },
       ],
       sidebar: {
         'mini-code/vue-next-mini': [
