@@ -73,3 +73,41 @@
   ```
 
 :::
+
+
+::: tip 总结
+
+由以上代码可知，整个计算属性的逻辑是非常复杂的：
+
+1. `effect`函数的执行，会实例化一个`ReactiveEffect`，并将该实例存到`activeEffect`中，同时执行其中的`匿名函数`
+2. `匿名函数`的执行时，`computedObj`访问了`value`属性，触发了依赖收集，将上述`activeEffect`添加到了`computedObj.dep`属性中
+3. 此时`computedObj._dirty`为`true`，执行`this.effect.run()`，也就是执行了`() => { return '姓名:' + obj.name }`函数，并将结果返回
+4. 此时的`activeEffect`就是`computedObj.effect`
+5. 该函数由于访问了`obj.name`，因此又触发了`reactive`的依赖收集，将`computedObj.effect`添加到`targetMaps`中
+6. 2秒后，对`obj.name`的赋值，触发了`targetMaps`中的依赖更新
+7. 此时，由于该`effect`包含调度器`scheduler`，因此会执行`computedObj.effect.scheduler`方法，即
+
+  ```js
+  () => {
+    if (!this._dirty) {
+      this._dirty = true
+      triggerRefValue(this)
+    }
+  }
+  ```
+
+8. 这里其实就是循环`computedObj.dep`的依赖去执行，也就是执行
+
+  ```js
+  () => {
+    document.querySelector('#p1').innerText = computedObj.value
+  }
+  ```
+
+9. 这里访问触发了`computedObj.value`又触发了
+
+  ```js
+  () => {
+    return '姓名：' + obj.name
+  }
+  ```
