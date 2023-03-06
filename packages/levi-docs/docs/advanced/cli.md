@@ -1,5 +1,15 @@
 # 关于CLI
 
+- 命令行UI交互标准[ANSI escape code](https://handwiki.org/wiki/ANSI_escape_code)
+
+```js
+// 这里的 \x1B[ 是固定的，后面内容在 https://handwiki.org/wiki/ANSI_escape_code 查询
+// 这里的 m 代表渲染属性
+// %s 用来传递一个参数，例如下面的 your name 就是替换 %s 的
+// 这里的 \x1B[0m 是为了恢复终端显示颜色的
+console.log('\x1B[31m%s\x1B[0m', 'Levi')
+```
+
 - shell、bash、cli关系图
 
   ![image](/assets/imgs/CLI.png)
@@ -30,3 +40,14 @@
 - 脚手架的本质就是客户端，这里讲的客户端并不是指的我们编写的代码本身是客户端，而是`node`是客户端
 
 - 软连接是可以嵌套的，因此比如不想使用`vue`命令，可以再创建一个`vue2`软连接指向`vue`
+
+## 如何本地调试脚手架
+
+- 方式一：比如`cli`目录下有个脚手架项目叫做`levi-cli-test`，那么在`cli`目录下执行`npm install -g levi-cli-test`，`npm`会自动将`软链`指向本地目录
+- 方式二：直接在`levi-cli-test`项目下执行`npm link`
+
+## yargs使用示例
+
+::: code-group
+<<< @/../../cli/levi-cli-test/bin/index.js
+:::

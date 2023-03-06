@@ -19,6 +19,32 @@ set-ExecutionPolicy RemoteSigned
 Y
 ```
 
+## 镜像设置
+
+- `npm`镜像
+
+```sh
+npm config set registry https://registry.npmmirror.com/
+```
+
+- `yarn`镜像
+
+```sh
+yarn config set registry https://registry.npmmirror.com/
+```
+
+- `pnpm`镜像
+
+```sh
+pnpm config set registry https://registry.npmmirror.com/
+```
+
+- `nvm`镜像:
+
+```sh
+nvm node_mirror https://npmmirror.com/mirrors/node/
+```
+
 ## Windows10下更换Git用户名或密码
 
 - 打开`控制面板`
