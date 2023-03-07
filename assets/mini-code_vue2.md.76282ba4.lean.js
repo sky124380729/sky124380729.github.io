@@ -1,0 +1,1 @@
+import{_ as s,o as n,c as a,a as l}from"./app.8e5e362f.js";const i=JSON.parse('{"title":"Mini Vue2","description":"","frontmatter":{},"headers":[],"relativePath":"mini-code/vue2.md","lastUpdated":1678202874000}'),p={name:"mini-code/vue2.md"},o=l("",3),t=[o];function e(c,F,r,y,D,A){return n(),a("div",null,t)}const d=s(p,[["render",e]]);export{i as __pageData,d as default};
