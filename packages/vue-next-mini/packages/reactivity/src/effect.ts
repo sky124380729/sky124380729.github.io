@@ -65,9 +65,20 @@ export function trigger(target: object, key: unknown, newValue: unknown) {
 export function triggerEffects(dep: Dep) {
   const effects = isArray(dep) ? dep : [...dep]
 
-  // 依次触发依赖
+  // REVIEW: 这里如果不这么写的话会产生死循环，太特么绕了...脑细胞已经没了
+
+  // 先执行计算属性的for循环
   for (const effect of effects) {
-    triggerEffect(effect)
+    if (effect.computed) {
+      triggerEffect(effect)
+    }
+  }
+
+  // 再执行非计算属性的for循环
+  for (const effect of effects) {
+    if (!effect.computed) {
+      triggerEffect(effect)
+    }
   }
 }
 

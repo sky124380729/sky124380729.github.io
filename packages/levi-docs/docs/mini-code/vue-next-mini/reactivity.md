@@ -10,7 +10,7 @@
 <<< @/../../vue-next-mini/packages/reactivity/src/dep.ts
 :::
 
-::: tip 总结
+::: info 总结
 
 1. `reactive`返回目标对象的代理对象
 2. `effect`函数执行的时候，实例化了一个`ReactiveEffect`，并将该实例存到全局`activeEffect`中，同时执行`effect`传递进去的`fn`函数
@@ -26,7 +26,7 @@
 <<< @/../../vue-next-mini/packages/reactivity/src/ref.ts
 :::
 
-::: tip 总结
+::: info 总结
 
 1. `ref`函数返回的就是`RefImpl`的实例
 2. `RefImpl`实例在构造的时候，会判断当前传入的`value`是否是对象，并存到`this._value`上
@@ -53,29 +53,7 @@
 <<< @/../../vue-next-mini/packages/reactivity/src/computed.ts
 :::
 
-::: tip 总结
-
-由以上代码可知，整个计算属性的逻辑是非常复杂的：
-
-1. 整个事件由 `obj.name = '李四'`开始
-2. 触发了`proxy`实例的`setter`
-3. 执行`trigger`，**第一次触发依赖**
-4. 注意，此时`effect`包含调度器属性，所以会触发调度器
-5. 调度器执行`ComputedRefImpl`的构造函数中传入的匿名函数
-6. 在匿名函数中会**再次触发依赖**
-7. 即：**两次触发依赖**
-8. 最后执行:
-
-  ```js
-  () => {
-    return '姓名：' + obj.name
-  }
-  ```
-
-:::
-
-
-::: tip 总结
+::: tip 执行过程
 
 由以上代码可知，整个计算属性的逻辑是非常复杂的：
 
@@ -111,3 +89,11 @@
     return '姓名：' + obj.name
   }
   ```
+
+::: info 总结
+
+1. 计算属性的实例，本质上是一个 `ComputedRefImpl` 的实例
+2. ComputedRefImpl 中通过 `dirty` 来控制 `run` 的执行和 `triggerRefValue` 的触发
+3. 想要访问计算属性的值，必须通过 `.value`，因为它内部和 `ref` 一样是通过 `get value`来进行实现的
+4. 每次触发 `.value` 时都会触发 `trackRefValue` 即： `依赖收集`
+5. 在依赖触发时，需要谨记，先触发 `computed` 的 `effect`， 再触发非 `computed` 的 `effect`，否则会死循环
