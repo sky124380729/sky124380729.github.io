@@ -55,6 +55,50 @@ nvm node_mirror https://npmmirror.com/mirrors/node/
 
 nodejs 目录换一个就好
 
+## 自定义imports引用
+
+> 不加#其实也可以，但是使用#比较直观，表示是自定义库
+
+::: code-group
+
+```json [package.json]
+{
+  "imports": {
+    "#ansi-styles": "./source/vendor...",
+    "#supports-colors": {
+      // 针对node
+      "node": "./source/vendor...",
+      // 针对浏览器
+      "default": "./source/vendor..."
+    }
+  }
+}
+```
+
+```js [main.js]
+import ansiStyles from '#ansi-styles'
+import supportsColor from '#supports-color'
+```
+
+:::
+
+## npm使用esm方式到处，在node环境如何直接使用
+
+文件名称改为`.mjs`执行`node`即可
+
+::: code-group
+
+```js [index.mjs]
+import chalk from 'chalk'
+console.log(chalk.red('Levi'))
+```
+
+```bash
+node index.mjs
+```
+
+:::
+
 ## nvm切换node version之后 npm全局包不能共用
 
 可以试一下将npm缓存和安装包的路径挂载到原有的缓存和全局安装包路径上
