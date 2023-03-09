@@ -49,5 +49,7 @@ console.log('\x1B[31m%s\x1B[0m', 'Levi')
 ## yargs使用示例
 
 ::: code-group
-<<< @/../../cli/levi-cli-test/bin/index.js
+<<< @/../../cli/levi-cli-test/bin/yargs.js
 :::
+
+## 如果实现命令行交互

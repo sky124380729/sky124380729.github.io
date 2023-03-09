@@ -153,7 +153,7 @@ npm i -g mirror-config-china --registry=https://registry.npm.taobao.org
 npm config list
 ```
 
-## [print-js](https://printjs.crabbly.com/) ---打印插件
+## [print-js](https://printjs.crabbly.com/) -> 打印插件
 
 ![print-js](/assets/imgs/print-js.jpg)
 
@@ -227,3 +227,24 @@ export default {
 ```
 
 :::
+
+## [inquirer](https://www.npmjs.com/package/inquirer) -> 命令行常用交互
+
+```js
+import inquirer from 'inquirer'
+
+inquirer
+  .prompt([
+    /* Pass your questions in here */
+  ])
+  .then((answers) => {
+    // Use user feedback for... whatever!!
+  })
+  .catch((error) => {
+    if (error.isTtyError) {
+      // Prompt couldn't be rendered in the current environment
+    } else {
+      // Something else went wrong
+    }
+  })
+```

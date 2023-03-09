@@ -1023,3 +1023,14 @@ console.log(map)
 ::: tip
 Vue中就是使用`WeakMap`将被代理对象存起来，一旦被代理对象被清空，`proxy`对象也就没有存在的价值了
 :::
+
+## 强制将函数转换为构造函数
+
+```js
+function Interface(options) {
+  if(!this instanceof Interface) {
+    return new Interface(options)
+  }
+  // ....
+}
+```

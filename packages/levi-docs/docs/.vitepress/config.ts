@@ -117,7 +117,7 @@ export default defineConfig({
         ] },
         { text: 'Advanced', items: [
           { text: 'Framework', link: '/advanced/framework' },
-          { text: 'CLI', link: '/advanced/cli' },
+          { text: 'CLI', link: '/advanced/cli/index' },
           { text: 'Design Patterns', link: '/advanced/design-patterns' },
           { text: 'Reg-Exp', link: '/advanced/reg-exp' }
         ] },
