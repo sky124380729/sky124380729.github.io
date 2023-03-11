@@ -248,3 +248,17 @@ inquirer
     }
   })
 ```
+
+## [import-local](https://www.npmjs.com/package/import-local) -> 脚手架优先加载本地版本
+
+> 比如全局安装了tsc，本地项目中也有tsc，优先使用本地的，主要还是给脚手架工具开发者来使用
+
+```js
+import importLocal from 'import-local';
+
+if (importLocal(import.meta.url)) {
+  console.log('Using local version of this package');
+} else {
+  // Code for both global and local version here…
+}
+```

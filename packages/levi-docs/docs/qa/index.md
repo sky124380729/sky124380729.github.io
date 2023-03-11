@@ -82,7 +82,7 @@ import supportsColor from '#supports-color'
 
 :::
 
-## npm使用esm方式到处，在node环境如何直接使用
+## npm使用esm方式导出，在node环境如何直接使用
 
 文件名称改为`.mjs`执行`node`即可
 

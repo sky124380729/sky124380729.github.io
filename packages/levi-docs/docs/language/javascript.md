@@ -610,7 +610,7 @@ setTimeout(function() {
 
 ## 关于ESM 和 CommonJs
 
-区别
+### 区别
 
 - ESM可以导入commonJs模块
 - commonJs不可以导入ESM
@@ -625,6 +625,42 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 console.log(__filename, __dirname)
 ```
+
+## nodejs中`cjs`和`esm`混合开发
+
+### 为什么会存在`cjs`和`esm`混合开发？
+
+`npm`模块有的使用`cjs`有的使用`esm`，导致`esm`和`cjs`混合开发成为`node`项目必须考虑的问题
+
+### cjs中如何运行esm的模块
+
+```js
+const cjs = require('cjs')
+import('esm').then(res => res.default()) // [!code hl]
+```
+
+```js
+(async function() {
+  const cjs = require('cjs')
+  const esm = await import('esm') // [!code hl]
+})()
+```
+
+### esm中如何运行cjs[推荐]
+
+可以直接使用，也就是源码要用`esm`开发
+
+:::warning
+这里注意使用`esm`的时候，导入文件要加后缀
+
+```js
+// error
+import a from './a'
+// ok
+import a from './a.js'
+```
+
+:::
 
 ## ESNEXT
 

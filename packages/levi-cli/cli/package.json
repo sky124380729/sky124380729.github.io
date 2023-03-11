@@ -1,0 +1,23 @@
+{
+  "name": "@levi-cli/cli",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "bin": {
+    "levi": "bin/cli.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@levi-cli/init": "workspace:*",
+    "@levi-cli/utils": "workspace:*",
+    "chalk": "^5.2.0",
+    "commander": "^10.0.0",
+    "import-local": "^3.1.0",
+    "semver": "^7.3.5"
+  }
+}
