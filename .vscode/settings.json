@@ -20,6 +20,8 @@
     "loadsh",
     "miniprogram",
     "nocheck",
+    "npmlog",
+    "readline",
     "substr",
     "swiper",
     "tailwindcss",
