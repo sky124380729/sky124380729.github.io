@@ -13,6 +13,7 @@
     "codemirror",
     "concat",
     "endregion",
+    "execa",
     "flexbox",
     "iife",
     "instanceof",

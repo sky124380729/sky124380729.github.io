@@ -619,8 +619,8 @@ setTimeout(function() {
 commonJs中 `__filename` 和 `__dirname`在ESM中如何获取
 
 ```js
-import { fileURLToPath } from 'url'
-import { dirname } from 'path'
+import { fileURLToPath } from 'node:url'
+import { dirname } from 'node:path'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 console.log(__filename, __dirname)

@@ -1,5 +1,5 @@
-const { log } = require('@levi-cli/utils')
-const Command = require('@levi-cli/command')
+import Command from '@levi-cli/command'
+import { log } from '@levi-cli/utils'
 
 class InitCommand extends Command {
   get command() {
@@ -27,4 +27,4 @@ function Init(instance) {
   return new InitCommand(instance)
 }
 
-module.exports = Init
+export default Init
