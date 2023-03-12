@@ -608,7 +608,7 @@ setTimeout(function() {
 
 ```
 
-## 关于ESM 和 CommonJs
+## 关于ESM和CJS
 
 ### 区别
 
@@ -616,7 +616,7 @@ setTimeout(function() {
 - commonJs不可以导入ESM
 - commonJs始终只会导出一个默认成员
 
-commonJs中 `__filename` 和 `__dirname`在ESM中如何获取
+### ESM中如何获取`__filename` 和 `__dirname`
 
 ```js
 import { fileURLToPath } from 'node:url'
@@ -624,6 +624,15 @@ import { dirname } from 'node:path'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 console.log(__filename, __dirname)
+```
+
+### ESM如何获取`package.json`，或者说如何获取`json`文件
+
+```js
+import fse from 'fs-extra'
+
+const pkg = fse.readJsonSync(path.resolve(__dirname, './package.json'))
+console.log(pkg.version)
 ```
 
 ## nodejs中`cjs`和`esm`混合开发
