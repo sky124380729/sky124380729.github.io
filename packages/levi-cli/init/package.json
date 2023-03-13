@@ -9,7 +9,11 @@
   },
   "dependencies": {
     "@levi-cli/command": "workspace:*",
-    "@levi-cli/utils": "workspace:*"
+    "@levi-cli/utils": "workspace:*",
+    "execa": "^7.1.0",
+    "fs-extra": "^10.0.0",
+    "ora": "^6.1.2",
+    "path-exists": "^5.0.0"
   },
   "keywords": [],
   "author": "",

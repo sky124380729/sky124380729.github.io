@@ -5,6 +5,7 @@ import log from './log.js'
 function getNpmInfo(npmName) {
   // 这里用的npm源
   const registry = 'https://registry.npmjs.org/'
+  // const registry = 'https://registry.npmmirror.com/'
   const url = urlJoin(registry, npmName)
   return axios.get(url).then((response) => {
     try {
