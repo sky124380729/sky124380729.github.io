@@ -155,4 +155,38 @@ rl.question('your name:', (answer) => {
 })
 ```
 
-## 如何实现命令行交互
+## 基础脚手架实现
+
+<div class="filename">levi-cli/cli</div>
+
+:::code-group
+<<< @/../../levi-cli/cli/bin/cli.js
+<<< @/../../levi-cli/cli/lib/index.js
+<<< @/../../levi-cli/cli/lib/createCLI.js
+<<< @/../../levi-cli/cli/lib/exception.js
+:::
+
+<div class="filename">levi-cli/command</div>
+
+:::code-group
+<<< @/../../levi-cli/command/lib/index.js
+:::
+
+<div class="filename">levi-cli/init</div>
+
+:::code-group
+<<< @/../../levi-cli/init/lib/index.js
+<<< @/../../levi-cli/init/lib/createTemplate.js
+<<< @/../../levi-cli/init/lib/downloadTemplate.js
+<<< @/../../levi-cli/init/lib/installTemplate.js
+:::
+
+<div class="filename">levi-cli/utils</div>
+
+:::code-group
+<<< @/../../levi-cli/utils/lib/index.js
+<<< @/../../levi-cli/utils/lib/inquirer.js
+<<< @/../../levi-cli/utils/lib/isDebug.js
+<<< @/../../levi-cli/utils/lib/log.js
+<<< @/../../levi-cli/utils/lib/npm.js
+:::
