@@ -1079,3 +1079,18 @@ function Interface(options) {
   // ....
 }
 ```
+
+## class私有属性
+
+```js
+class Person {
+  #name = 'Levi'
+  getName() {
+    return this.#name
+  }
+}
+
+const p = new Person()
+console.log(p.getName()) // Levi
+console.log(p.#name) // Uncaught SyntaxError: Private field '#name' must be declared in an enclosing class
+```

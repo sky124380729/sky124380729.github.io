@@ -35,6 +35,38 @@ import { nanoid } from 'nanoid'
 model.id = nanoid() //=> "V1StGXR8_Z5jdHi6B-myT"
 ```
 
+## [ora](https://www.npmjs.com/package/ora) -> 终端loading显示
+
+![image](/assets/imgs/ora.svg)
+
+```js
+import ora from 'ora';
+
+const spinner = ora('Loading unicorns').start();
+
+setTimeout(() => {
+  spinner.color = 'yellow';
+  spinner.text = 'Loading rainbows';
+}, 1000);
+```
+
+## [bl](https://www.npmjs.com/package/bl) -> 输入输出流控制
+
+```js
+import { BufferListStream } from 'bl'
+
+const bl = new BufferListStream()
+bl.append(Buffer.from('abcd'))
+bl.append(Buffer.form('efgh'))
+
+console.log(bl.length)
+console.log(bl.toString()) // 输出流
+```
+
+::: tip 使用场景
+比如执行某个命令时阻止控制台输入，命令程序执行完毕之后将输入的流再输出到控制台
+:::
+
 ## [mongoose](https://www.npmjs.com/package/mongoose) -> node.js的MongoDB库
 
 > Mongoose为模型提供了一种直接的，基于scheme结构去定义你的数据模型。它内置数据验证， 查询构建，业务逻辑钩子等，开箱即用。
