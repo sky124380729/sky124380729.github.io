@@ -4,6 +4,12 @@ import createTemplate from './createTemplate.js'
 import downloadTemplate from './downloadTemplate.js'
 import installTemplate from './installTemplate.js'
 
+/**
+ * examples:
+ * levi init
+ * levi init aaa -t project -tp template-vue3 --force
+ */
+
 class InitCommand extends Command {
   get command() {
     return 'init [name]'
@@ -16,8 +22,10 @@ class InitCommand extends Command {
   get options() {
     // 这里是个二位数组
     return [
-      ['-f, --force', '是否强制更新', false]
-      // ['-t --test', '是否是测试', false]
+      ['-f, --force', '是否强制更新', false],
+      // REVIEW: 以下非交互式命令是为了方便单元测试
+      ['-t, --type <type>', '项目类型(project/page)'],
+      ['-tp, --template <template>', '模板名称']
     ]
   }
 

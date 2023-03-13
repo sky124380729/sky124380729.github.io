@@ -1,5 +1,6 @@
 import urlJoin from 'url-join'
 import axios from 'axios'
+import ora from 'ora'
 import log from './log.js'
 
 function getNpmInfo(npmName) {
@@ -7,10 +8,13 @@ function getNpmInfo(npmName) {
   const registry = 'https://registry.npmjs.org/'
   // const registry = 'https://registry.npmmirror.com/'
   const url = urlJoin(registry, npmName)
+  const spinner = ora('正在获取模板包的最新版本...').start()
   return axios.get(url).then((response) => {
     try {
+      spinner.stop()
       return response.data
     } catch (err) {
+      spinner.stop()
       return Promise.reject(err)
     }
   })
