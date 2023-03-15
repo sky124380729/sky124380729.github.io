@@ -33,6 +33,15 @@ const SF_SVG = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.
 
 const { go } = useRouter()
 
+const navigateTo = (url) => {
+  // 如果是外链
+  if(/^https?:\/\//.test(url)) {
+    window.open(url)
+  } else {
+    go(url)
+  }
+}
+
 const members = [
   {
     avatar: 'https://www.github.com/sky124380729.png',
@@ -46,6 +55,7 @@ const members = [
 ]
 
 const columns = [
+  { title: '个人开源项目 levi-vue-admin', img: image2, link: 'https://levi-vue-admin.vercel.app/' },
   { title: '关于微前端的理解与实践', img: image0, link: '/columns/micro-frontend/index' },
   { title: '手撕Promise', img: image1, link: '/mini-code/promise' },
   { title: '关于KMP的理解', img: image2, link: '/algorithm/kmp' },
@@ -61,7 +71,7 @@ const columns = [
     style="height: 450px"
     show-arrow
   >
-    <n-carousel-item v-for="column in columns" @click="go(column.link)" :style="{ width: '60%' }">
+    <n-carousel-item v-for="column in columns" @click="navigateTo(column.link)" :style="{ width: '60%' }">
       <div class="carousel-img" :style="`background: url(${column.img}) no-repeat center`">
         {{ column.title }}
       </div>
