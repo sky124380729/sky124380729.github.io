@@ -1,13 +1,9 @@
 import path from 'node:path'
 import { homedir } from 'node:os' // 主目录，兼容windows和mac
-import { log, makeList, makeInput, getLatestVersion } from '@levi-cli/utils'
+import { log, makeList, makeInput, getLatestVersion, request, printErrorLog } from '@levi-cli/utils'
 
 const ADD_TYPE_PROJECT = 'project'
 const ADD_TYPE_PAGE = 'page'
-const ADD_TEMPLATE = [
-  { name: 'vue3项目模板', value: 'template-vue3', npmName: '@imooc.com/template-vue3', version: '1.0.0' },
-  { name: 'react18项目模板', value: 'template-react18', npmName: '@imooc.com/template-react18', version: '1.0.0' }
-]
 const ADD_TYPE = [
   { name: '项目', value: ADD_TYPE_PROJECT },
   { name: '页面', value: ADD_TYPE_PAGE }
@@ -36,7 +32,7 @@ function getAddName() {
 }
 
 // 选择项目模板
-function getAddTemplate() {
+function getAddTemplate(ADD_TEMPLATE) {
   return makeList({
     choices: ADD_TEMPLATE,
     message: '请选择项目模板'
@@ -48,7 +44,27 @@ function makeTargetPath() {
   return path.resolve(`${homedir()}/${TEMP_HOME}`, 'addTemplate')
 }
 
+// 通过API获取项目模板
+async function getTemplateFromAPI() {
+  try {
+    const data = await request({
+      url: '/project/template',
+      method: 'get'
+    })
+    log.verbose('template', data)
+    return data
+  } catch (e) {
+    printErrorLog(e)
+    return null
+  }
+}
+
 export default async function createTemplate(name, options) {
+  const ADD_TEMPLATE = await getTemplateFromAPI()
+  if (!ADD_TEMPLATE) {
+    log.verbose('目前要执行 pnpm -F @levi/cli-server dev 来启动接口服务获取模板')
+    throw new Error('项目模板不存在!')
+  }
   const { type = null, template = null } = options
   let addType // 项目类型
   let addName // 项目名称
@@ -72,7 +88,7 @@ export default async function createTemplate(name, options) {
         throw new Error(`项目模板 ${template} 不存在`)
       }
     } else {
-      const addTemplate = await getAddTemplate()
+      const addTemplate = await getAddTemplate(ADD_TEMPLATE)
       selectedTemplate = ADD_TEMPLATE.find((_) => _.value === addTemplate)
       log.verbose('addTemplate', addTemplate)
     }

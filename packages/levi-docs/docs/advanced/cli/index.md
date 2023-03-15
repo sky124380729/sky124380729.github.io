@@ -189,4 +189,5 @@ rl.question('your name:', (answer) => {
 <<< @/../../levi-cli/utils/lib/isDebug.js
 <<< @/../../levi-cli/utils/lib/log.js
 <<< @/../../levi-cli/utils/lib/npm.js
+<<< @/../../levi-cli/utils/lib/request.js
 :::
