@@ -39,6 +39,14 @@ function getAddTemplate(ADD_TEMPLATE) {
   })
 }
 
+// 选择所在团队
+function getAddTeam(teams) {
+  return makeList({
+    choices: teams.map((item) => ({ name: item, value: item })),
+    message: '请选择团队'
+  })
+}
+
 // 安装缓存目录
 function makeTargetPath() {
   return path.resolve(`${homedir()}/${TEMP_HOME}`, 'addTemplate')
@@ -48,7 +56,7 @@ function makeTargetPath() {
 async function getTemplateFromAPI() {
   try {
     const data = await request({
-      url: '/project/template',
+      url: 'v1/project',
       method: 'get'
     })
     log.verbose('template', data)
@@ -88,7 +96,12 @@ export default async function createTemplate(name, options) {
         throw new Error(`项目模板 ${template} 不存在`)
       }
     } else {
-      const addTemplate = await getAddTemplate(ADD_TEMPLATE)
+      // 获取团队信息
+      let teamList = ADD_TEMPLATE.map((_) => _.team)
+      teamList = [...new Set(teamList)]
+      const addTeam = await getAddTeam(teamList)
+      log.verbose('addTeam', addTeam)
+      const addTemplate = await getAddTemplate(ADD_TEMPLATE.filter((_) => _.team === addTeam))
       selectedTemplate = ADD_TEMPLATE.find((_) => _.value === addTemplate)
       log.verbose('addTemplate', addTemplate)
     }

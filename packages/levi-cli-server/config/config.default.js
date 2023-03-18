@@ -18,6 +18,18 @@ module.exports = appInfo => {
   // add your middleware config here
   config.middleware = [];
 
+  // 暂时关闭csrf
+  config.security = {
+    csrf: {
+      enable: false,
+    },
+  };
+
+  // 配置mongodb
+  config.mongoose = {
+    url: 'mongodb+srv://sky124380729:HRdXVESyfnvpvgLW@cluster0.skfldei.mongodb.net/cli',
+  };
+
   // add your user config here
   const userConfig = {
     // myAppName: 'egg',

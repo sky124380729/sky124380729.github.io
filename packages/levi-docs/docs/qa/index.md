@@ -371,3 +371,23 @@ npm i node-sass --sass_binary_site=https://npm.taobao.org/mirrors/node-sass/
 - 首先在包的项目中输入`npm link`
 - 然后在应用中输入`npm link levi-element`好像是相对路径
 - 然后在应用中的`package.json`依赖中加入`levi-element`,版本号随便写，为了方便测试的时候`import`得到
+
+## 使用MongoDB中遇到的问题
+
+- 选择线上[MongoDB](https://www.mongodb.com)
+- 使用`MongoDB-Compass`的时候连不上线上数据库
+
+1. 线上创建数据库的时候链接需要配置白名单 `0.0.0.0/0` 设置为任意IP可以访问
+2. 连接的时候需要填正确的用户名和密码（提前在云数据上创建好）
+
+- 连接上找不到对应的数据
+
+需要找到对应的`database`
+
+```
+mongodb+srv://<username>:<password>@cluster0.skfldei.mongodb.net/<database>
+```
+
+以上`<>`中的内容也要连同`<一起替换掉>`
+
+
