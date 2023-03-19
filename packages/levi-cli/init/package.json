@@ -10,8 +10,10 @@
   "dependencies": {
     "@levi-cli/command": "workspace:*",
     "@levi-cli/utils": "workspace:*",
+    "ejs": "^3.1.9",
     "execa": "^7.1.0",
     "fs-extra": "^10.0.0",
+    "glob": "^9.3.0",
     "ora": "^6.1.2",
     "path-exists": "^5.0.0"
   },

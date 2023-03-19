@@ -1,6 +1,8 @@
 import path from 'node:path'
 import fse from 'fs-extra'
 import ora from 'ora'
+import ejs from 'ejs'
+import glob from 'glob'
 import { pathExistsSync } from 'path-exists'
 import { log } from '@levi-cli/utils'
 
@@ -17,6 +19,27 @@ function copyFile(targetPath, template, installDir) {
   })
   spinner.stop()
   log.success('模板拷贝成功')
+}
+
+async function ejsRender(installDir, template, name) {
+  log.verbose('ejsRender', installDir, template)
+  const { ignore } = template
+  const ejsData = {
+    data: {
+      name // 项目名称
+    }
+  }
+  const files = await glob('**', { cwd: installDir, nodir: true, ignore: [...ignore, '**/node_modules/**'] })
+  files.forEach((file) => {
+    const filePath = path.join(installDir, file)
+    ejs.renderFile(filePath, ejsData, (err, result) => {
+      if (!err) {
+        fse.writeFileSync(filePath, result)
+      } else {
+        log.error(err)
+      }
+    })
+  })
 }
 
 export default function installTemplate(selectedTemplate, opts) {
@@ -40,4 +63,5 @@ export default function installTemplate(selectedTemplate, opts) {
     fse.ensureDirSync(installDir)
   }
   copyFile(targetPath, template, installDir)
+  ejsRender(installDir, template, name)
 }

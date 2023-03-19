@@ -155,6 +155,61 @@ rl.question('your name:', (answer) => {
 })
 ```
 
+## ejs使用
+
+```js
+const ejs = require('ejs')
+const path = require('path')
+
+const html = '<div><%= user.name %></div>'
+const options = {}
+const data = {
+  user: {
+    name: 'Levi'
+  }
+}
+const data2 = {
+  user: {
+    name: 'Levi2'
+  }
+}
+
+// 返回function，用于解析html中的ejs模板
+const template = ejs.compile(html, options)
+const compiledTemplate = template(data)
+const compiledTemplate2 = template(data2)
+console.log(compiledTemplate)
+console.log(compiledTemplate2)
+
+// 第二种方法，与第一种用法最大的区别在于模板是否需要重用
+// 如果需要重用，肯定是第一种用法效率高
+const renderedTemplate = ejs.render(html, data, options)
+console.log(renderedTemplate)
+
+// 第三种用法，引入外部文件
+// 注意这里文件不管是什么后缀，都当字符串来处理
+// 3.1 Promise
+const renderedFile = ejs.renderFile(path.resolve(__dirname, 'template.html'), data, options)
+renderedFile.then(file => console.log(file))
+// 3.2 callback
+js.renderFile(path.resolve(__dirname, 'template.html'), data, options, (err, file => {
+  console.log(file)
+}))
+```
+
+## glob使用
+
+```js
+const glob = require('glob')
+
+// 排除node_modules的js文件
+glob('**/*.js', {
+  ignore: ['node_modules/**', 'webpack.config.js']
+}, function(err, file) {
+  console.log(err, file)
+})
+```
+
 ## 基础脚手架实现
 
 <div class="filename">levi-cli/cli</div>
