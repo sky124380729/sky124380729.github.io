@@ -1,13 +1,18 @@
 import path from 'node:path'
+import os from 'node:os'
 import fse from 'fs-extra'
 import ora from 'ora'
 import ejs from 'ejs'
 import glob from 'glob'
 import { pathExistsSync } from 'path-exists'
-import { log } from '@levi-cli/utils'
+import { log, makeList, makeInput } from '@levi-cli/utils'
 
 function getCacheFilePath(targetPath, template) {
   return path.resolve(targetPath, 'node_modules', template.npmName, 'template')
+}
+
+function getPluginFilePath(targetPath, template) {
+  return path.resolve(targetPath, 'node_modules', template.npmName, 'plugins', 'index.js')
 }
 
 function copyFile(targetPath, template, installDir) {
@@ -21,12 +26,35 @@ function copyFile(targetPath, template, installDir) {
   log.success('模板拷贝成功')
 }
 
-async function ejsRender(installDir, template, name) {
+// window下将本地文件协议转成 file://
+function pathToFileURL(filePath) {
+  if (os.platform() === 'win32') {
+    const url = new URL('file:///')
+    url.pathname = path.resolve(filePath).replace(/\\/g, '/')
+    return url.toString()
+  } else {
+    return filePath
+  }
+}
+
+async function ejsRender(targetPath, installDir, template, name) {
   log.verbose('ejsRender', installDir, template)
   const { ignore } = template
+  // 执行插件
+  let data = {}
+  const pluginPath = getPluginFilePath(targetPath, template)
+  if (pathExistsSync(pluginPath)) {
+    const pluginFn = (await import(pathToFileURL(pluginPath))).default
+    const api = {
+      makeList,
+      makeInput
+    }
+    data = await pluginFn(api)
+  }
   const ejsData = {
     data: {
-      name // 项目名称
+      name, // 项目名称
+      ...data
     }
   }
   const files = await glob('**', { cwd: installDir, nodir: true, ignore: [...ignore, '**/node_modules/**'] })
@@ -42,7 +70,7 @@ async function ejsRender(installDir, template, name) {
   })
 }
 
-export default function installTemplate(selectedTemplate, opts) {
+export default async function installTemplate(selectedTemplate, opts) {
   const { force = false } = opts
   const { targetPath, name, template } = selectedTemplate
   const rootDir = process.cwd()
@@ -63,5 +91,5 @@ export default function installTemplate(selectedTemplate, opts) {
     fse.ensureDirSync(installDir)
   }
   copyFile(targetPath, template, installDir)
-  ejsRender(installDir, template, name)
+  await ejsRender(targetPath, installDir, template, name)
 }
