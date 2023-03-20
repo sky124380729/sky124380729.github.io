@@ -197,6 +197,44 @@ js.renderFile(path.resolve(__dirname, 'template.html'), data, options, (err, fil
 }))
 ```
 
+## ejs中关于模板的解析(ejs中最亮眼的算法部分)
+
+:::tip
+`<div><%= user.name %></div> ===> ['<div>', '<%=', ' user.name ', '%>', '<div>']`
+:::
+
+```js
+// parseTemplate
+
+function parseTemplateText() {
+
+  var str = this.templateText;
+    var pat = this.regex;
+    var result = pat.exec(str);
+    var arr = [];
+    var firstPos;
+
+    while (result) {
+      firstPos = result.index;
+
+      if (firstPos !== 0) {
+        arr.push(str.substring(0, firstPos));
+        str = str.slice(firstPos);
+      }
+
+      arr.push(result[0]);
+      str = str.slice(result[0].length);
+      result = pat.exec(str);
+    }
+
+    if (str) {
+      arr.push(str);
+    }
+
+    return arr;
+}
+```
+
 ## glob使用
 
 ```js
