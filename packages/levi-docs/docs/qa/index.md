@@ -45,6 +45,10 @@ pnpm config set registry https://registry.npmmirror.com/
 nvm node_mirror https://npmmirror.com/mirrors/node/
 ```
 
+## 使用SwitchHosts不生效
+
+关闭代理软件
+
 ## Windows10下更换Git用户名或密码
 
 - 打开`控制面板`
