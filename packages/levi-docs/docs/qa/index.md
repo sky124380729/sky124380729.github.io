@@ -45,7 +45,7 @@ pnpm config set registry https://registry.npmmirror.com/
 nvm node_mirror https://npmmirror.com/mirrors/node/
 ```
 
-## 使用SwitchHosts不生效
+## 使用SwitchHosts，开启之后不生效
 
 关闭代理软件
 
