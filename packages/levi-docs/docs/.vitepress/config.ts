@@ -6,6 +6,11 @@ export default defineConfig({
     ],
     lastUpdated: true,
     title: 'LEVI NOTEBOOK',
+    markdown:{
+      lineNumbers: true
+    },
+    // TODO: FOR MONOREPO
+    rewrites:{},
     themeConfig: {
       logo: '/logo.svg',
       editLink: {
