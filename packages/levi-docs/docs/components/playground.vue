@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { NDivider, NText, NButton, NSpace, NDrawer, NDrawerContent } from 'naive-ui'
+// import { NDivider, NText, NButton, NSpace, NDrawer, NDrawerContent } from 'naive-ui'
 import { dynamicImport } from '../utils'
 import Editor from './editor.vue'
 

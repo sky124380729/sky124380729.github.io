@@ -20,7 +20,7 @@ features:
 ---
 
 <script setup>
-import { NCarousel, NCarouselItem } from 'naive-ui'
+// import { NCarousel, NCarouselItem } from 'naive-ui'
 import { VPTeamMembers } from 'vitepress/theme'
 import { useRouter } from 'vitepress'
 import image0 from '/assets/wallpapers/w1.jpg'
