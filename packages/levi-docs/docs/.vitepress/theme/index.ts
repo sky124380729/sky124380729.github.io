@@ -1,5 +1,4 @@
 import DefaultTheme from 'vitepress/theme'
-import { install } from "naive-ui"
 import { onMounted } from 'vue'
 import mediumZoom from 'medium-zoom'
 import { Playground } from '../../components'
@@ -18,7 +17,6 @@ export default {
   },
   enhanceApp(ctx) {
     DefaultTheme.enhanceApp(ctx)
-    install(ctx.app)
     ctx.app.component('Playground', Playground)
   }
 }
