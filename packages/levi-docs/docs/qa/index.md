@@ -4,46 +4,63 @@
 
 ## Windows Powershell禁止运行脚本
 
-> 普通模式下
+::: code-group
 
-```sh
+```sh [普通模式]
 Start-Process powershell -Verb runAs
 set-ExecutionPolicy RemoteSigned
 Y
 ```
 
-> 管理员模式下
-
-```sh
+```sh [管理员模式]
 set-ExecutionPolicy RemoteSigned
 Y
 ```
 
+:::
+
+## git代理设置
+
+只针对部分网站的代理设置方法，以下是对`github.com`设置
+
+::: code-group
+
+```bash [set]
+git config --global http.https://github.com.proxy socks5://127.0.0.1:${port}
+```
+
+```bash [unset]
+git config --global --unset http.proxy
+```
+
+:::
+
+
+
 ## 镜像设置
 
-- `npm`镜像
+:::code-group
 
-```sh
+```sh [npm]
 npm config set registry https://registry.npmmirror.com/
 ```
 
-- `yarn`镜像
-
-```sh
+```sh [yarn]
 yarn config set registry https://registry.npmmirror.com/
 ```
 
-- `pnpm`镜像
-
-```sh
+```sh [pnpm]
 pnpm config set registry https://registry.npmmirror.com/
 ```
 
-- `nvm`镜像:
-
-```sh
+```sh [nvm]
+# node_mirror
 nvm node_mirror https://npmmirror.com/mirrors/node/
+# npm_mirror
+nvm npm_mirror https://npmmirror.com/mirrors/npm/
 ```
+
+:::
 
 ## 使用SwitchHosts，开启之后不生效
 
