@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    .wrapper {
+      width: 400px;
+      height: 400px;
+      position: relative;
+      display: block;
+      background-color: gray;
+      margin: 50px auto;
+    }
+
+    .wrapper::after {
+      position: absolute;
+      content: ' ';
+      display: block;
+      width: 1px;
+      height: 400px;
+      background-color: #fff;
+      top: 0;
+      left: 200px;
+    }
+
+    .wrapper::before {
+      position: absolute;
+      content: ' ';
+      display: block;
+      width: 400px;
+      height: 1px;
+      background-color: #fff;
+      top: 200px;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <canvas id="canvas" width="400" height="400">此浏览器不支持canvas</canvas>
+  </div>
+
+  <script src="./index.js"></script>
+  <script>
+    const canvas = document.getElementById('canvas')
+    const gl = canvas.getContext('webgl')
+
+    const VERTEX_SHADER_SOURCE = `
+      attribute vec4 aPosition;
+      attribute float aPointSize;
+      // 必须要存在 main 函数
+      void main() {
+        gl_Position = aPosition;
+        gl_PointSize = aPointSize;
+      }
+    `
+
+    const FRAGMENT_SHADER_SOURCE = `
+      void main() {
+        gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0);;
+      }
+    `
+    const program = initShader(gl, VERTEX_SHADER_SOURCE, FRAGMENT_SHADER_SOURCE)
+
+    // 获取attribute
+    const aPosition = gl.getAttribLocation(program, 'aPosition')
+    // 获取attribute
+    const aPointSize = gl.getAttribLocation(program, 'aPointSize')
+
+    // 创建顶点数据
+    // 在webgl中，需要处理大量的相同类型的数据，所以引入类型化数组，这样程序就可以预知到数组中的数据类型，提高性能
+    const points = new Float32Array([
+      // 前两个是位置信息，第三个是尺寸信息
+      -0.5, -0.5, 10.0,
+      0.5, -0.5, 20.0,
+      0.0, 0.5, 30.0
+    ])
+
+    // 创建内存区域
+    const buffer = gl.createBuffer()
+
+    // 缓存区对象绑定到webgl
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
+
+    // 向缓冲区写入数据，这里第三个参数也有多种类型可以使用
+    gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW)
+
+    // 每个数据的字节量
+    const BYTES = points.BYTES_PER_ELEMENT
+
+    /* 指定给attribute变量
+    参数1是location，表示变量的存储位置
+    参数2是size, 表示每个顶点所使用的数据个数
+    参数3是type, 表示数据格式
+    参数4是normalized, 表示数据是否归一化到[0,1],[-1, 1]这个区间
+    参数5是stride, 表示两个相邻顶点之间的字节数
+    参数6是offset, 表示偏移量 */
+    gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, BYTES * 3, 0)
+
+    gl.enableVertexAttribArray(aPosition)
+
+    gl.vertexAttribPointer(aPointSize, 1, gl.FLOAT, false, BYTES * 3, BYTES * 2)
+
+    gl.enableVertexAttribArray(aPointSize)
+
+
+    // 绘制，从第0个开始，绘制个点
+    gl.drawArrays(gl.POINTS, 0, 3)
+
+    // gl.drawArrays(gl.LINE_LOOP, 0, 3)
+
+    // 绘制三角形顶点数量要是3的倍数
+    gl.drawArrays(gl.TRIANGLES, 0, 3)
+  </script>
+</body>
+</html>
