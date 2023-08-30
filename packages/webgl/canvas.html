@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    .wrapper {
+      width: 400px;
+      height: 400px;
+      position: relative;
+      display: block;
+      background-color: gray;
+      margin: 50px auto;
+    }
+
+    .wrapper::after {
+      position: absolute;
+      content: ' ';
+      display: block;
+      width: 1px;
+      height: 400px;
+      background-color: #fff;
+      top: 0;
+      left: 200px;
+    }
+
+    .wrapper::before {
+      position: absolute;
+      content: ' ';
+      display: block;
+      width: 400px;
+      height: 1px;
+      background-color: #fff;
+      top: 200px;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <canvas id="canvas" width="400" height="400">此浏览器不支持canvas</canvas>
+  </div>
+
+  <script src="./index.js"></script>
+  <script>
+    const canvas = document.getElementById('canvas')
+    const gl = canvas.getContext('webgl')
+
+    // 着色器(要注意源码中的分号是必须的)
+    // 创建顶点着色器源码
+    const VERTEX_SHADER_SOURCE = `
+      // 声明一个变量，这个attribute只能在顶点着色器源码中使用
+      // uniform可以在顶点着色器中使用，但是不能传递顶点数据
+      attribute vec4 aPosition;
+      // 必须要存在 main 函数
+      void main() {
+        // 要绘制的点的坐标
+        // gl_Position = vec4(0.0, 0.0, 0.0, 1.0);
+        // 这里不给值得话默认值就是上面那个注释掉的代码 vec4(0.0, 0.0, 0.0, 1.0)
+        gl_Position = aPosition;
+        // 点的大小
+        gl_PointSize = 10.0;
+      }
+    `
+    // 创建片元着色器源码
+    // gl_Position 中的 vec4(0.0, 0.0, 0.0, 1.0)  x,y,z,w w是齐次坐标，相当于 (x/w,y/w,z/w)
+    // gl_FragColor 中的 vec4(1.0, 0.0, 0.0, 1.0) r,g,b,a
+    const FRAGMENT_SHADER_SOURCE = `
+      // 注意这里需要指定精度，精度有高精度，中等精度和低精度
+      precision mediump float;
+      // 声明一个变量，这里使用uniform
+      // uniform vec4 uColor;
+      uniform vec2 uColor;
+      void main() {
+        // gl_FragColor = uColor;
+        // 注意这里不像顶点着色器，不给默认值会报错，必须要有默认精度
+        gl_FragColor = vec4(uColor.r, uColor.g, 0.0, 1.0);;
+      }
+    `
+
+    const program = initShader(gl, VERTEX_SHADER_SOURCE, FRAGMENT_SHADER_SOURCE)
+
+    // 获取attribute
+    const aPosition = gl.getAttribLocation(program, 'aPosition')
+    /* 设置attribute，注意这里不能使用js的赋值方式，即 aPosition = 'xxx'
+    这里其实有多个函数可以使用
+    gl.vertexAttrib1f(location, v0)
+    gl.vertexAttrib2f(location, v0, v1)
+    gl.vertexAttrib3f(location, v0, v1, v2)
+    gl.vertexAttrib4f(location, v0, v1, v2, v3) */
+
+    // gl.vertexAttrib4f(aPosition, 0.5, 0.5, 0.0, 1.0)
+
+    // 获取uniform
+    const uColor = gl.getUniformLocation(program, 'uColor')
+
+    /* 设置uniform
+    这里和vertexAttrib用法稍微有点区别
+    声明uniform的时候用的是vec4，这里就要用uniform4f
+    声明uniform的时候用的是vec3，这里就要用uniform3f
+    声明uniform的时候用的是vec2，这里就要用uniform2f
+    声明uniform的时候用的是float，这里就要用uniform1f */
+
+    // gl.uniform4f(uColor, 1.0, 0.0, 0.0, 1.0)
+
+
+    // 执行绘制
+
+    // 要绘制的图形是什么，从哪开始，使用几个顶点
+    // gl.drawArrays(gl.POINTS, 0, 1)
+    // gl.drawArrays(gl.LINES, 0, 1) // 最少需要两个点
+    // gl.drawArrays(gl.TRIANGLES, 0, 1) // 最少需要三个点
+
+    let x = 0
+    let timer = setInterval(() => {
+      x += 0.1
+      if(x > 1.0) x = 0
+      // 修改位置信息
+      gl.vertexAttrib1f(aPosition, x)
+      // 注意每次修改完位置信息之后，需要执行重新绘制动作
+      gl.drawArrays(gl.POINTS, 0, 1)
+    }, 200)
+
+
+    // 添加点击事件
+
+    const points = []
+    canvas.onclick = function(ev) {
+      // 坐标
+      const x = ev.clientX
+      const y = ev.clientY
+      const domPosition = ev.target.getBoundingClientRect()
+      const domX = x - domPosition.left
+      const domY = y - domPosition.top
+      // 转换成webGL中的坐标系
+      const halfWidth = canvas.offsetWidth / 2
+      const halfHeight = canvas.offsetHeight / 2
+      const clickX = (domX - halfWidth) / halfWidth
+      const clickY = (halfHeight - domY) / halfHeight
+
+      clearInterval(timer)
+      points.push({ clickX, clickY })
+
+      for(let i = 0; i < points.length; i++) {
+        // 位置信息
+        gl.vertexAttrib2f(aPosition, points[i].clickX, points[i].clickY)
+        // 颜色信息
+        gl.uniform2f(uColor, points[i].clickX, points[i].clickY)
+        // 绘制
+        gl.drawArrays(gl.POINTS, 0, 1)
+      }
+
+    }
+
+
+  </script>
+</body>
+</html>
