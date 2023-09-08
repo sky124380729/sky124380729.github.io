@@ -20,3 +20,33 @@ function initShader(gl, VERTEX_SHADER_SOURCE, FRAGMENT_SHADER_SOURCE) {
 
   return program
 }
+
+// 平移矩阵
+function getTranslateMatrix(x = 0, y = 0, z = 0) {
+  return new Float32Array([
+    1.0, 0.0, 0.0, 0.0,
+    0.0, 1.0, 0.0, 0.0,
+    0.0, 0.0, 1.0, 0.0,
+    x, y, z, 1
+  ])
+}
+
+// 缩放矩阵
+function getScaleMatrix(x = 1, y = 1, z = 1) {
+  return new Float32Array([
+    x, 0.0, 0.0, 0.0,
+    0.0, y, 0.0, 0.0,
+    0.0, 0.0, z, 0.0,
+    0.0, 0.0, 0.0, 1
+  ])
+}
+
+// 绕z轴旋转矩阵
+function getRotateMatrix(deg) {
+  return new Float32Array([
+    Math.cos(deg), Math.sin(deg), 0.0, 0.0,
+    -Math.sin(deg), Math.cos(deg), 0.0, 0.0,
+    0.0, 0.0, 1.0, 0.0,
+    0.0, 0.0, 0.0, 1
+  ])
+}

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    .wrapper {
+      width: 400px;
+      height: 400px;
+      position: relative;
+      display: block;
+      background-color: gray;
+      margin: 50px auto;
+    }
+
+    .wrapper::after {
+      position: absolute;
+      content: ' ';
+      display: block;
+      width: 1px;
+      height: 400px;
+      background-color: #fff;
+      top: 0;
+      left: 200px;
+    }
+
+    .wrapper::before {
+      position: absolute;
+      content: ' ';
+      display: block;
+      width: 400px;
+      height: 1px;
+      background-color: #fff;
+      top: 200px;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <canvas id="canvas" width="400" height="400">此浏览器不支持canvas</canvas>
+  </div>
+
+  <script src="./index.js"></script>
+  <script>
+    const canvas = document.getElementById('canvas')
+    const gl = canvas.getContext('webgl')
+
+    const VERTEX_SHADER_SOURCE = `
+      attribute vec4 aPosition;
+      attribute float aTranslate;
+      void main() {
+        gl_Position = vec4(aPosition.x + aTranslate, aPosition.y, aPosition.z, 1.0);
+        gl_PointSize = 10.0;
+      }
+    `
+    const FRAGMENT_SHADER_SOURCE = `
+      void main() {
+        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);;
+      }
+    `
+
+    const program = initShader(gl, VERTEX_SHADER_SOURCE, FRAGMENT_SHADER_SOURCE)
+
+    const aPosition = gl.getAttribLocation(program, 'aPosition')
+
+    const aTranslate = gl.getAttribLocation(program, 'aTranslate')
+
+    const points = new Float32Array([
+      -0.5, -0.5,
+      0.5, -0.5,
+      0.0, 0.5,
+    ])
+
+    const buffer = gl.createBuffer()
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
+
+    gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW)
+
+    gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0)
+
+    gl.enableVertexAttribArray(aPosition)
+
+    let x = -1
+    setInterval(() => {
+      x += 0.01
+      if(x > 1) x = -1
+      // 修改位置信息
+      gl.vertexAttrib1f(aTranslate, x)
+      // 注意每次修改完位置信息之后，需要执行重新绘制动作
+      gl.drawArrays(gl.TRIANGLES, 0, 3)
+    }, 60)
+
+
+  </script>
+</body>
+</html>
