@@ -2,6 +2,54 @@
 
 [[toc]]
 
+## Git常用命令
+
+::: code-group
+
+```bash [回退reset]
+# 将head指向某个版本，并抛弃后续版本
+# 适用场景：如果想恢复到之前某个提交的版本，且那个版本之后提交的版本我们都不要了，就可以用这种方法。
+
+# 查看记录，获取id
+git log
+# 回退到某个节点
+git reset --hard xxx
+# 此时如果用“git push”会报错，因为我们本地库HEAD指向的版本比远程库的要旧
+# 注意如果是protected分支，要开启`Allowed to force push`
+git push -f
+```
+
+```bash [反做revert]
+# 修改其中某一次提交记录，后续的记录保持不变
+# 适用场景：如果我们想撤销之前的某一版本，但是又想保留该目标版本后面的版本，记录下这整个版本变动流程，就可以用这种方法。
+
+# 查看记录，获取id
+git log
+# 反做，使用“git revert -n 版本号”命令。如下命令，我们反做版本号为8b89621的版本，可能会有冲突，需要手动修复。而且要git add 文件名。
+git revert -n 8b89621019c9adc6fc4d242cd41daeb13aeb9861
+# 提交，使用“git commit -m 版本名”
+git commit -m 'revert: xxx'
+# 推送远程
+git push
+```
+
+```bash [文件/目录大小写不敏感解决mv]
+git mv oldName.txt newName.txt
+```
+
+```bash [切换origin]
+# 先重命名之前的源
+git remote rename origin old-origin
+# 添加新的源
+git remote add origin you_git_url
+# 推送所有分支到远程
+git push -u origin --all
+# 推送所有tag到远程
+git push -u origin --tags
+```
+
+:::
+
 ## Windows Powershell禁止运行脚本
 
 ::: code-group

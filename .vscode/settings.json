@@ -3,8 +3,8 @@
   "editor.detectIndentation": false,
   "editor.tabSize": 2,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true,
-    "source.fixAll.stylelint": true
+    "source.fixAll.eslint": "explicit",
+    "source.fixAll.stylelint": "explicit"
   },
   "editor.rulers": [80, 120],
   "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
