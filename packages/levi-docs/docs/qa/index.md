@@ -83,8 +83,6 @@ git config --global --unset http.proxy
 
 :::
 
-
-
 ## 镜像设置
 
 :::code-group
@@ -109,6 +107,22 @@ nvm npm_mirror https://npmmirror.com/mirrors/npm/
 ```
 
 :::
+
+## electron安装或者打包失败？
+
+- 安装依赖的时候使用`npm`
+
+- 增加以下配置文件
+
+  ::: code-group
+
+  ```.npmrc [.npmrc]
+  registry=https://registry.npmmirror.com
+  electron_mirror=https://npmmirror.com/mirrors/electron/
+  electron_builder_binaries_mirror=https://npmmirror.com/mirrors/electron-builder-binaries/
+  ```
+
+  :::
 
 ## 使用SwitchHosts，开启之后不生效
 
