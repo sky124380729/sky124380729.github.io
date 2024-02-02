@@ -57,7 +57,8 @@ const members = [
 
 const columns = [
   { title: '个人开源项目 levi-vue-admin', img: image2, link: 'https://levi-vue-admin.vercel.app/' },
-  { title: '关于微前端的理解与实践', img: image0, link: '/columns/micro-frontend/index' },
+  { title: '浅析微前端', img: image0, link: '/columns/micro-frontend/index' },
+  { title: '微前端框架(wujie)实战总结', img: image3, link: '/columns/wujie/index' },
   { title: '手撕Promise', img: image1, link: '/mini-code/promise' },
   { title: '关于KMP的理解', img: image2, link: '/algorithm/kmp' },
   { title: '前端性能优化', img: image3, link: '/columns/perform-optimize/index' }
