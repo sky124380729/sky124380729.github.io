@@ -2,7 +2,21 @@ import { defineConfig } from 'vitepress'
 
 export default defineConfig({
     head: [
-      ['link', { rel: 'shortcut icon', href: '/favicon.ico'} ],
+      [
+        'link', { rel: 'shortcut icon', href: '/favicon.ico'}
+      ],
+      [
+        'script', {}, `
+        // 百度流量统计
+        var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?bb6ad308cbbeaa342099abc91a8ee9cb";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+        `
+      ]
     ],
     lastUpdated: true,
     title: 'LEVI NOTEBOOK',

@@ -252,4 +252,34 @@ offset:function(b){return a(b)._offset()} // [!code ++]
 
 有一个`polyfill`方案，不知道是否可行，读者可以自行尝试[locationHref](https://wujie-polyfill.github.io/doc/plugins/locationHref.html)
 
-## 未完待续...
+## $.ajaxFileUpload 报错
+
+作为子应用被接入的时候，不规范的写法会导致主应用报错
+
+### 【解决方案】
+
+```js
+$.ajaxFileUpload({
+  url: sparePartUrl,
+  secureuri: false,
+  fileElementId: '', // [!code --]
+  fileElementId: 'file', // [!code ++]
+  dataType: 'JSON',
+  data: data,
+  success: function(res, status) {}
+})
+```
+
+## 加载子应用的时候页面白屏
+
+### 【原因分析】
+
+子应用中存在标签没有指定`type`，主应用在获取的时候会解析为`text`
+
+### 【解决方案】
+
+```js
+<script></script> // [!code --]
+
+<script type="text/javascript"></script> // [!code ++]
+```
