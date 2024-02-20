@@ -449,3 +449,65 @@ T extends U ? X : Y
     readonly effect: ReactiveEffect<T>
   }
   ```
+
+## 开发中的一些技巧
+
+### 对象属性互斥
+
+日常开发中我们可能遇到以下场景，一个对象的属性其中一个传了，另外一个就不能再传，比如一个表格的属性，传递了`column`就不能传`title`，
+这时候我们如何写呢
+
+- vue-router中routes的定义
+
+```ts
+
+type RouteRecordRaw = RouteRecordSingleView | RouteRecordMultipleViews
+
+export declare interface _RouteRecordBase extends PathParserOptions {
+    path: string;
+    redirect?: RouteRecordRedirectOption;
+    alias?: string | string[];
+    name?: RouteRecordName;
+    beforeEnter?: NavigationGuardWithThis<undefined> | NavigationGuardWithThis<undefined>[];
+    meta?: RouteMeta;
+    children?: RouteRecordRaw[];
+    props?: _RouteRecordProps | Record<string, _RouteRecordProps>;
+}
+
+export declare interface RouteRecordSingleView extends _RouteRecordBase {
+    component: RawRouteComponent;
+    components?: never;
+    children?: never;
+    redirect?: never;
+    props?: _RouteRecordProps;
+}
+
+export declare interface RouteRecordMultipleViews extends _RouteRecordBase {
+    components: Record<string, RawRouteComponent>;
+    component?: never;
+    children?: never;
+    redirect?: never;
+    props?: Record<string, _RouteRecordProps> | boolean;
+}
+```
+
+- 简易版本
+
+```typescript
+interface TypeA {
+    a: number
+    b?: never
+}
+
+interface TypeB {
+    a?: never
+    b: number
+}
+
+type Type = TypeA | TypeB
+
+const o: Type = {
+    a: 1,
+    b: 2
+}
+```

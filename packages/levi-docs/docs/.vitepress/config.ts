@@ -138,7 +138,8 @@ export default defineConfig({
           { text: 'Framework', link: '/advanced/framework' },
           { text: 'CLI', link: '/advanced/cli/index' },
           { text: 'Design Patterns', link: '/advanced/design-patterns' },
-          { text: 'Reg-Exp', link: '/advanced/reg-exp' }
+          { text: 'Reg-Exp', link: '/advanced/reg-exp' },
+          { text: 'Monorepo', link: '/advanced/monorepo' }
         ] },
         { text: 'Links', items: [
           { text: 'Projects', link: '/links/projects' },
