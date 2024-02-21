@@ -116,7 +116,7 @@ nvm npm_mirror https://npmmirror.com/mirrors/npm/
 
   ::: code-group
 
-  ```.npmrc [.npmrc]
+  ``` [.npmrc]
   registry=https://registry.npmmirror.com
   electron_mirror=https://npmmirror.com/mirrors/electron/
   electron_builder_binaries_mirror=https://npmmirror.com/mirrors/electron-builder-binaries/
